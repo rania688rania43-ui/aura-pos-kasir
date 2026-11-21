@@ -31,7 +31,6 @@ label{display:block;font-size:12px;font-weight:700;margin:9px 0 4px;color:#1e3a8
 <button type="button" class="tab" id="tKatalog">Parfum</button>
 <button type="button" class="tab" id="tAdmin">Setting</button>
 </div>
-
 <section id="secKasir">
 <div class="card">
 <label>Cari Nama Parfum</label><input id="searchParfum" placeholder="Ketik nama parfum (misal: Baccarat, Dior...)">
@@ -49,7 +48,6 @@ label{display:block;font-size:12px;font-weight:700;margin:9px 0 4px;color:#1e3a8
 <div class="line"><span id="itemFormula">Komposisi</span><strong id="itemSubtotal">Rp0</strong></div>
 <button type="button" class="btn secondary" id="addToCartBtn">+ Tambah ke Keranjang</button>
 </div>
-
 <div class="card">
 <div class="row"><div class="adminhead" style="margin:0">🛒 Keranjang Belanja (<span id="cartCount">0</span>)</div><button type="button" id="clearCartBtn" style="border:0;background:#fee2e2;color:#b91c1c;border-radius:8px;padding:5px 9px;font-size:12px;font-weight:700">Kosongkan</button></div>
 <div id="cartList" style="margin:8px 0"><p class="note">Keranjang masih kosong.</p></div>
@@ -83,7 +81,6 @@ label{display:block;font-size:12px;font-weight:700;margin:9px 0 4px;color:#1e3a8
 <div id="salesList"></div>
 </div>
 </section>
-
 <section id="secKatalog" class="hide">
 <div class="card">
 <div class="adminhead">Tambah Varian Parfum Baru</div>
@@ -98,7 +95,6 @@ label{display:block;font-size:12px;font-weight:700;margin:9px 0 4px;color:#1e3a8
 </div>
 </div>
 </section>
-
 <section id="secAdmin" class="hide">
 <div class="card" id="adminLock"><div class="adminhead">🔒 Pengaturan Toko — Password</div><label>Password Admin</label><input id="adminPasswordInput" type="password" placeholder="Masukkan password"><button type="button" class="btn" id="unlockAdmin">Buka Pengaturan</button></div>
 <div id="adminPanel" class="hide"><div class="card">
@@ -107,7 +103,6 @@ label{display:block;font-size:12px;font-weight:700;margin:9px 0 4px;color:#1e3a8
 <label>Alamat / Slogan Struk</label><input id="shopAddr" placeholder="Jl. Contoh No. 123 · Jakarta">
 <label>Link Google Sheets Closing (Web App URL)</label><input id="sheetWebhook" placeholder="https://google.com...">
 <button type="button" class="btn" id="saveProfileBtn">Simpan Profil & Link Online</button>
-
 <div class="admin-section"><div class="adminhead">Master Campuran</div><div class="grid"><div><label>Nama Campuran</label><input id="newMixName"></div><div><label>Harga / ml (Rp)</label><input id="newMixPrice" type="number" min="0"></div><div class="full"><button type="button" class="btn" id="addMix">Tambah Campuran</button></div></div><div id="mixList"></div></div>
 <div class="admin-section"><div class="adminhead">Master Kapasitas (ml)</div><div class="grid"><div class="full"><label>Ukuran (ml)</label><input id="newCapacitySize" type="number" min="1"></div><div class="full"><button type="button" class="btn" id="addCapacity">Tambah Kapasitas</button></div></div><div id="capacityList"></div></div>
 <div class="admin-section"><div class="adminhead">Master Botol / Kemasan</div><div class="grid"><div><label>Nama Botol</label><input id="newPurchaseName"></div><div><label>Harga (Rp)</label><input id="newPurchasePrice" type="number" min="0"></div><div class="full"><button type="button" class="btn" id="addPurchase">Tambah Botol</button></div></div><div id="purchaseList"></div></div>
@@ -118,19 +113,15 @@ label{display:block;font-size:12px;font-weight:700;margin:9px 0 4px;color:#1e3a8
 </section>
 </main>
 <div id="editModal" class="modal-bg hide"><div class="modal-box"><div class="adminhead" id="modalTitle">Edit</div><div id="modalFields"></div><div class="grid" style="margin-top:12px"><button type="button" class="btn secondary" id="modalCancel" style="margin:0">Batal</button><button type="button" class="btn" id="modalSave" style="margin:0">Simpan</button></div></div></div>
-<script>
+  <script>
 (function(){
 var defaultCaps=[];for(var sz=10;sz<=100;sz+=5)defaultCaps.push({size:sz});
 var def={
 shop:{name:"AURA INTERNATIONAL PERFUME",addr:"Wangi Khas Pilihanmu",webhook:""},
 perfumes:[
-{name:"Baccarat Rouge 540",price:3500},
-{name:"Dior Sauvage",price:3000},
-{name:"Creed Aventus",price:4500},
-{name:"Black Opium",price:3000},
-{name:"Scandalous",price:2500},
-{name:"Dunhill Blue",price:2500},
-{name:"Vanilla Lace",price:2000}
+{name:"Baccarat Rouge 540",price:3500},{name:"Dior Sauvage",price:3000},
+{name:"Creed Aventus",price:4500},{name:"Black Opium",price:3000},
+{name:"Scandalous",price:2500},{name:"Dunhill Blue",price:2500},{name:"Vanilla Lace",price:2000}
 ],
 mixes:[{name:"Ethanol Jerman",price:400},{name:"Ethanol Lokal",price:200},{name:"Alkohol",price:0}],
 capacities:defaultCaps,
@@ -185,14 +176,10 @@ knob.addEventListener("pointercancel",function(){dragging=false;});
 function calcCurrentItem(){
 var idx=+$("perfumeSelect").value;
 if(isNaN(idx)||!data.perfumes[idx]||!data.mixes.length||!data.capacities.length||!data.purchases.length){$("itemSubtotal").textContent="Rp0";return null;}
-var p=data.perfumes[idx];
-var m=data.mixes[+$("mixSelect").value||0];
-var c=data.capacities[+$("capacitySelect").value||0];
-var b=data.purchases[+$("purchaseSelect").value||0];
+var p=data.perfumes[idx],m=data.mixes[+$("mixSelect").value||0],c=data.capacities[+$("capacitySelect").value||0],b=data.purchases[+$("purchaseSelect").value||0];
 var pct=currentPct,vol=c.size,oil=vol*pct/100,sol=vol-oil;
 var raw=(oil*p.price)+(sol*m.price)+b.price;
 var step=Math.max(1,+data.rounding||1000),sub=Math.ceil(raw/step)*step;
-
 $("pctLabel").textContent=pct+"%";
 $("status").textContent=pct<=30?"NOT RECOMMENDED":"★ RECOMMENDED ★";
 $("status").className="status "+(pct<=30?"bad":"good");
@@ -200,149 +187,81 @@ $("itemFormula").textContent=oil.toFixed(1)+"ml bibit + "+sol.toFixed(1)+"ml "+m
 $("itemSubtotal").textContent=fmt(sub);
 return {parfum:p.name,hargaMl:p.price,campuran:m.name,vol:vol,pct:pct,oil:oil,sol:sol,botol:b.name,subtotal:sub};
 }
-
 function renderCart(){
 $("cartCount").textContent=cart.length;
-if(!cart.length){
-$("cartList").innerHTML='<p class="note">Keranjang masih kosong.</p>';
-$("cartTotal").textContent="Rp0";
-calcChange();return;
-}
+if(!cart.length){$("cartList").innerHTML='<p class="note">Keranjang masih kosong.</p>';$("cartTotal").textContent="Rp0";calcChange();return;}
 var total=0;
 $("cartList").innerHTML=cart.map(function(it,i){
 total+=it.subtotal;
 return '<div class="item"><div class="row"><div><strong>'+esc(it.parfum)+' ('+it.vol+'ml · '+it.pct+'%)</strong><div class="small">'+esc(it.campuran)+' · '+esc(it.botol)+'</div></div><div style="text-align:right"><strong>'+fmt(it.subtotal)+'</strong><div><button type="button" onclick="window._rmCart('+i+')" style="border:0;background:#fee2e2;color:#b91c1c;border-radius:6px;padding:3px 8px;font-size:11px;margin-top:3px">Hapus</button></div></div></div></div>';
 }).join("");
-$("cartTotal").textContent=fmt(total);
-calcChange();
+$("cartTotal").textContent=fmt(total);calcChange();
 }
 window._rmCart=function(i){cart.splice(i,1);renderCart();};
 
 function getCartTotal(){return cart.reduce(function(s,x){return s+x.subtotal;},0);}
 function calcChange(){
-var tot=getCartTotal(),paid=+$("cashPaid").value||0;
-var diff=paid-tot;
+var tot=getCartTotal(),paid=+$("cashPaid").value||0,diff=paid-tot;
 $("changeDue").textContent=diff>=0?fmt(diff):"Kurang "+fmt(Math.abs(diff));
 $("changeDue").style.color=diff>=0?"#16a34a":"#dc2626";
 }
-  function buildReceipt58(trx){
-var out="================================\n";
-out+="  "+(data.shop.name||"AURA POS").toUpperCase()+"\n";
+
+function buildReceipt58(trx){
+var out="================================\n  "+(data.shop.name||"AURA POS").toUpperCase()+"\n";
 if(data.shop.addr)out+="  "+data.shop.addr+"\n";
-out+="================================\n";
-out+="No   : "+trx.id+"\n";
-out+="Tgl  : "+trx.time+"\n";
-out+="Bayar: "+trx.method+"\n";
-out+="--------------------------------\n";
+out+="================================\nNo   : "+trx.id+"\nTgl  : "+trx.time+"\nBayar: "+trx.method+"\n--------------------------------\n";
 trx.items.forEach(function(it,idx){
-out+=(idx+1)+". "+it.parfum+" ("+it.vol+"ml)\n";
-out+="   "+it.pct+"% | "+it.campuran+" | "+it.botol+"\n";
-out+="   Subtotal: "+fmt(it.subtotal)+"\n";
+out+=(idx+1)+". "+it.parfum+" ("+it.vol+"ml)\n   "+it.pct+"% | "+it.campuran+" | "+it.botol+"\n   Subtotal: "+fmt(it.subtotal)+"\n";
 });
-out+="================================\n";
-out+="TOTAL   : "+fmt(trx.total)+"\n";
-if(trx.method==="Tunai"){
-out+="TUNAI   : "+fmt(trx.paid)+"\n";
-out+="KEMBALI : "+fmt(trx.change)+"\n";
-}
-out+="================================\n";
-out+="  Terima Kasih Atas Kunjungan   \n\n\n";
+out+="================================\nTOTAL   : "+fmt(trx.total)+"\n";
+if(trx.method==="Tunai")out+="TUNAI   : "+fmt(trx.paid)+"\nKEMBALI : "+fmt(trx.change)+"\n";
+out+="================================\n  Terima Kasih Atas Kunjungan   \n\n\n";
 return out;
 }
 
-function printRawBT(txt){
-var b64=btoa(unescape(encodeURIComponent(txt)));
-window.location.href="rawbt:base64,"+b64;
-}
+function printRawBT(txt){window.location.href="rawbt:base64,"+btoa(unescape(encodeURIComponent(txt)));}
 
-$("addToCartBtn").onclick=function(){
-var it=calcCurrentItem();if(!it)return;
-cart.push(it);renderCart();
-};
+$("addToCartBtn").onclick=function(){var it=calcCurrentItem();if(it){cart.push(it);renderCart();}};
 $("clearCartBtn").onclick=function(){cart=[];renderCart();};
 $("cashPaid").oninput=calcChange;
-$("payMethod").onchange=function(){
-if($("payMethod").value!=="Tunai"){$("cashPaid").value=getCartTotal();calcChange();}
-};
+$("payMethod").onchange=function(){if($("payMethod").value!=="Tunai"){$("cashPaid").value=getCartTotal();calcChange();}};
 
 $("checkoutBtn").onclick=function(){
 if(!cart.length){alert("Tambahkan parfum ke keranjang terlebih dahulu.");return;}
-var tot=getCartTotal(),method=$("payMethod").value;
-var paid=method==="Tunai"?(+$("cashPaid").value||0):tot;
+var tot=getCartTotal(),method=$("payMethod").value,paid=method==="Tunai"?(+$("cashPaid").value||0):tot;
 if(method==="Tunai"&&paid<tot){alert("Uang pembayaran kurang dari total tagihan.");return;}
-var now=new Date();
-var trx={
-id:"INV-"+now.getTime().toString().slice(-6),
-date:todayStr(),
-time:now.toLocaleString("id-ID",{dateStyle:"short",timeStyle:"short"}),
-items:clone(cart),
-total:tot,
-method:method,
-paid:paid,
-change:Math.max(0,paid-tot),
-synced:false
-};
-sales.unshift(trx);saveSales();
-cart=[];$("cashPaid").value="";renderCart();renderReport();
+var now=new Date(),trx={id:"INV-"+now.getTime().toString().slice(-6),date:todayStr(),time:now.toLocaleString("id-ID",{dateStyle:"short",timeStyle:"short"}),items:clone(cart),total:tot,method:method,paid:paid,change:Math.max(0,paid-tot),synced:false};
+sales.unshift(trx);saveSales();cart=[];$("cashPaid").value="";renderCart();renderReport();
 printRawBT(buildReceipt58(trx));
 };
 
 function renderReport(){
-var d=$("reportDate").value||todayStr();
-var list=sales.filter(function(s){return s.date===d;});
-var omzet=0,cash=0,nonCash=0,unsynced=0;
-list.forEach(function(s){
-omzet+=s.total;
-if(s.method==="Tunai")cash+=s.total;else nonCash+=s.total;
-if(!s.synced)unsynced++;
-});
-$("statOmzet").textContent=fmt(omzet);
-$("statCount").textContent=list.length+" Nota";
-$("statCash").textContent=fmt(cash);
-$("statNonCash").textContent=fmt(nonCash);
+var d=$("reportDate").value||todayStr(),list=sales.filter(function(s){return s.date===d;}),omzet=0,cash=0,nonCash=0,unsynced=0;
+list.forEach(function(s){omzet+=s.total;if(s.method==="Tunai")cash+=s.total;else nonCash+=s.total;if(!s.synced)unsynced++;});
+$("statOmzet").textContent=fmt(omzet);$("statCount").textContent=list.length+" Nota";$("statCash").textContent=fmt(cash);$("statNonCash").textContent=fmt(nonCash);
 $("syncStatusNote").textContent=unsynced>0?("Ada "+unsynced+" nota belum dikirim online. Tekan Closing saat tutup toko."):"Semua transaksi tanggal ini sudah tersinkronisasi.";
-
 $("salesList").innerHTML=list.map(function(s){
 var badge=s.synced?'<span class="badge ok">Terkirim Online</span>':'<span class="badge wait">Lokal (Offline)</span>';
 var summaryItems=s.items.map(function(i){return i.parfum+" "+i.vol+"ml";}).join(", ");
 return '<div class="item"><div class="row"><div><strong>'+s.id+' · '+fmt(s.total)+'</strong> '+badge+'<div class="small">'+s.time+' · '+s.method+'</div><div class="small">'+esc(summaryItems)+'</div></div><div class="item-actions"><button type="button" onclick="window._reprint(\''+s.id+'\')">Struk</button></div></div></div>';
 }).join("")||'<p class="note">Belum ada transaksi pada tanggal ini.</p>';
 }
-
-window._reprint=function(id){
-var trx=sales.find(function(s){return s.id===id;});
-if(trx)printRawBT(buildReceipt58(trx));
-};
-
-$("closingBtn").onclick=async function(){
-var d=$("reportDate").value||todayStr();
-var list=sales.filter(function(s){return s.date===d;});
+window._reprint=function(id){var trx=sales.find(function(s){return s.id===id;});if(trx)printRawBT(buildReceipt58(trx));};
+  $("closingBtn").onclick=async function(){
+var d=$("reportDate").value||todayStr(),list=sales.filter(function(s){return s.date===d;});
 if(!list.length){alert("Belum ada transaksi pada tanggal "+d+" untuk di-closing.");return;}
-if(!data.shop.webhook){
-alert("Link Google Sheets belum diisi di menu Setting. Data tetap tersimpan aman di HP dan bisa dikirim lewat tombol Kirim Rekap WA.");
-return;
-}
+if(!data.shop.webhook){alert("Link Google Sheets belum diisi di menu Setting. Data tetap tersimpan aman di HP.");return;}
 $("closingBtn").textContent="⏳ Mengirim data ke Google Sheets...";
 try{
-await fetch(data.shop.webhook,{
-method:"POST",
-mode:"no-cors",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({date:d,shop:data.shop.name,transactions:list})
-});
-list.forEach(function(s){s.synced=true;});
-saveSales();renderReport();
+await fetch(data.shop.webhook,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({date:d,shop:data.shop.name,transactions:list})});
+list.forEach(function(s){s.synced=true;});saveSales();renderReport();
 alert("✅ Closing Berhasil! Seluruh data penjualan tanggal "+d+" telah masuk ke Google Sheets Anda.");
-}catch(e){
-alert("Gagal terhubung ke internet. Coba tekan Closing lagi saat sinyal stabil.");
-}
+}catch(e){alert("Gagal terhubung ke internet. Coba tekan Closing lagi saat sinyal stabil.");}
 $("closingBtn").textContent="🔒 Closing Penjualan Hari Ini (Kirim Online)";
 };
 
 $("waReportBtn").onclick=function(){
-var d=$("reportDate").value||todayStr();
-var list=sales.filter(function(s){return s.date===d;});
-var omzet=0,cash=0,nonCash=0;
+var d=$("reportDate").value||todayStr(),list=sales.filter(function(s){return s.date===d;}),omzet=0,cash=0,nonCash=0;
 list.forEach(function(s){omzet+=s.total;if(s.method==="Tunai")cash+=s.total;else nonCash+=s.total;});
 var txt="LAPORAN CLOSING "+data.shop.name+"\nTanggal: "+d+"\nTotal Nota: "+list.length+"\nTunai: "+fmt(cash)+"\nQRIS/Transfer: "+fmt(nonCash)+"\nTOTAL OMZET: "+fmt(omzet);
 window.open("https://wa.me"+encodeURIComponent(txt),"_blank");
@@ -350,10 +269,7 @@ window.open("https://wa.me"+encodeURIComponent(txt),"_blank");
 
 $("exportSalesCsvBtn").onclick=function(){
 var rows=[["NO_NOTA","TANGGAL","WAKTU","METODE","DETAIL_ITEM","TOTAL"]];
-sales.forEach(function(s){
-var det=s.items.map(function(i){return i.parfum+" ("+i.vol+"ml "+i.pct+"% "+i.campuran+" "+i.botol+")";}).join(" | ");
-rows.push([s.id,s.date,s.time,s.method,det,s.total]);
-});
+sales.forEach(function(s){var det=s.items.map(function(i){return i.parfum+" ("+i.vol+"ml "+i.pct+"% "+i.campuran+" "+i.botol+")";}).join(" | ");rows.push([s.id,s.date,s.time,s.method,det,s.total]);});
 var csv="\uFEFF"+rows.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(",");}).join("\r\n");
 var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="Laporan_AuraPOS_"+todayStr()+".csv";a.click();
 };
@@ -365,40 +281,22 @@ $("modalSave").onclick=function(){if(act)act();$("editModal").classList.add("hid
 
 function listRender(k,id,filter){
 var q=(filter||"").toLowerCase().trim();
-$(id).innerHTML=data[k].map(function(x,i){return {x:x,i:i};}).filter(function(o){
-if(!q)return true;
-var lbl=k==="capacities"?String(o.x.size):o.x.name;
-return lbl.toLowerCase().indexOf(q)>=0;
-}).map(function(o){
-var x=o.x,i=o.i;
-var t=k==="capacities"?x.size+" ml":esc(x.name);
-var s=k==="capacities"?"Kapasitas botol":fmt(x.price)+(k==="perfumes"||k==="mixes"?"/ml":"");
+$(id).innerHTML=data[k].map(function(x,i){return {x:x,i:i};}).filter(function(o){if(!q)return true;var lbl=k==="capacities"?String(o.x.size):o.x.name;return lbl.toLowerCase().indexOf(q)>=0;}).map(function(o){
+var x=o.x,i=o.i,t=k==="capacities"?x.size+" ml":esc(x.name),s=k==="capacities"?"Kapasitas botol":fmt(x.price)+(k==="perfumes"||k==="mixes"?"/ml":"");
 return '<div class="item"><div class="row"><div><strong>'+t+'</strong><div class="small">'+s+'</div></div><div class="item-actions"><button type="button" onclick="window._ed(\''+k+'\','+i+')">Edit</button><button type="button" onclick="window._dl(\''+k+'\','+i+')" style="background:#fee2e2;color:#b91c1c">Hapus</button></div></div></div>';
 }).join("")||'<p class="note">Belum ada data.</p>';
 }
 
 window._ed=function(k,i){
 var item=data[k][i];
-if(k==="capacities"){
-modal("Edit Kapasitas",'<label>Ukuran (ml)</label><input id="mS" type="number" value="'+item.size+'">',function(){var v=+$("mS").value;if(v>0){data[k][i]={size:v};saveMaster();all();}});
-}else{
-modal("Edit Data",'<label>Nama</label><input id="mN" value="'+esc(item.name)+'"><label>Harga (Rp)</label><input id="mP" type="number" value="'+item.price+'">',function(){var n=$("mN").value.trim(),v=+$("mP").value;if(n&&v>=0){data[k][i]={name:n,price:v};saveMaster();all();}});
-}
+if(k==="capacities"){modal("Edit Kapasitas",'<label>Ukuran (ml)</label><input id="mS" type="number" value="'+item.size+'">',function(){var v=+$("mS").value;if(v>0){data[k][i]={size:v};saveMaster();all();}});}
+else{modal("Edit Data",'<label>Nama</label><input id="mN" value="'+esc(item.name)+'"><label>Harga (Rp)</label><input id="mP" type="number" value="'+item.price+'">',function(){var n=$("mN").value.trim(),v=+$("mP").value;if(n&&v>=0){data[k][i]={name:n,price:v};saveMaster();all();}});}
 };
-window._dl=function(k,i){
-modal("Hapus Data",'<p class="note" style="font-size:14px;color:#222">Hapus item ini?</p>',function(){data[k].splice(i,1);saveMaster();all();});
-};
+window._dl=function(k,i){modal("Hapus Data",'<p class="note" style="font-size:14px;color:#222">Hapus item ini?</p>',function(){data[k].splice(i,1);saveMaster();all();});};
 
 function all(){
-$("parfumTotalCount").textContent=data.perfumes.length;
-$("shopName").value=data.shop.name||"";
-$("shopAddr").value=data.shop.addr||"";
-$("sheetWebhook").value=data.shop.webhook||"";
-$("shopSub").textContent=data.shop.name||"AURA International Perfume";
-renderSelects();
-listRender("perfumes","perfumeList",$("filterKatalog").value);
-listRender("mixes","mixList");listRender("capacities","capacityList");listRender("purchases","purchaseList");
-$("rounding").value=data.rounding;
+$("parfumTotalCount").textContent=data.perfumes.length;$("shopName").value=data.shop.name||"";$("shopAddr").value=data.shop.addr||"";$("sheetWebhook").value=data.shop.webhook||"";$("shopSub").textContent=data.shop.name||"AURA International Perfume";
+renderSelects();listRender("perfumes","perfumeList",$("filterKatalog").value);listRender("mixes","mixList");listRender("capacities","capacityList");listRender("purchases","purchaseList");$("rounding").value=data.rounding;
 refreshKnob();calcCurrentItem();renderCart();renderReport();
 }
 
@@ -410,24 +308,22 @@ if(id==="tLaporan"){$("secLaporan").classList.remove("hide");$("tLaporan").class
 if(id==="tKatalog"){$("secKatalog").classList.remove("hide");$("tKatalog").classList.add("active");}
 if(id==="tAdmin"){$("secAdmin").classList.remove("hide");$("tAdmin").classList.add("active");}
 }
-$("tKasir").onclick=function(){setTab("tKasir");};
-$("tLaporan").onclick=function(){setTab("tLaporan");};
-$("tKatalog").onclick=function(){setTab("tKatalog");};
-$("tAdmin").onclick=function(){setTab("tAdmin");};
+$("tKasir").onclick=function(){setTab("tKasir");};$("tLaporan").onclick=function(){setTab("tLaporan");};$("tKatalog").onclick=function(){setTab("tKatalog");};$("tAdmin").onclick=function(){setTab("tAdmin");};
 
-$("searchParfum").oninput=function(){renderPerfumeOptions(this.value);};
-$("filterKatalog").oninput=function(){listRender("perfumes","perfumeList",this.value);};
+$("searchParfum").oninput=function(){renderPerfumeOptions(this.value);};$("filterKatalog").oninput=function(){listRender("perfumes","perfumeList",this.value);};
 ["perfumeSelect","mixSelect","capacitySelect","purchaseSelect"].forEach(function(id){$(id).onchange=calcCurrentItem;});
 $("reportDate").value=todayStr();$("reportDate").onchange=renderReport;
 
 $("addPerfume").onclick=function(){var n=$("newPerfumeName").value.trim(),v=+$("newPerfumePrice").value;if(!n||$("newPerfumePrice").value==="")return;data.perfumes.unshift({name:n,price:v});$("newPerfumeName").value="";$("newPerfumePrice").value="";saveMaster();all();};
 $("addMix").onclick=function(){var n=$("newMixName").value.trim(),v=+$("newMixPrice").value;if(!n||$("newMixPrice").value==="")return;data.mixes.push({name:n,price:v});$("newMixName").value="";$("newMixPrice").value="";saveMaster();all();};
 $("addCapacity").onclick=function(){var v=+$("newCapacitySize").value;if(v<=0)return;data.capacities.push({size:v});$("newCapacitySize").value="";saveMaster();all();};
-  $("addPurchase").onclick=function(){var n=$("newPurchaseName").value.trim(),v=+$("newPurchasePrice").value;if(!n||$("newPurchasePrice").value==="")return;data.purchases.push({name:n,price:v});$("newPurchaseName").value="";$("newPurchasePrice").value="";saveMaster();all();};
+$("addPurchase").onclick=function(){var n=$("newPurchaseName").value.trim(),v=+$("newPurchasePrice").value;if(!n||$("newPurchasePrice").value==="")return;data.purchases.push({name:n,price:v});$("newPurchaseName").value="";$("newPurchasePrice").value="";saveMaster();all();};
 $("saveProfileBtn").onclick=function(){data.shop={name:$("shopName").value.trim(),addr:$("shopAddr").value.trim(),webhook:$("sheetWebhook").value.trim()};saveMaster();all();alert("Profil & Link Google Sheets tersimpan!");};
 $("rounding").onchange=function(){data.rounding=Math.max(1,+$("rounding").value||1000);saveMaster();calcCurrentItem();};
-$("resetBtn").onclick=function(){modal("Reset",'Kembalikan data awal?',function(){data=clone(def);saveMaster();all();});};
+$("resetBtn").onclick=function(){modal("Reset",'<p class="note" style="font-size:14px;color:#222">Kembalikan data awal?</p>',function(){data=clone(def);saveMaster();all();});};
 $("unlockAdmin").onclick=function(){if($("adminPasswordInput").value===localStorage.getItem(PASS)){$("adminLock").classList.add("hide");$("adminPanel").classList.remove("hide");$("adminPasswordInput").value="";}};
 $("changePassBtn").onclick=function(){var n=$("newAdminPass").value.trim();if(n.length>=4){localStorage.setItem(PASS,n);$("newAdminPass").value="";alert("Password diganti!");}};
 all();
 })();
+</script>
+</body></html>
