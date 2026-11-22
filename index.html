@@ -73,7 +73,16 @@
 </div>
 <div class="line"><span id="itemFormula">Komposisi</span><strong id="itemSubtotal">Rp0</strong></div>
 <button type="button" class="btn secondary" id="addToCartBtn">+ Tambah ke Keranjang</button>
+  </div>
+<div class="card">
+<div class="row"><div class="adminhead" style="margin:0">🛒 Keranjang (<span id="cartCount">0</span>)</div><button type="button" id="clearCartBtn" style="border:0;background:#fee2e2;color:#b91c1c;border-radius:8px;padding:5px 9px;font-size:12px;font-weight:700">Kosongkan</button></div>
+<div id="cartList" style="margin:8px 0"><p class="note">Keranjang masih kosong.</p></div>
+<div class="line total"><span>TOTAL TAGIHAN</span><strong id="cartTotal">Rp0</strong></div>
+<div class="grid"><div><label>Metode Bayar</label><select id="payMethod"><option value="Tunai">Tunai (Cash)</option><option value="QRIS">QRIS</option><option value="Transfer">Transfer</option></select></div><div><label>Uang Diterima (Rp)</label><input id="cashPaid" type="number" min="0" placeholder="0"></div></div>
+<div class="line" style="margin-top:6px"><span>Kembalian</span><strong id="changeDue" style="color:var(--green);font-size:16px">Rp0</strong></div>
+<button type="button" class="btn" id="checkoutBtn">✅ Simpan & Cetak Struk 58mm</button>
 </div>
+</section>
 <section id="secLaporan" class="hide">
 <div class="card">
 <div class="row"><div class="adminhead" style="margin:0">📊 Laporan & Closing</div><input type="date" id="reportDate" style="width:auto;padding:6px 10px;font-size:13px"></div>
