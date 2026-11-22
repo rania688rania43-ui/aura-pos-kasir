@@ -162,6 +162,12 @@
 <div class="grid"><div><label>Pass Management</label><input id="mgmtPassInput" type="text"></div><div><label>Pass Owner</label><input id="ownerPassInput" type="text"></div><div class="full"><label>Pass Pengembang</label><input id="devPassInput" type="text"></div></div>
 <button type="button" class="btn" id="saveProfileBtn">Simpan Pengaturan & Password</button>
 <div class="admin-section"><div class="adminhead">📥 Import 437 Parfum dari CSV</div><input type="file" id="csvFileInput" accept=".csv,text/csv"></div>
+  <div class="admin-section">
+<div class="adminhead">💾 Backup & Restore Semua Pengaturan Master</div>
+<button type="button" class="btn secondary" id="exportMasterBtn">📤 Download Master (JSON)</button>
+<label style="margin-top:8px">📥 Upload Master (JSON)</label>
+<input type="file" id="importMasterInput" accept=".json,application/json">
+</div>
 <div class="admin-section"><div class="adminhead">Daftar 19 Outlet</div><div class="grid"><div><input id="newOutletName" placeholder="Outlet Baru"></div><div><button type="button" class="btn" id="addOutletBtn" style="margin:0">+ Tambah</button></div></div><div id="outletList" style="margin-top:8px"></div></div>
 <div class="admin-section"><div class="adminhead">Master Parfum</div><div class="grid"><div><label>Kode & Nama</label><input id="newPerfumeName"></div><div><label>Harga / ml</label><input id="newPerfumePrice" type="number"></div><div><label>Stok Awal</label><input id="newPerfumeStock" type="number" value="500"></div><div><label>Batas Order</label><input id="newPerfumeMin" type="number" value="50"></div><div class="full"><button type="button" class="btn" id="addPerfume">+ Tambah Parfum</button></div></div><input id="filterMasterParfum" placeholder="Cari parfum..." style="margin-top:8px"><div id="perfumeList"></div></div>
 <div class="admin-section"><div class="adminhead">Master Campuran</div><div class="grid"><div><label>Nama Campuran</label><input id="newMixName"></div><div><label>Harga / ml</label><input id="newMixPrice" type="number"></div><div class="full"><button type="button" class="btn" id="addMix">+ Tambah</button></div></div><div id="mixList"></div></div>
@@ -501,6 +507,39 @@ saveSales();if(session)renderGrafik();
 }
 }catch(e){}
 }
+  el("exportMasterBtn").onclick=function(){
+var jsonStr=JSON.stringify(data,null,2);
+var a=document.createElement("a");
+a.href=URL.createObjectURL(new Blob([jsonStr],{type:"application/json"}));
+a.download="Master_AuraPOS_19Outlet_"+todayStr()+".json";
+a.click();
+};
+
+el("importMasterInput").onchange=function(e){
+var file=e.target.files[0];
+if(!file)return;
+var reader=new FileReader();
+reader.onload=async function(ev){
+try{
+var parsed=JSON.parse(ev.target.result);
+if(parsed&&parsed.perfumes&&parsed.outlets){
+var keepHook=data.shop.webhook;
+data=parsed;
+if(!data.shop.webhook&&keepHook)data.shop.webhook=keepHook;
+saveMaster();
+renderLoginOutlets();
+all();
+await pushCloudMaster();
+alert("✅ Master berhasil di-upload & otomatis dikirim ke 19 Outlet!");
+}else{
+alert("Format file Master JSON tidak valid.");
+}
+}catch(err){
+alert("File gagal dibaca. Pastikan memilih file .json dari hasil Download Master.");
+}
+};
+reader.readAsText(file);
+};
 el("saveProfileBtn").onclick=async function(){data.shop={name:el("shopName").value.trim(),addr:el("shopAddr").value.trim(),webhook:el("sheetWebhook").value.trim(),mgmtPass:el("mgmtPassInput").value.trim()||"2222",ownerPass:el("ownerPassInput").value.trim()||"1234",devPass:el("devPassInput").value.trim()||"9999"};saveMaster();all();await pushCloudMaster();alert("✅ Tersimpan & Berhasil Dikirim ke Semua 19 Toko!");};
 el("rounding").onchange=function(){data.rounding=Math.max(1,+el("rounding").value||1000);saveMaster();calcCurrentItem();pushCloudMaster();};
 el("resetBtn").onclick=function(){modal("Reset",'<p class="note">Kembalikan data awal?</p>',function(){data=clone(def);saveMaster();all();pushCloudMaster();});};
