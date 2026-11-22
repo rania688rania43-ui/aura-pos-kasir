@@ -418,16 +418,39 @@ el("waReportBtn").onclick=function(){if(!session)return;var d=el("reportDate").v
 el("exportSalesCsvBtn").onclick=function(){var rows=[["OUTLET","NO_NOTA","TANGGAL","WAKTU","METODE","DETAIL_ITEM","TOTAL"]];sales.forEach(function(s){var det=s.items.map(function(i){return i.parfum+" ("+i.vol+"ml "+i.pct+"% "+i.campuran+" "+i.botol+")";}).join(" | ");rows.push([s.outlet,s.id,s.date,s.time,s.method,det,s.total]);});var csv="\uFEFF"+rows.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(",");}).join("\r\n");var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="Laporan_AuraPOS_"+todayStr()+".csv";a.click();};
 
 el("csvFileInput").onchange=function(e){var file=e.target.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(ev){var lines=ev.target.result.split(/\r?\n/),added=0;lines.forEach(function(ln){var cols=ln.split(",");if(cols.length>=6){var code=cols[2]?cols[2].trim():"",nm=cols[3]?cols[3].trim():"",pr=parseInt((cols[5]||"").replace(/\D/g,""),10);if(nm&&nm!=="PERFUME"&&pr>0){var fullName=code?(code+" - "+nm):nm;if(!data.perfumes.some(function(p){return p.name===fullName;})){data.perfumes.push({name:fullName,price:pr,min:50});added++;}}}});saveMaster();all();alert("✅ Berhasil mengimpor "+added+" varian parfum!");};reader.readAsText(file);};
-    var act=null;function modal(t,h,fn){el("modalTitle").textContent=t;el("modalFields").innerHTML=h;el("editModal").classList.remove("hide");act=fn;}el("modalCancel").onclick=function(){el("editModal").classList.add("hide");act=null;};el("modalSave").onclick=function(){if(act)act();el("editModal").classList.add("hide");act=null;};
-function listRender(k,id,filter){var q=(filter||"").toLowerCase().trim();el(id).innerHTML=data[k].map(function(x,i){return {x:x,i:i};}).filter(function(o){return !q||o.x.name.toLowerCase().indexOf(q)>=0;}).map(function(o){var x=o.x,i=o.i,s=fmt(x.price)+(k==="purchases"?"":"/ml")+(x.min?" · Min: "+x.min:"");return '<div class="item"><div class="row"><div><strong>'+esc(x.name)+'</strong><div class="small">'+s+'</div></div><div class="item-actions"><button type="button" onclick="window._ed(\''+k+'\','+i+')">Edit</button><button type="button" onclick="window._dl(\''+k+'\','+i+')" style="background:#fee2e2;color:#b91c1c">Hapus</button></div></div></div>';}).join("")||'<p class="note">Belum ada data.</p>';}
+    var act=null;
+function modal(t,h,fn){el("modalTitle").textContent=t;el("modalFields").innerHTML=h;el("editModal").classList.remove("hide");act=fn;}
+el("modalCancel").onclick=function(){el("editModal").classList.add("hide");act=null;};
+el("modalSave").onclick=function(){if(act)act();el("editModal").classList.add("hide");act=null;};
+
+function listRender(k,id,filter){
+var q=(filter||"").toLowerCase().trim();
+el(id).innerHTML=data[k].map(function(x,i){return {x:x,i:i};}).filter(function(o){return !q||o.x.name.toLowerCase().indexOf(q)>=0;}).map(function(o){
+var x=o.x,i=o.i,s=fmt(x.price)+(k==="purchases"?"":"/ml")+(x.min?" · Min: "+x.min:"");
+return '<div class="item"><div class="row"><div><strong>'+esc(x.name)+'</strong><div class="small">'+s+'</div></div><div class="item-actions"><button type="button" onclick="window._ed(\''+k+'\','+i+')">Edit</button><button type="button" onclick="window._dl(\''+k+'\','+i+')" style="background:#fee2e2;color:#b91c1c">Hapus</button></div></div></div>';
+}).join("")||'<p class="note">Belum ada data.</p>';
+}
 window._ed=function(k,i){var item=data[k][i];modal("Edit Data",'<label>Nama</label><input id="mN" value="'+esc(item.name)+'"><label>Harga (Rp)</label><input id="mP" type="number" value="'+item.price+'"><label>Batas Minim</label><input id="mM" type="number" value="'+(item.min||0)+'">',function(){var n=el("mN").value.trim(),v=+el("mP").value,m=+el("mM").value||0;if(n&&v>=0){data[k][i]={name:n,price:v,min:m};saveMaster();all();}});};
 window._dl=function(k,i){modal("Hapus Data",'<p class="note">Hapus item ini?</p>',function(){data[k].splice(i,1);saveMaster();all();});};
 function renderOutlets(){el("outletList").innerHTML=data.outlets.map(function(o,i){return '<div class="item"><div class="row"><strong>'+esc(o)+'</strong><div class="item-actions"><button type="button" onclick="window._edOut('+i+')">Ubah Nama</button></div></div></div>';}).join("");}
 window._edOut=function(i){modal("Ubah Nama Outlet",'<input id="mOut" value="'+esc(data.outlets[i])+'">',function(){var v=el("mOut").value.trim();if(v){data.outlets[i]=v;saveMaster();renderOutlets();renderLoginOutlets();}});};
+    function all(){
+el("shopName").value=data.shop.name||"";el("shopAddr").value=data.shop.addr||"";el("sheetWebhook").value=data.shop.webhook||"";
+el("mgmtPassInput").value=data.shop.mgmtPass||"2222";el("ownerPassInput").value=data.shop.ownerPass||"1234";el("devPassInput").value=data.shop.devPass||"9999";
+el("shopSub").textContent=data.shop.name||"AURA International Perfume";
+renderSelects();renderOutlets();renderOutletEmails();listRender("perfumes","perfumeList",el("filterMasterParfum").value);listRender("mixes","mixList");listRender("purchases","purchaseList");
+el("rounding").value=data.rounding;refreshKnob();calcCurrentItem();renderCart();renderLowStock();renderReport();renderStokAwal();renderStockInHistory();renderOwnerAudit();renderGrafik();
+}
 
-function all(){el("shopName").value=data.shop.name||"";el("shopAddr").value=data.shop.addr||"";el("sheetWebhook").value=data.shop.webhook||"";el("mgmtPassInput").value=data.shop.mgmtPass||"2222";el("ownerPassInput").value=data.shop.ownerPass||"1234";el("devPassInput").value=data.shop.devPass||"9999";el("shopSub").textContent=data.shop.name||"AURA International Perfume";renderSelects();renderOutlets();renderOutletEmails();listRender("perfumes","perfumeList",el("filterMasterParfum").value);listRender("mixes","mixList");listRender("purchases","purchaseList");el("rounding").value=data.rounding;refreshKnob();calcCurrentItem();renderCart();renderLowStock();renderReport();renderStokAwal();renderStockInHistory();renderOwnerAudit();renderGrafik();}
-function setTab(id){["secKasir","secLaporan","secOrder","secGrafik","secStokAwal","secStokMasuk","secAudit","secAkses","secAdmin"].forEach(function(s){el(s).classList.add("hide");});document.querySelectorAll("#navTabs .tab").forEach(function(t){t.classList.remove("active");});var map={tKasir:"secKasir",tLaporan:"secLaporan",tOrder:"secOrder",tGrafik:"secGrafik",tStokAwal:"secStokAwal",tStokMasuk:"secStokMasuk",tAudit:"secAudit",tAkses:"secAkses",tAdmin:"secAdmin"};if(el(map[id]))el(map[id]).classList.remove("hide");if(el(id))el(id).classList.add("active");if(id==="tKasir")refreshKnob();if(id==="tOrder")renderLowStock();if(id==="tLaporan")renderReport();if(id==="tGrafik")renderGrafik();if(id==="tStokAwal")renderStokAwal();if(id==="tStokMasuk")renderStockInHistory();if(id==="tAudit")renderOwnerAudit();}
+function setTab(id){
+["secKasir","secLaporan","secOrder","secGrafik","secStokAwal","secStokMasuk","secAudit","secAkses","secAdmin"].forEach(function(s){el(s).classList.add("hide");});
+document.querySelectorAll("#navTabs .tab").forEach(function(t){t.classList.remove("active");});
+var map={tKasir:"secKasir",tLaporan:"secLaporan",tOrder:"secOrder",tGrafik:"secGrafik",tStokAwal:"secStokAwal",tStokMasuk:"secStokMasuk",tAudit:"secAudit",tAkses:"secAkses",tAdmin:"secAdmin"};
+if(el(map[id]))el(map[id]).classList.remove("hide");if(el(id))el(id).classList.add("active");
+if(id==="tKasir")refreshKnob();if(id==="tOrder")renderLowStock();if(id==="tLaporan")renderReport();if(id==="tGrafik")renderGrafik();if(id==="tStokAwal")renderStokAwal();if(id==="tStokMasuk")renderStockInHistory();if(id==="tAudit")renderOwnerAudit();
+}
 ["tKasir","tLaporan","tOrder","tGrafik","tStokAwal","tStokMasuk","tAudit","tAkses","tAdmin"].forEach(function(id){el(id).onclick=function(){setTab(id);};});
+
 el("searchParfum").oninput=function(){renderPerfumeOptions(this.value);};el("filterStokAwal").oninput=renderStokAwal;el("filterAudit").oninput=renderOwnerAudit;el("filterMasterParfum").oninput=function(){listRender("perfumes","perfumeList",this.value);};
 ["perfumeSelect","mixSelect","capacitySelect","purchaseSelect"].forEach(function(id){el(id).onchange=calcCurrentItem;});el("reportDate").value=todayStr();el("auditDateInput").value=todayStr();el("reportDate").onchange=renderReport;
 el("addOutletBtn").onclick=function(){var n=el("newOutletName").value.trim();if(n){data.outlets.push(n);el("newOutletName").value="";saveMaster();all();}};
