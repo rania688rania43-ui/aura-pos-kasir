@@ -161,7 +161,8 @@
 <label>Nama Brand / Toko</label><input id="shopName"><label>Slogan / Alamat Kop Struk</label><input id="shopAddr"><label>Link Google Sheets Closing</label><input id="sheetWebhook" placeholder="https://script.google.com/macros/s/...">
 <div class="grid"><div><label>Pass Management</label><input id="mgmtPassInput" type="text"></div><div><label>Pass Owner</label><input id="ownerPassInput" type="text"></div><div class="full"><label>Pass Pengembang</label><input id="devPassInput" type="text"></div></div>
 <button type="button" class="btn" id="saveProfileBtn">Simpan Pengaturan & Password</button>
-<div class="admin-section"><div class="adminhead">📥 Import 437 Parfum dari CSV</div><input type="file" id="csvFileInput" accept=".csv,text/csv"></div>
+<div class="admin-section"><div class="adminhead">📥 Import 437 Parfum dari CSV</div><button type="button" class="btn secondary" id="dlSampleCsvBtn" style="margin-bottom:8px">📄 Download Contoh Template CSV Parfum</button>
+<input type="file" id="csvFileInput" accept=".csv,text/csv"></div>
   <div class="admin-section">
 <div class="adminhead">💾 Backup & Restore Semua Pengaturan Master</div>
 <button type="button" class="btn secondary" id="exportMasterBtn">📤 Download Master (JSON)</button>
@@ -443,7 +444,48 @@ el("waReportBtn").onclick=function(){if(!session)return;var d=el("reportDate").v
 
 el("exportSalesCsvBtn").onclick=function(){var rows=[["OUTLET","NO_NOTA","TANGGAL","WAKTU","METODE","DETAIL_ITEM","TOTAL"]];sales.forEach(function(s){var det=s.items.map(function(i){return i.parfum+" ("+i.vol+"ml "+i.pct+"% "+i.campuran+" "+i.botol+")";}).join(" | ");rows.push([s.outlet,s.id,s.date,s.time,s.method,det,s.total]);});var csv="\uFEFF"+rows.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(",");}).join("\r\n");var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="Laporan_AuraPOS_"+todayStr()+".csv";a.click();};
 
-el("csvFileInput").onchange=function(e){var file=e.target.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(ev){var lines=ev.target.result.split(/\r?\n/),added=0;lines.forEach(function(ln){var cols=ln.split(",");if(cols.length>=6){var code=cols[2]?cols[2].trim():"",nm=cols[3]?cols[3].trim():"",pr=parseInt((cols[5]||"").replace(/\D/g,""),10);if(nm&&nm!=="PERFUME"&&pr>0){var fullName=code?(code+" - "+nm):nm;if(!data.perfumes.some(function(p){return p.name===fullName;})){data.perfumes.push({name:fullName,price:pr,min:50});added++;}}}});saveMaster();all();alert("✅ Berhasil mengimpor "+added+" varian parfum!");};reader.readAsText(file);};
+el("dlSampleCsvBtn").onclick=function(){
+var rows=[
+["KODE","NAMA_PARFUM","HARGA_PER_ML","BATAS_MINIM_ML"],
+["9110","Baccarot",3200,50],
+["1407","Cristian Dior - Sauvage",2800,50],
+["801","Bvlgari - Aqua For Man A",4700,50]
+];
+var csv="\uFEFF"+rows.map(function(r){return r.join(",");}).join("\r\n");
+var a=document.createElement("a");
+a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+a.download="Template_Import_Parfum_AURA.csv";
+a.click();
+};
+
+el("csvFileInput").onchange=function(e){
+var file=e.target.files[0];
+if(!file)return;
+var reader=new FileReader();
+reader.onload=async function(ev){
+var lines=ev.target.result.split(/\r?\n/),added=0,updated=0;
+lines.forEach(function(ln,idx){
+if(!ln.trim()||idx===0)return;
+var sep=ln.indexOf(";")>=0?";":",";
+var cols=ln.split(sep).map(function(c){return c.trim().replace(/^"|"$/g,"");});
+var code="",nm="",pr=0,mn=50;
+if(cols.length>=6){
+code=cols[0]||"";nm=cols[1]||"";pr=parseInt((cols[5]||"").replace(/\D/g,""),10);
+}else if(cols.length>=3){
+code=cols[0]||"";nm=cols[1]||"";pr=parseInt((cols[2]||"").replace(/\D/g,""),10);mn=parseInt((cols[3]||"50").replace(/\D/g,""),10)||50;
+}
+if(nm&&nm.toUpperCase()!=="PERFUME"&&nm.toUpperCase()!=="NAMA_PARFUM"&&pr>0){
+var fullName=code?(code+" - "+nm):nm;
+var exist=data.perfumes.find(function(p){return p.name===fullName;});
+if(exist){exist.price=pr;exist.min=mn;updated++;}
+else{data.perfumes.push({name:fullName,price:pr,min:mn});added++;}
+}
+});
+saveMaster();all();await pushCloudMaster();
+alert("✅ Selesai! "+added+" parfum baru ditambahkan, "+updated+" harga diperbarui & dikirim ke 19 Outlet!");
+};
+reader.readAsText(file);
+};
     var act=null;
 function modal(t,h,fn){el("modalTitle").textContent=t;el("modalFields").innerHTML=h;el("editModal").classList.remove("hide");act=fn;}
 el("modalCancel").onclick=function(){el("editModal").classList.add("hide");act=null;};
