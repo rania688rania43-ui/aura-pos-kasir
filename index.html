@@ -178,7 +178,7 @@
 var defaultOutlets=[];for(var o=1;o<=19;o++)defaultOutlets.push("Outlet "+String(o).padStart(2,"0"));
 var defaultCaps=[];for(var sz=10;sz<=100;sz+=5)defaultCaps.push({size:sz});
 var def={
-shop:{name:"AURA INTERNATIONAL PERFUME",addr:"Wangi Khas Pilihanmu",webhook:"",mgmtPass:"2222",ownerPass:"1234",devPass:"9999"},
+shop:{name:"AURA INTERNATIONAL PERFUME",addr:"Wangi Khas Pilihanmu",webhook:"https://script.google.com/macros/s/AKfycbw9R9Sf-DtOelDtlqWMDNARXT7-QNRCH8oMMAqBUSRpDxrHPB1KfD612sThQ6cnYQuV/exec",mgmtPass:"2222",ownerPass:"1234",devPass:"9999"},
 outlets:defaultOutlets,
 outletEmails:{},
 perfumes:[
@@ -477,10 +477,34 @@ el("addOutletBtn").onclick=function(){var n=el("newOutletName").value.trim();if(
 el("addPerfume").onclick=function(){var n=el("newPerfumeName").value.trim(),v=+el("newPerfumePrice").value,st=+el("newPerfumeStock").value||0,mn=+el("newPerfumeMin").value||50;if(!n)return;data.perfumes.unshift({name:n,price:v,min:mn});if(session){ensureOutletStock(session.outlet);stocks[session.outlet].initial.perfumes[n]=st;stocks[session.outlet].current.perfumes[n]=st;saveStocks();}el("newPerfumeName").value="";el("newPerfumePrice").value="";saveMaster();all();};
 el("addMix").onclick=function(){var n=el("newMixName").value.trim(),v=+el("newMixPrice").value;if(!n)return;data.mixes.push({name:n,price:v,min:200});el("newMixName").value="";el("newMixPrice").value="";saveMaster();all();};
 el("addPurchase").onclick=function(){var n=el("newPurchaseName").value.trim(),v=+el("newPurchasePrice").value;if(!n)return;data.purchases.push({name:n,price:v,min:10});el("newPurchaseName").value="";el("newPurchasePrice").value="";saveMaster();all();};
-el("saveProfileBtn").onclick=function(){data.shop={name:el("shopName").value.trim(),addr:el("shopAddr").value.trim(),webhook:el("sheetWebhook").value.trim(),mgmtPass:el("mgmtPassInput").value.trim()||"2222",ownerPass:el("ownerPassInput").value.trim()||"1234",devPass:el("devPassInput").value.trim()||"9999"};saveMaster();all();alert("Pengaturan 4 Role & Pusat tersimpan!");};
-el("rounding").onchange=function(){data.rounding=Math.max(1,+el("rounding").value||1000);saveMaster();calcCurrentItem();};
-el("resetBtn").onclick=function(){modal("Reset",'<p class="note">Kembalikan data awal?</p>',function(){data=clone(def);saveMaster();all();});};
-renderLoginOutlets();
+async function pushCloudMaster(){
+if(!data.shop.webhook)return;
+try{await fetch(data.shop.webhook,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"SYNC_MASTER",masterData:data})});}catch(e){}
+}
+async function pullCloudData(){
+if(!data.shop.webhook)return;
+try{
+var res=await fetch(data.shop.webhook);
+var j=await res.json();
+if(j&&j.master&&j.master.perfumes){
+var keepHook=data.shop.webhook;
+data=j.master;if(!data.shop.webhook)data.shop.webhook=keepHook;
+saveMaster();renderLoginOutlets();if(session)all();
+}
+if(j&&Array.isArray(j.sales)&&j.sales.length){
+j.sales.forEach(function(cs){
+if(cs.id&&!sales.some(function(ls){return ls.id===cs.id;})){
+sales.push({outlet:cs.outlet,id:cs.id,date:String(cs.date).slice(0,10),time:cs.time,method:cs.method,items:[{parfum:cs.summary,vol:0,pct:0,campuran:"",botol:"",subtotal:cs.total}],total:cs.total,synced:true});
+}
+});
+saveSales();if(session)renderGrafik();
+}
+}catch(e){}
+}
+el("saveProfileBtn").onclick=async function(){data.shop={name:el("shopName").value.trim(),addr:el("shopAddr").value.trim(),webhook:el("sheetWebhook").value.trim(),mgmtPass:el("mgmtPassInput").value.trim()||"2222",ownerPass:el("ownerPassInput").value.trim()||"1234",devPass:el("devPassInput").value.trim()||"9999"};saveMaster();all();await pushCloudMaster();alert("✅ Tersimpan & Berhasil Dikirim ke Semua 19 Toko!");};
+el("rounding").onchange=function(){data.rounding=Math.max(1,+el("rounding").value||1000);saveMaster();calcCurrentItem();pushCloudMaster();};
+el("resetBtn").onclick=function(){modal("Reset",'<p class="note">Kembalikan data awal?</p>',function(){data=clone(def);saveMaster();all();pushCloudMaster();});};
+renderLoginOutlets();pullCloudData();
 })();
 </script>
 </body></html>
