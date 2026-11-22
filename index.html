@@ -55,7 +55,7 @@
 <button type="button" class="tab role-staff role-dev" id="tOrder">Order <span id="orderBadgeCount" class="badge alert hide">0</span></button>
 <button type="button" class="tab role-mgmt role-owner role-dev hide" id="tGrafik">Grafik & Omzet</button>
 <button type="button" class="tab role-dev hide" id="tStokAwal">Stok Awal</button>
-<button type="button" class="tab role-dev hide" id="tStokMasuk">Stok Masuk</button>
+<button type="button" class="tab role-staff role-dev hide" id="tStokMasuk">Stok Masuk</button>
 <button type="button" class="tab role-dev hide" id="tAudit">Stok Aktual</button>
 <button type="button" class="tab role-dev hide" id="tAkses">Akses Email</button>
 <button type="button" class="tab role-dev hide" id="tAdmin">Master</button>
@@ -342,7 +342,7 @@ var tot=getCartTotal(),method=el("payMethod").value,paid=method==="Tunai"?(+el("
 if(method==="Tunai"&&paid<tot){alert("Uang pembayaran kurang dari total tagihan.");return;}
 var out=session.outlet;ensureOutletStock(out);var cur=stocks[out].current;
 cart.forEach(function(it){
-cur.perfumes[it.parfum]=Math.max(0,(cur.perfumes[it.parfum]||0)-it.oil);
+cur.perfumes[it.parfum]=Math.max(0,(cur.perfumes[it.parfum]||0)-(it.oil*1.025));
 cur.mixes[it.campuran]=Math.max(0,(cur.mixes[it.campuran]||0)-it.sol);
 var bObj=data.purchases.find(function(x){return x.name===it.botol;});
 if(bObj&&bObj.price>0)cur.purchases[it.botol]=Math.max(0,(cur.purchases[it.botol]||0)-1);
@@ -399,7 +399,21 @@ reader.readAsText(file);
 };
    function renderStockInItems(){var cat=el("inCatSelect").value;el("inItemSelect").innerHTML=data[cat].map(function(x){return '<option value="'+esc(x.name)+'">'+esc(x.name)+'</option>';}).join("");}
 el("inCatSelect").onchange=renderStockInItems;
-el("saveStockInBtn").onclick=function(){if(!session)return;var cat=el("inCatSelect").value,name=el("inItemSelect").value,qty=+el("inQtyInput").value||0,cost=+el("inCostInput").value||0,note=el("inNoteInput").value.trim()||"Stok Masuk";if(qty<=0){alert("Masukkan jumlah stok masuk.");return;}ensureOutletStock(session.outlet);stocks[session.outlet].current[cat][name]=(stocks[session.outlet].current[cat][name]||0)+qty;saveStocks();stockIns.unshift({outlet:session.outlet,date:todayStr(),time:new Date().toLocaleString("id-ID",{dateStyle:"short",timeStyle:"short"}),cat:cat,name:name,qty:qty,cost:cost,note:note});saveStockIns();el("inQtyInput").value="";el("inCostInput").value="";el("inNoteInput").value="";all();alert("✅ Stok masuk berhasil ditambahkan!");};
+el("saveStockInBtn").onclick=function(){
+if(!session)return;
+var cat=el("inCatSelect").value,name=el("inItemSelect").value,qty=+el("inQtyInput").value||0,cost=+el("inCostInput").value||0,note=el("inNoteInput").value.trim()||"Stok Masuk";
+if(qty<=0){alert("Masukkan jumlah stok masuk.");return;}
+ensureOutletStock(session.outlet);
+var netQty=(cat==="perfumes")?(qty*0.975):qty;
+var finalNote=(cat==="perfumes")?(note+" (Masuk "+qty+"ml - Susut 2,5%)"):note;
+stocks[session.outlet].current[cat][name]=(stocks[session.outlet].current[cat][name]||0)+netQty;
+saveStocks();
+stockIns.unshift({outlet:session.outlet,date:todayStr(),time:new Date().toLocaleString("id-ID",{dateStyle:"short",timeStyle:"short"}),cat:cat,name:name,qty:+netQty.toFixed(1),cost:cost,note:finalNote});
+saveStockIns();
+el("inQtyInput").value="";el("inCostInput").value="";el("inNoteInput").value="";
+all();
+alert("✅ Stok masuk berhasil disimpan! Netto bertambah: "+netQty.toFixed(1)+(cat==="purchases"?" pcs":" ml"));
+};
 function renderStockInHistory(){if(!session)return;var list=stockIns.filter(function(x){return x.outlet===session.outlet;}).slice(0,25);el("stockInHistoryList").innerHTML=list.map(function(x){var unit=x.cat==="purchases"?"pcs":"ml";return '<div class="item"><div class="row"><div><strong>+'+x.qty+' '+unit+' · '+esc(x.name)+'</strong><div class="small">'+x.time+' · '+esc(x.note)+'</div></div><strong>'+fmt(x.cost||0)+'</strong></div></div>';}).join("")||'<p class="note">Belum ada riwayat stok masuk.</p>';}
 
 function renderOwnerAudit(){if(!session)return;var out=session.outlet,q=(el("filterAudit").value||"").toLowerCase().trim();ensureOutletStock(out);var cur=stocks[out].current,rows=[];data.perfumes.forEach(function(p){rows.push({cat:"perfumes",name:p.name,qty:cur.perfumes[p.name]||0,min:p.min||50,unit:"ml"});});data.mixes.forEach(function(m){rows.push({cat:"mixes",name:m.name,qty:cur.mixes[m.name]||0,min:m.min||200,unit:"ml"});});data.purchases.forEach(function(b){if(b.price>0)rows.push({cat:"purchases",name:b.name,qty:cur.purchases[b.name]||0,min:b.min||10,unit:"pcs"});});el("ownerStockList").innerHTML=rows.filter(function(r){return !q||r.name.toLowerCase().indexOf(q)>=0;}).map(function(r){var st=r.qty<=r.min?'<span class="badge alert">Minim</span>':'<span class="badge ok">Aman</span>';return '<div class="item"><div class="row"><div><strong>'+esc(r.name)+'</strong> '+st+'<div class="small">Sistem: <strong>'+r.qty.toFixed(1)+' '+r.unit+'</strong></div></div><div class="item-actions"><button type="button" onclick="window._auditItem(\''+r.cat+'\',\''+esc(r.name)+'\',\''+r.unit+'\')">Set Aktual</button></div></div></div>';}).join("");}
