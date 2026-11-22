@@ -144,6 +144,18 @@
 </div>
 <div class="card"><div class="adminhead">Riwayat Stok Masuk Outlet Ini</div><div id="stockInHistoryList"></div></div>
 </section>
+  <section id="secAudit" class="hide">
+<div class="card">
+<div class="adminhead">🛡️ Cek Stok Aktual & Tutup Tahun</div>
+<p class="note">Input hasil hitung fisik aktual. Angka aktual otomatis menjadi <strong>Stok Awal baru</strong> pada tanggal cek.</p>
+<label>Tanggal Cek Stok Aktual</label><input type="date" id="auditDateInput">
+<input id="filterAudit" placeholder="Cari parfum / botol..." style="margin-top:8px"><div id="ownerStockList" style="margin-top:8px"></div>
+<div class="admin-section"><div class="adminhead">📆 Tutup Buku Akhir Tahun</div><button type="button" class="btn secondary" id="rolloverYearBtn">🔄 Pindahkan ke Stok Awal Tahun Baru</button></div>
+</div>
+</section>
+<section id="secAkses" class="hide">
+<div class="card"><div class="adminhead">✉️ Pengaturan Email Karyawan per Outlet</div><p class="note">Kosong = bebas masuk. Diisi email = hanya email tersebut yang bisa masuk.</p><div id="outletEmailList"></div></div>
+</section>
 <section id="secAdmin" class="hide">
 <div class="card">
 <div class="adminhead">🛠️ Panel Pengembang & Master Data</div>
