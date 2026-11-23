@@ -615,7 +615,7 @@ delReqs.unshift(reqObj);saveReqs();all();await pushCloudReqs();
 var waNum=(data.shop.devWa||"").replace(/\D/g,"");
 if(waNum){
 var waTxt="🔔 PENGAJUAN HAPUS DATA - AURA POS\nOutlet: "+session.outlet+"\nData: "+desc+"\nTanggal: "+tgl+"\nAlasan: "+reason+"\n\nSilakan buka menu Master di akun Pengembang untuk klik Accept & Hapus.";
-window.open("https://wa.me"+waNum+"?text="+encodeURIComponent(waTxt),"_blank");
+window.open("https://wa.me"/+waNum+"?text="+encodeURIComponent(waTxt),"_blank");
 }
 alert("✅ Pengajuan hapus terkirim ke Pengembang! Menunggu persetujuan (Accept).");
 });
@@ -655,8 +655,6 @@ saveStocks();stockIns.splice(r.targetIdx,1);saveStockIns();
 r.status="accepted";saveReqs();all();await pushCloudReqs();alert("✅ Pengajuan diterima! Data dihapus & stok outlet dikembalikan.");
 };
 window._rejectReq=async function(reqId){
-var r=delReqs.find(function(x){return x.reqId===reqId;});if(!r||session.role!=="dev")return;
-r.status="rejected";saveReqs();all();await pushCloudReqs();alert("Pengajuan ditolak.");
 };
 var r=delReqs.find(function(x){return x.reqId===reqId;});if(!r||session.role!=="dev")return;
 r.status="rejected";saveReqs();all();alert("Pengajuan ditolak.");
@@ -834,9 +832,7 @@ alert("File gagal dibaca. Pastikan memilih file .json dari hasil Download Master
 };
 reader.readAsText(file);
 };
-el("saveProfileBtn").onclick=async function(){data.shop={name:el("shopName").value.trim(),addr:el("shopAddr").value.trim(),webhook:el("sheetWebhook").value.trim(),if(j&&Array.isArray(j.reqs)){
-delReqs=j.reqs;saveReqs();renderDevRequests();if(session)all();
-}mgmtPass:el("mgmtPassInput").value.trim()||"2222",ownerPass:el("ownerPassInput").value.trim()||"1234",devPass:el("devPassInput").value.trim()||"9999"};saveMaster();all();await pushCloudMaster();alert("✅ Tersimpan & Berhasil Dikirim ke Semua 19 Toko!");};
+el("saveProfileBtn").onclick=async function(){data.shop={name:el("shopName").value.trim(),addr:el("shopAddr").value.trim(),webhook:el("sheetWebhook").value.trim(),devWa:el("devWaInput").value.trim(),mgmtPass:el("mgmtPassInput").value.trim()||"2222",ownerPass:el("ownerPassInput").value.trim()||"1234",devPass:el("devPassInput").value.trim()||"9999"};saveMaster();all();await pushCloudMaster();alert("✅ Tersimpan & Berhasil Dikirim ke Semua 19 Toko!");};
 el("rounding").onchange=function(){data.rounding=Math.max(1,+el("rounding").value||1000);saveMaster();calcCurrentItem();pushCloudMaster();};
 el("resetBtn").onclick=function(){modal("Reset",'<p class="note">Kembalikan data awal?</p>',function(){data=clone(def);saveMaster();all();pushCloudMaster();});};
 renderLoginOutlets();pullCloudData();
