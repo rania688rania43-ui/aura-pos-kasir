@@ -615,7 +615,7 @@ delReqs.unshift(reqObj);saveReqs();all();await pushCloudReqs();
 var waNum=(data.shop.devWa||"").replace(/\D/g,"");
 if(waNum){
 var waTxt="🔔 PENGAJUAN HAPUS DATA - AURA POS\nOutlet: "+session.outlet+"\nData: "+desc+"\nTanggal: "+tgl+"\nAlasan: "+reason+"\n\nSilakan buka menu Master di akun Pengembang untuk klik Accept & Hapus.";
-window.open("https://wa.me"/+waNum+"?text="+encodeURIComponent(waTxt),"_blank");
+window.open("https://wa.me/"+waNum+"?text="+encodeURIComponent(waTxt),"_blank");
 }
 alert("✅ Pengajuan hapus terkirim ke Pengembang! Menunggu persetujuan (Accept).");
 });
