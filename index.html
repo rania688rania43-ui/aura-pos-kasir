@@ -412,7 +412,15 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 <label>Botol / Kemasan</label><select id="purchaseSelect"></select>
 <div style="margin-top:10px">
 <div class="row"><strong>Konsentrasi Bibit</strong><span class="pct" id="pctLabel">50%</span></div>
-<div class="sc-wrap" id="scWrap"><div class="sc-track"><div class="sc-fill" id="scFill"></div><div class="sc-knob" id="scKnob"></div></div></div>
+<div style="display:flex; align-items:center; gap:8px; margin:10px 0;">
+  <button type="button" id="pctMinusBtn" style="width:34px; height:34px; border-radius:8px; border:1px solid #bfdbfe; background:#eff6ff; color:#0d6efd; font-size:18px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">◀</button>
+  
+  <div class="sc-wrap" id="scWrap" style="flex:1; margin:0;">
+    <div class="sc-track"><div class="sc-fill" id="scFill"></div><div class="sc-knob" id="scKnob"></div></div>
+  </div>
+  
+  <button type="button" id="pctPlusBtn" style="width:34px; height:34px; border-radius:8px; border:1px solid #bfdbfe; background:#eff6ff; color:#0d6efd; font-size:18px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">▶</button>
+</div>
 <div class="status good" id="status">★ RECOMMENDED ★</div>
 </div>
 <div class="line"><span id="itemFormula">Komposisi</span><strong id="itemSubtotal">Rp0</strong></div>
@@ -1204,6 +1212,24 @@ function moveKnob(clientX){
   var ratio=Math.max(0,Math.min(1,(clientX-rect.left)/rect.width));
   currentPct=Math.round(1+ratio*99);refreshKnob();calcCurrentItem();
 }
+
+// Fungsi tombol panah kiri (Kurang 1%)
+el("pctMinusBtn").onclick = function(){
+  if(currentPct > 1){ 
+    currentPct--; 
+    refreshKnob(); 
+    calcCurrentItem(); 
+  }
+};
+
+// Fungsi tombol panah kanan (Tambah 1%)
+el("pctPlusBtn").onclick = function(){
+  if(currentPct < 100){ 
+    currentPct++; 
+    refreshKnob(); 
+    calcCurrentItem(); 
+  }
+};
 knob.addEventListener("pointerdown",function(e){e.stopPropagation();dragging=true;if(knob.setPointerCapture)knob.setPointerCapture(e.pointerId);});
 knob.addEventListener("pointermove",function(e){if(dragging)moveKnob(e.clientX);});
 knob.addEventListener("pointerup",function(){dragging=false;});
