@@ -1120,11 +1120,14 @@ function hasStokMinOverride(outlet,cat,name){
 function updateLoginUI(){
   var role=el("loginRoleSelect").value,out=el("loginOutletSelect").value;
   
-  // Jika Management, sembunyikan pilihan outlet
-  if(role==="management"){
-    el("loginOutletWrap").style.display = "none";
-  }else{
-    el("loginOutletWrap").style.display = "block";
+   // Jika Management, sembunyikan pilihan outlet
+  var wrap = el("loginOutletWrap");
+  if(wrap){
+    if(role==="management"){
+      wrap.style.display = "none";
+    }else{
+      wrap.style.display = "block";
+    }
   }
 
   if(role==="staff"){
