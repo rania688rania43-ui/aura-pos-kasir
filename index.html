@@ -655,9 +655,8 @@ saveStocks();stockIns.splice(r.targetIdx,1);saveStockIns();
 r.status="accepted";saveReqs();all();await pushCloudReqs();alert("✅ Pengajuan diterima! Data dihapus & stok outlet dikembalikan.");
 };
 window._rejectReq=async function(reqId){
-};
 var r=delReqs.find(function(x){return x.reqId===reqId;});if(!r||session.role!=="dev")return;
-r.status="rejected";saveReqs();all();alert("Pengajuan ditolak.");
+r.status="rejected";saveReqs();all();await pushCloudReqs();alert("Pengajuan ditolak.");
 };
     el("closingBtn").onclick=async function(){
 if(!session)return;var d=el("reportDate").value||todayStr(),out=session.outlet,list=sales.filter(function(s){return s.outlet===out&&s.date===d;});
