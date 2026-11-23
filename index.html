@@ -1508,11 +1508,18 @@ function getHargaBeliZeroList(){
   return data.perfumes.filter(function(p){return !p.buy||p.buy<=0;});
 }
 function updateDistHargaBeliWarn(){
+  // Cek role: Jika bukan admin, sembunyikan total banner ini
+  if(!session || session.role !== "admin"){
+    el("distHargaBeliWarn").style.display="none";
+    return;
+  }
   var list=getHargaBeliZeroList();
   if(list.length>0){
     el("distHargaBeliWarn").style.display="flex";
     el("distHargaBeliWarnTxt").textContent="⚠️ Ada "+list.length+" parfum dengan harga beli 0. Distribusi diblokir sampai dilengkapi.";
-  }else{el("distHargaBeliWarn").style.display="none";}
+  }else{
+    el("distHargaBeliWarn").style.display="none";
+  }
 }
 el("distHargaBeliFixBtn").onclick=function(){setTab("tNotif");};
 
@@ -2380,6 +2387,10 @@ function renderAdminNotif(){
   }
 }
 window._goFixHargaBeli=function(name){
+  if(!session || session.role !== "admin"){
+    toast("Akses ditolak! Hanya Admin yang bisa mengubah harga beli.","err");
+    return;
+  }
   setTab("tAdmin");
   var idx=data.perfumes.findIndex(function(p){return p.name===name;});
   if(idx>=0){window._ed("perfumes",idx);}
@@ -2743,10 +2754,18 @@ function all(){
 /* ================== TAB NAV ================== */
 var TAB_MAP={tKasir:"secKasir",tLaporan:"secLaporan",tOrder:"secOrder",tGrafik:"secGrafik",tStokAwal:"secStokAwal",tStokMasuk:"secStokMasuk",tAudit:"secAudit",tStokMin:"secStokMin",tAkses:"secAkses",tAdmin:"secAdmin",tMgmt:"secMgmt",tNotif:"secNotif"};
 function setTab(id){
+  // PENGAMAN: Cegah akses tab admin/master oleh role selain admin
+  var adminTabs = ["tStokAwal","tAudit","tStokMin","tAkses","tAdmin","tNotif"];
+  if (adminTabs.indexOf(id) >= 0 && (!session || session.role !== "admin")) {
+    toast("Akses ditolak! Halaman ini khusus Admin.","err");
+    return;
+  }
+
   Object.keys(TAB_MAP).forEach(function(k){if(el(TAB_MAP[k]))el(TAB_MAP[k]).classList.add("hide");});
   document.querySelectorAll("#navTabs .tab").forEach(function(t){t.classList.remove("active");});
   if(el(TAB_MAP[id]))el(TAB_MAP[id]).classList.remove("hide");
   if(el(id))el(id).classList.add("active");
+  
   if(id==="tKasir")refreshKnob();
   if(id==="tOrder")renderLowStock();
   if(id==="tLaporan")renderReport();
