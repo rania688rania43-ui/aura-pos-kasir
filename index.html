@@ -820,7 +820,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 
 <!-- ================= TAMPILAN DETAIL TOKO ================= -->
 <div id="mgmtDetailView" class="hide">
-  <button type="button" class="btn secondary" id="mgmtBackBtn" style="margin-bottom:12px">⬅ Kembali ke Daftar Toko</button>
+    <button type="button" class="btn secondary" id="mgmtBackBtn" style="margin-bottom:12px">⬅ Kembali</button>
   
   <div class="card" style="background:linear-gradient(135deg,#e0f2fe,#dcfce7); border-color:#7dd3fc;">
     <div class="adminhead" id="mgmtDetailTitle" style="font-size:18px; color:#0369a1; margin:0;">Detail Outlet</div>
@@ -2736,7 +2736,7 @@ window._openMgmtDetail = function(outletName){
 el("mgmtBackBtn").onclick = function(){
   el("mgmtDetailView").classList.add("hide");
   el("mgmtListView").classList.remove("hide");
-  window.scrollTo(0,0);
+  // window.scrollTo(0,0); dihapus agar layar tidak lompat ke atas
 };
 
 function renderMgmtDetail(outletName){
