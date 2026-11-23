@@ -1250,11 +1250,18 @@ el("pctPlusBtn").onclick = function(){
     calcCurrentItem(); 
   }
 };
-knob.addEventListener("pointerdown",function(e){e.stopPropagation();dragging=true;if(knob.setPointerCapture)knob.setPointerCapture(e.pointerId);});
-knob.addEventListener("pointermove",function(e){if(dragging)moveKnob(e.clientX);});
+knob.addEventListener("pointerdown",function(e){
+  e.preventDefault(); // Mencegah layar ikut ter-scroll
+  dragging=true;
+  if(knob.setPointerCapture) knob.setPointerCapture(e.pointerId);
+});
+wrap.addEventListener("pointermove", function(e){
+  moveKnob(e.clientX);
+});
 knob.addEventListener("pointerup",function(){dragging=false;});
 knob.addEventListener("pointercancel",function(){dragging=false;});
-
+window.addEventListener("pointerup",function(){dragging=false;}); // Jaga-jaga kalau jari lepas di luar area
+  wrap.addEventListener("click", function(e) { moveKnob(e.clientX); });
 /* ================== CALC ITEM ================== */
 function calcCurrentItem(){
   var idx=+el("perfumeSelect").value;
