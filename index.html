@@ -161,7 +161,7 @@
 </div>
 </section>
 <section id="secAkses" class="hide">
-<div class="card"><div class="adminhead">🔑 Pengaturan PIN Toko per Outlet</div><p class="note"><strong>Wajib diisi:</strong> Karyawan hanya bisa masuk menggunakan PIN Toko yang didaftarkan untuk outlet tersebut.</p><div id="outletEmailList"></div></div>
+<div class="card"><div class="adminhead">🔑 Pengaturan PIN Toko per Outlet</div><p class="note"><strong>Wajib diisi:</strong> Karyawan hanya bisa masuk menggunakan PIN Toko yang didaftarkan untuk outlet tersebut.</p><div id="outletEmailList"></div><button type="button" class="btn" id="savePinsBtn">💾 Simpan & Kirim PIN ke Semua Outlet</button></div>
 </section>
 <section id="secAdmin" class="hide">
 <div class="card">
@@ -516,6 +516,8 @@ saveStocks();all();alert("Berhasil pindah ke Stok Awal Tahun Baru!");
 };
 function renderOutletEmails(){el("outletEmailList").innerHTML=data.outlets.map(function(o){var pin=data.outletEmails[o]||"";return '<div class="item"><label style="margin:0 0 4px">'+esc(o)+'</label><div class="row"><input type="text" inputmode="numeric" value="'+esc(pin)+'" placeholder="Masukkan PIN Toko (misal: 1122)" onchange="window._setOutEmail(\''+esc(o)+'\',this.value)"><span class="badge '+(pin?"ok":"alert")+'">'+(pin?"Aktif":"Belum Diatur")+'</span></div></div>';}).join("");}
 window._setOutEmail=function(out,val){data.outletEmails[out]=val.trim();saveMaster();renderOutletEmails();};
+el("savePinsBtn").onclick=async function(){saveMaster();renderLoginOutlets();await pushCloudMaster();alert("✅ Semua PIN Toko berhasil disimpan & dikirim ke 19 Outlet!");};
+  
 function renderReport(){
 if(!session)return;var d=el("reportDate").value||todayStr(),list=sales.filter(function(s){return s.outlet===session.outlet&&s.date===d;}),omzet=0,cash=0,nonCash=0,unsynced=0;
 list.forEach(function(s){omzet+=s.total;if(s.method==="Tunai")cash+=s.total;else nonCash+=s.total;if(!s.synced)unsynced++;});
