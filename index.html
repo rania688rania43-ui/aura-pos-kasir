@@ -170,6 +170,7 @@
 <div id="devReqList"></div>
 </div>
 <label>Nama Brand / Toko</label><input id="shopName"><label>Slogan / Alamat Kop Struk</label><input id="shopAddr"><label>Link Google Sheets Closing</label><input id="sheetWebhook" placeholder="https://script.google.com/macros/s/...">
+<label>Nomor WA Notifikasi Pengembang (Awali 62, contoh: 628123456789)</label><input id="devWaInput" type="tel" placeholder="628123456789">
 <div class="grid"><div><label>Pass Management</label><input id="mgmtPassInput" type="text"></div><div><label>Pass Owner</label><input id="ownerPassInput" type="text"></div><div class="full"><label>Pass Pengembang</label><input id="devPassInput" type="text"></div></div>
 <button type="button" class="btn" id="saveProfileBtn">Simpan Pengaturan & Password</button>
 <div class="admin-section"><div class="adminhead">📥 Import 437 Parfum dari CSV</div><button type="button" class="btn secondary" id="dlSampleCsvBtn" style="margin-bottom:8px">📄 Download Contoh Template CSV Parfum</button>
@@ -593,6 +594,10 @@ if(bObj&&bObj.price>0)cur.purchases[it.botol]=(cur.purchases[it.botol]||0)+1;
 saveStocks();sales.splice(idx,1);saveSales();all();alert("✅ Nota "+trx.id+" dihapus & stok dikembalikan.");
 });
 };
+async function pushCloudReqs(){
+if(!data.shop.webhook)return;
+try{await fetch(data.shop.webhook,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"SYNC_REQS",reqs:delReqs})});}catch(e){}
+}
 window._reqDel=function(type,ref){
 if(!session)return;
 var desc="",targetId="",targetIdx=-1,tgl=todayStr();
@@ -603,11 +608,15 @@ targetId=s.id;tgl=s.date;desc="Nota "+s.id+" ("+fmt(s.total)+") - "+s.items.map(
 var x=stockIns[ref];if(!x)return;
 targetIdx=ref;tgl=x.date;desc="Stok Masuk "+x.name+" (+"+x.qty+") - "+x.note;
 }
-modal("Ajukan Hapus ke Pengembang",'<p class="note">Item: <strong>'+esc(desc)+'</strong><br>Tanggal: <strong>'+tgl+'</strong></p><label>Alasan Salah Input (Wajib diisi)</label><input id="mReqReason" placeholder="Contoh: Salah pilih parfum / salah ketik jumlah">',function(){
+modal("Ajukan Hapus ke Pengembang",'<p class="note">Item: <strong>'+esc(desc)+'</strong><br>Tanggal: <strong>'+tgl+'</strong></p><label>Alasan Salah Input (Wajib diisi)</label><input id="mReqReason" placeholder="Contoh: Salah pilih parfum / salah ketik jumlah">',async function(){
 var reason=el("mReqReason").value.trim()||"Salah input data";
 var reqObj={reqId:"REQ-"+Date.now().toString().slice(-6),outlet:session.outlet,type:type,targetId:targetId,targetIdx:targetIdx,date:tgl,desc:desc,reason:reason,status:"pending",createdAt:new Date().toLocaleString("id-ID",{dateStyle:"short",timeStyle:"short"})};
-delReqs.unshift(reqObj);saveReqs();all();
-if(data.shop.webhook){fetch(data.shop.webhook,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"DEL_REQ",req:reqObj})}).catch(function(){});}
+delReqs.unshift(reqObj);saveReqs();all();await pushCloudReqs();
+var waNum=(data.shop.devWa||"").replace(/\D/g,"");
+if(waNum){
+var waTxt="🔔 PENGAJUAN HAPUS DATA - AURA POS\nOutlet: "+session.outlet+"\nData: "+desc+"\nTanggal: "+tgl+"\nAlasan: "+reason+"\n\nSilakan buka menu Master di akun Pengembang untuk klik Accept & Hapus.";
+window.open("https://wa.me"+waNum+"?text="+encodeURIComponent(waTxt),"_blank");
+}
 alert("✅ Pengajuan hapus terkirim ke Pengembang! Menunggu persetujuan (Accept).");
 });
 };
@@ -624,7 +633,7 @@ el("devReqList").innerHTML=pend.map(function(r){
 return '<div class="item" style="border-color:#fca5a5;background:#fef2f2"><div><strong>['+esc(r.outlet)+'] '+esc(r.desc)+'</strong><div class="small">📅 Tgl Data: <strong>'+r.date+'</strong> · Diajukan: '+r.createdAt+'</div><div class="small" style="color:#b91c1c">Alasan: '+esc(r.reason)+'</div></div><div class="item-actions" style="margin-top:6px"><button type="button" onclick="window._acceptReq(\''+r.reqId+'\')" style="background:#16a34a;color:#fff">✅ Accept & Hapus</button><button type="button" onclick="window._rejectReq(\''+r.reqId+'\')" style="background:#fee2e2;color:#b91c1c">❌ Tolak</button></div></div>';
 }).join("");
 }
-window._acceptReq=function(reqId){
+window._acceptReq=async function(reqId){
 var r=delReqs.find(function(x){return x.reqId===reqId;});if(!r||session.role!=="dev")return;
 if(r.type==="sale"){
 var idx=sales.findIndex(function(s){return s.id===r.targetId;});
@@ -643,9 +652,12 @@ var x=stockIns[r.targetIdx];ensureOutletStock(x.outlet);
 stocks[x.outlet].current[x.cat][x.name]=Math.max(0,(stocks[x.outlet].current[x.cat][x.name]||0)-x.qty);
 saveStocks();stockIns.splice(r.targetIdx,1);saveStockIns();
 }
-r.status="accepted";saveReqs();all();alert("✅ Pengajuan diterima! Data dihapus & stok outlet dikembalikan.");
+r.status="accepted";saveReqs();all();await pushCloudReqs();alert("✅ Pengajuan diterima! Data dihapus & stok outlet dikembalikan.");
 };
-window._rejectReq=function(reqId){
+window._rejectReq=async function(reqId){
+var r=delReqs.find(function(x){return x.reqId===reqId;});if(!r||session.role!=="dev")return;
+r.status="rejected";saveReqs();all();await pushCloudReqs();alert("Pengajuan ditolak.");
+};
 var r=delReqs.find(function(x){return x.reqId===reqId;});if(!r||session.role!=="dev")return;
 r.status="rejected";saveReqs();all();alert("Pengajuan ditolak.");
 };
@@ -740,7 +752,7 @@ el("chartOutlets").innerHTML=oList.map(function(x){return '<div class="bar-row">
 }
 el("chartScopeSelect").onchange=renderGrafik;
   function all(){
-el("shopName").value=data.shop.name||"";el("shopAddr").value=data.shop.addr||"";el("sheetWebhook").value=data.shop.webhook||"";
+el("shopName").value=data.shop.name||"";el("shopAddr").value=data.shop.addr||"";el("sheetWebhook").value=data.shop.webhook||"";el("devWaInput").value=data.shop.devWa||"";
 el("mgmtPassInput").value=data.shop.mgmtPass||"2222";el("ownerPassInput").value=data.shop.ownerPass||"1234";el("devPassInput").value=data.shop.devPass||"9999";
 el("shopSub").textContent=data.shop.name||"AURA International Perfume";
 renderSelects();renderOutlets();renderOutletEmails();listRender("perfumes","perfumeList",el("filterMasterParfum").value);listRender("mixes","mixList");listRender("purchases","purchaseList");
@@ -784,6 +796,9 @@ sales.push({outlet:cs.outlet,id:cs.id,date:String(cs.date).slice(0,10),time:cs.t
 });
 saveSales();if(session)renderGrafik();
 }
+if(j&&Array.isArray(j.reqs)){
+delReqs=j.reqs;saveReqs();renderDevRequests();if(session)all();
+}  
 }catch(e){}
 }
   el("exportMasterBtn").onclick=function(){
@@ -819,7 +834,9 @@ alert("File gagal dibaca. Pastikan memilih file .json dari hasil Download Master
 };
 reader.readAsText(file);
 };
-el("saveProfileBtn").onclick=async function(){data.shop={name:el("shopName").value.trim(),addr:el("shopAddr").value.trim(),webhook:el("sheetWebhook").value.trim(),mgmtPass:el("mgmtPassInput").value.trim()||"2222",ownerPass:el("ownerPassInput").value.trim()||"1234",devPass:el("devPassInput").value.trim()||"9999"};saveMaster();all();await pushCloudMaster();alert("✅ Tersimpan & Berhasil Dikirim ke Semua 19 Toko!");};
+el("saveProfileBtn").onclick=async function(){data.shop={name:el("shopName").value.trim(),addr:el("shopAddr").value.trim(),webhook:el("sheetWebhook").value.trim(),if(j&&Array.isArray(j.reqs)){
+delReqs=j.reqs;saveReqs();renderDevRequests();if(session)all();
+}mgmtPass:el("mgmtPassInput").value.trim()||"2222",ownerPass:el("ownerPassInput").value.trim()||"1234",devPass:el("devPassInput").value.trim()||"9999"};saveMaster();all();await pushCloudMaster();alert("✅ Tersimpan & Berhasil Dikirim ke Semua 19 Toko!");};
 el("rounding").onchange=function(){data.rounding=Math.max(1,+el("rounding").value||1000);saveMaster();calcCurrentItem();pushCloudMaster();};
 el("resetBtn").onclick=function(){modal("Reset",'<p class="note">Kembalikan data awal?</p>',function(){data=clone(def);saveMaster();all();pushCloudMaster();});};
 renderLoginOutlets();pullCloudData();
