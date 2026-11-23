@@ -726,6 +726,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 </div>
 </section>
 <!-- ============ LAPORAN MANAGEMENT (PRO) ============ -->
+<!-- ============ LAPORAN MANAGEMENT (PRO) ============ -->
 <section id="secMgmt" class="hide">
 <div class="card">
   <div class="row">
@@ -745,81 +746,100 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
   <p class="note" id="mgmtPeriodLabel">—</p>
 </div>
 
-<div class="report-tabs">
-  <button type="button" class="report-tab active" data-rtab="omzet">💰 Omzet</button>
-  <button type="button" class="report-tab" data-rtab="produk">🏆 Produk</button>
-  <button type="button" class="report-tab" data-rtab="belanja">💸 Belanja vs Omzet</button>
-  <button type="button" class="report-tab" data-rtab="stok">📦 Stok</button>
-  <button type="button" class="report-tab" data-rtab="kasir">🧾 Kasir</button>
-</div>
-
-<!-- OMZET -->
-<div class="report-section active" data-rsec="omzet">
-  <div class="kpi-grid">
-    <div class="kpi-card"><div class="kp-label">OMZET PERIODE</div><div class="kp-val" id="rpOmzet">Rp0</div><div class="kp-sub" id="rpOmzetDelta">—</div></div>
-    <div class="kpi-card"><div class="kp-label">JUMLAH NOTA</div><div class="kp-val" id="rpNota">0</div><div class="kp-sub" id="rpNotaSub">—</div></div>
-    <div class="kpi-card"><div class="kp-label">RATA-RATA / NOTA</div><div class="kp-val" id="rpAvg">Rp0</div><div class="kp-sub flat">per transaksi</div></div>
-    <div class="kpi-card"><div class="kp-label">OMZET HARI INI</div><div class="kp-val" id="rpHariIni">Rp0</div><div class="kp-sub" id="rpHariSub">—</div></div>
+<!-- ================= TAMPILAN DAFTAR TOKO ================= -->
+<div id="mgmtListView">
+  <div class="report-tabs">
+    <button type="button" class="report-tab active" data-rtab="omzet">💰 Omzet</button>
+    <button type="button" class="report-tab" data-rtab="produk">🏆 Produk</button>
+    <button type="button" class="report-tab" data-rtab="belanja">💸 Belanja vs Omzet</button>
+    <button type="button" class="report-tab" data-rtab="stok">📦 Stok</button>
+    <button type="button" class="report-tab" data-rtab="kasir">🧾 Kasir</button>
   </div>
-  <div class="card"><div class="adminhead">📈 Tren Harian (30 Hari Terakhir)</div><div id="rpChart30"></div></div>
-  <div class="card"><div class="adminhead">🏪 Omzet per Outlet</div>
-    <div class="data-table" style="overflow-x:auto"><table class="data-table" id="rpOutletTable"></table></div>
-  </div>
-  <div class="card"><div class="adminhead">💳 Metode Bayar</div><div id="rpPaymentChart"></div></div>
-</div>
 
-<!-- PRODUK -->
-<div class="report-section" data-rsec="produk">
-  <div class="card"><div class="adminhead">🏆 Top 10 Parfum Terlaris</div><div id="rpTop10"></div></div>
-  <div class="card"><div class="adminhead">📉 Parfum Tidak Laku (30 Hari)</div><div id="rpDeadProducts"></div></div>
-  <div class="card"><div class="adminhead">💰 Rata-rata Harga Jual per ml</div><div class="stat-grid" style="margin-top:8px">
-    <div class="stat-box"><div class="small">Total Volume Terjual</div><div class="stat-val" id="rpTotalVol">0 ml</div></div>
-    <div class="stat-box"><div class="small">Rata-rata Rp/ml</div><div class="stat-val" id="rpAvgPerMl">Rp0</div></div>
-  </div></div>
-</div>
-
-<!-- BELANJA VS OMZET -->
-<div class="report-section" data-rsec="belanja">
-  <div class="kpi-grid">
-    <div class="kpi-card"><div class="kp-label">TOTAL BELANJA (NORMAL)</div><div class="kp-val" id="rpBelanjaNormal">Rp0</div><div class="kp-sub flat">qty masuk × harga beli</div></div>
-    <div class="kpi-card"><div class="kp-label">TOTAL BELANJA (NETTO)</div><div class="kp-val" id="rpBelanjaNetto">Rp0</div><div class="kp-sub flat">setelah susut 2,5%</div></div>
-    <div class="kpi-card"><div class="kp-label">RASIO HPP / OMZET</div><div class="kp-val" id="rpHppRatio">0%</div><div class="kp-sub flat">semakin kecil semakin baik</div></div>
-        <!-- Laba Kotor disembunyikan -->
+  <!-- OMZET -->
+  <div class="report-section active" data-rsec="omzet">
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kp-label">OMZET PERIODE</div><div class="kp-val" id="rpOmzet">Rp0</div><div class="kp-sub" id="rpOmzetDelta">—</div></div>
+      <div class="kpi-card"><div class="kp-label">JUMLAH NOTA</div><div class="kp-val" id="rpNota">0</div><div class="kp-sub" id="rpNotaSub">—</div></div>
+      <div class="kpi-card"><div class="kp-label">RATA-RATA / NOTA</div><div class="kp-val" id="rpAvg">Rp0</div><div class="kp-sub flat">per transaksi</div></div>
+      <div class="kpi-card"><div class="kp-label">OMZET HARI INI</div><div class="kp-val" id="rpHariIni">Rp0</div><div class="kp-sub" id="rpHariSub">—</div></div>
+    </div>
+    <div class="card"><div class="adminhead">📈 Tren Harian (30 Hari Terakhir)</div><div id="rpChart30"></div></div>
+    <div class="card"><div class="adminhead">🏪 Performa Tiap Outlet (Klik untuk detail)</div>
+      <div id="rpOutletList" class="grid" style="grid-template-columns:1fr; gap:6px"></div>
+    </div>
+    <div class="card"><div class="adminhead">💳 Metode Bayar (Semua Toko)</div><div id="rpPaymentChart"></div></div>
   </div>
-  <div class="card"><div class="adminhead">📊 Perbandingan Harian</div><div id="rpBelanjaChart"></div></div>
+
+  <!-- PRODUK -->
+  <div class="report-section" data-rsec="produk">
+    <div class="card"><div class="adminhead">🏆 Top 10 Parfum Terlaris</div><div id="rpTop10"></div></div>
+    <div class="card"><div class="adminhead">📉 Parfum Tidak Laku (30 Hari)</div><div id="rpDeadProducts"></div></div>
+    <div class="card"><div class="adminhead">💰 Rata-rata Harga Jual per ml</div><div class="stat-grid" style="margin-top:8px">
+      <div class="stat-box"><div class="small">Total Volume Terjual</div><div class="stat-val" id="rpTotalVol">0 ml</div></div>
+      <div class="stat-box"><div class="small">Rata-rata Rp/ml</div><div class="stat-val" id="rpAvgPerMl">Rp0</div></div>
+    </div></div>
+  </div>
+
+  <!-- BELANJA VS OMZET -->
+  <div class="report-section" data-rsec="belanja">
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kp-label">TOTAL BELANJA (NORMAL)</div><div class="kp-val" id="rpBelanjaNormal">Rp0</div><div class="kp-sub flat">qty masuk × harga beli</div></div>
+      <div class="kpi-card"><div class="kp-label">TOTAL BELANJA (NETTO)</div><div class="kp-val" id="rpBelanjaNetto">Rp0</div><div class="kp-sub flat">setelah susut 2,5%</div></div>
+      <div class="kpi-card"><div class="kp-label">RASIO HPP / OMZET</div><div class="kp-val" id="rpHppRatio">0%</div><div class="kp-sub flat">semakin kecil semakin baik</div></div>
+      <div class="kpi-card"><div class="kp-label">LABA KOTOR</div><div class="kp-val" id="rpLabaKotor">Rp0</div><div class="kp-sub flat">omzet − belanja netto</div></div>
+    </div>
+    <div class="card"><div class="adminhead">📊 Perbandingan Harian</div><div id="rpBelanjaChart"></div></div>
     <div class="card"><div class="adminhead">📅 Rekap Bulanan</div>
-    <div style="overflow-x:auto"><table class="data-table" id="rpBulananTable"></table></div>
+      <div style="overflow-x:auto"><table class="data-table" id="rpBulananTable"></table></div>
+    </div>
   </div>
-</div>
 
-<!-- STOK -->
-<div class="report-section" data-rsec="stok">
-  <div class="card"><div class="adminhead">💎 Total Nilai Stok per Outlet</div>
-    <p class="note">Nilai = qty stok × harga beli per ml. Hanya parfum & campuran.</p>
-    <div style="overflow-x:auto"><table class="data-table" id="rpNilaiStokTable"></table></div>
+  <!-- STOK -->
+  <div class="report-section" data-rsec="stok">
+    <div class="card"><div class="adminhead">💎 Total Nilai Stok per Outlet</div>
+      <p class="note">Nilai = qty stok × harga beli per ml.</p>
+      <div style="overflow-x:auto"><table class="data-table" id="rpNilaiStokTable"></table></div>
+    </div>
+    <div class="card"><div class="adminhead">⚠️ Item di Bawah Minimum</div><div id="rpLowStockList"></div></div>
+    <div class="card"><div class="adminhead">🧊 Dead Stock (Tidak Bergerak 60 Hari)</div><div id="rpDeadStockList"></div></div>
   </div>
-  <div class="card"><div class="adminhead">⚠️ Item di Bawah Minimum per Outlet</div>
-    <div id="rpLowStockList"></div>
-  </div>
-  <div class="card"><div class="adminhead">🧊 Dead Stock (Tidak Bergerak 60 Hari)</div>
-    <div id="rpDeadStockList"></div>
-  </div>
-</div>
 
-<!-- KASIR -->
-<div class="report-section" data-rsec="kasir">
-  <div class="card"><div class="adminhead">💳 Porsi Metode Bayar</div><div id="rpMetodePorsi"></div></div>
-  <div class="card"><div class="adminhead">🕐 Jam Sibuk (Peak Hour)</div><div id="rpPeakHour"></div></div>
-  <div class="card"><div class="adminhead">📋 Rata-rata Transaksi per Nota</div>
-    <div class="stat-grid" style="margin-top:8px">
-      <div class="stat-box"><div class="small">Rata-rata Nota</div><div class="stat-val" id="rpAvgNota">Rp0</div></div>
-      <div class="stat-box"><div class="small">Rata-rata Item/Nota</div><div class="stat-val" id="rpAvgItems">0</div></div>
+  <!-- KASIR -->
+  <div class="report-section" data-rsec="kasir">
+    <div class="card"><div class="adminhead">💳 Porsi Metode Bayar</div><div id="rpMetodePorsi"></div></div>
+    <div class="card"><div class="adminhead">🕐 Jam Sibuk (Peak Hour)</div><div id="rpPeakHour"></div></div>
+    <div class="card"><div class="adminhead">📋 Rata-rata Transaksi per Nota</div>
+      <div class="stat-grid" style="margin-top:8px">
+        <div class="stat-box"><div class="small">Rata-rata Nota</div><div class="stat-val" id="rpAvgNota">Rp0</div></div>
+        <div class="stat-box"><div class="small">Rata-rata Item/Nota</div><div class="stat-val" id="rpAvgItems">0</div></div>
+      </div>
     </div>
   </div>
 </div>
-</section>
 
-<!-- ============ NOTIF ADMIN ============ -->
+<!-- ================= TAMPILAN DETAIL TOKO ================= -->
+<div id="mgmtDetailView" class="hide">
+  <button type="button" class="btn secondary" id="mgmtBackBtn" style="margin-bottom:12px">⬅ Kembali ke Daftar Toko</button>
+  
+  <div class="card" style="background:linear-gradient(135deg,#e0f2fe,#dcfce7); border-color:#7dd3fc;">
+    <div class="adminhead" id="mgmtDetailTitle" style="font-size:18px; color:#0369a1; margin:0;">Detail Outlet</div>
+    <div class="small" id="mgmtDetailPeriod" style="margin-top:4px;">—</div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="kp-label">OMZET TOKO INI</div><div class="kp-val" id="dtOmzet">Rp0</div></div>
+    <div class="kpi-card"><div class="kp-label">JUMLAH NOTA</div><div class="kp-val" id="dtNota">0</div></div>
+    <div class="kpi-card"><div class="kp-label">RATA-RATA / NOTA</div><div class="kp-val" id="dtAvg">Rp0</div></div>
+    <div class="kpi-card"><div class="kp-label">TOTAL BELANJA</div><div class="kp-val" id="dtBelanja">Rp0</div></div>
+  </div>
+
+  <div class="card"><div class="adminhead">🏆 Top 5 Parfum di Toko Ini</div><div id="dtTopParfum"></div></div>
+  <div class="card"><div class="adminhead">💳 Metode Bayar</div><div id="dtMetode"></div></div>
+  <div class="card"><div class="adminhead">🕐 Jam Tersibuk</div><div id="dtPeakHour"></div></div>
+</div>
+
+</section>
 <section id="secNotif" class="hide">
 <div class="card">
   <div class="adminhead" style="color:#dc2626">🔔 Notifikasi Admin</div>
@@ -2544,15 +2564,19 @@ function renderMgmtOmzet(d){
     var oSales=d.listSales.filter(function(s){return s.outlet===o;});
     var sum=oSales.reduce(function(a,b){return a+b.total;},0);
     return {name:o,omzet:sum,nota:oSales.length,avg:oSales.length?sum/oSales.length:0};
-  }).filter(function(x){return x.omzet>0;}).sort(function(a,b){return b.omzet-a.omzet;});
-  var maxO=outletRows.length?Math.max.apply(null,outletRows.map(function(x){return x.omzet;})):1;
-  var html='<tr><th>Outlet</th><th class="right">Omzet</th><th class="right">Nota</th><th class="right">Rata2</th><th>Bar</th></tr>';
+  }).sort(function(a,b){return b.omzet-a.omzet;});
+  
+  var html='<div class="item" style="cursor:pointer; border-left:4px solid #0d6efd; padding:12px; background:#fff;" onclick="window._openMgmtDetail(\'ALL\')"><div class="row"><strong>🌐 Semua Toko (Klik Detail Gabungan)</strong><span style="font-weight:900; color:#0d6efd">'+fmt(omzet)+'</span></div></div>';
+  
   outletRows.forEach(function(x){
-    html+='<tr><td>'+esc(x.name)+'</td><td class="right">'+fmt(x.omzet)+'</td><td class="right">'+x.nota+'</td><td class="right">'+fmt(x.avg)+'</td><td><div class="bar-bg"><div class="bar-fill" style="width:'+Math.round(x.omzet/maxO*100)+'%"></div></div></td></tr>';
+    var border = x.omzet>0 ? "#16a34a" : "#cbd5e1";
+    html+='<div class="item" style="cursor:pointer; border-left:4px solid '+border+'; padding:12px; background:#fff;" onclick="window._openMgmtDetail(\''+esc(x.name)+'\')">'+
+      '<div class="row"><strong>🏪 '+esc(x.name)+'</strong><span style="font-weight:900; color:#0d6efd">'+fmt(x.omzet)+'</span></div>'+
+      '<div class="small" style="margin-top:4px">Nota: '+x.nota+' · Rata-rata: '+fmt(x.avg)+'</div>'+
+    '</div>';
   });
-  if(!outletRows.length)html+='<tr><td colspan="5" class="note">Belum ada data.</td></tr>';
-  html+='<tr class="total-row"><td>TOTAL</td><td class="right">'+fmt(omzet)+'</td><td class="right">'+nota+'</td><td colspan="2"></td></tr>';
-  el("rpOutletTable").innerHTML=html;
+  
+  el("rpOutletList").innerHTML=html;
   // payment
   var payMap={};
   d.listSales.forEach(function(s){payMap[s.method]=(payMap[s.method]||0)+s.total;});
@@ -2696,7 +2720,79 @@ function renderMgmtKasir(d){
   el("rpAvgNota").textContent=total?fmt(totRp/total):"Rp0";
   el("rpAvgItems").textContent=total?(totItems/total).toFixed(1):"0";
 }
+/* ================== LAPORAN DETAIL TOKO (DRILL-DOWN) ================== */
+var currentMgmtOutlet = "ALL";
+window._openMgmtDetail = function(outletName){
+  currentMgmtOutlet = outletName;
+  el("mgmtListView").classList.add("hide");
+  el("mgmtDetailView").classList.remove("hide");
+  el("mgmtDetailTitle").textContent = (outletName==="ALL") ? "🌐 Semua Toko" : "🏪 "+outletName;
+  el("mgmtDetailPeriod").textContent = "Periode: "+ (el("mgmtFrom").value||"—") +" s/d "+ (el("mgmtTo").value||"—");
+  
+  renderMgmtDetail(outletName);
+  window.scrollTo(0,0);
+};
 
+el("mgmtBackBtn").onclick = function(){
+  el("mgmtDetailView").classList.add("hide");
+  el("mgmtListView").classList.remove("hide");
+  window.scrollTo(0,0);
+};
+
+function renderMgmtDetail(outletName){
+  var from = el("mgmtFrom").value || mgmtFrom;
+  var to = el("mgmtTo").value || mgmtTo;
+  
+  var filterOutlet = (outletName === "ALL") ? null : outletName;
+  
+  var listSales = sales.filter(function(s){
+    return (!filterOutlet || s.outlet===filterOutlet) && s.date>=from && s.date<=to;
+  });
+  var listDist = distHistory.filter(function(d){
+    return (!filterOutlet || d.outlet===filterOutlet) && d.date>=from && d.date<=to;
+  });
+
+  // 1. KPI Dasar
+  var omzet=0, nota=listSales.length;
+  listSales.forEach(function(s){omzet+=s.total;});
+  var belanja=0;
+  listDist.forEach(function(x){belanja+=x.totalNetto;});
+  
+  el("dtOmzet").textContent=fmt(omzet);
+  el("dtNota").textContent=nota;
+  el("dtAvg").textContent=nota>0?fmt(omzet/nota):"Rp0";
+  el("dtBelanja").textContent=fmt(belanja);
+
+  // 2. Top 5 Parfum
+  var pMap={};
+  listSales.forEach(function(s){s.items.forEach(function(i){if(i.parfum&&i.vol>0)pMap[i.parfum]=(pMap[i.parfum]||0)+i.vol;});});
+  var topP=Object.keys(pMap).map(function(k){return {name:k,vol:pMap[k]};}).sort(function(a,b){return b.vol-a.vol;}).slice(0,5);
+  var maxP=topP.length?Math.max.apply(null,topP.map(function(x){return x.vol;})):1;
+  el("dtTopParfum").innerHTML=topP.map(function(x){
+    return '<div class="bar-row"><div class="row"><small>'+esc(x.name)+'</small><strong>'+x.vol.toFixed(1)+' ml</strong></div><div class="bar-bg"><div class="bar-fill" style="width:'+Math.round(x.vol/maxP*100)+'%"></div></div></div>';
+  }).join("")||'<p class="note">Belum ada penjualan.</p>';
+
+  // 3. Metode Bayar
+  var payMap={};
+  listSales.forEach(function(s){payMap[s.method]=(payMap[s.method]||0)+s.total;});
+  var totalP=omzet||1;
+  el("dtMetode").innerHTML=Object.keys(payMap).map(function(k){
+    return '<div class="bar-row"><div class="row"><small>'+k+'</small><strong>'+fmt(payMap[k])+' ('+Math.round(payMap[k]/totalP*100)+'%)</strong></div><div class="bar-bg"><div class="bar-fill" style="width:'+Math.round(payMap[k]/totalP*100)+'%"></div></div></div>';
+  }).join("")||'<p class="note">Belum ada data.</p>';
+
+  // 4. Peak Hour
+  var hourMap={};
+  listSales.forEach(function(s){
+    if(!s.time)return;
+    var m=s.time.match(/(\d{1,2})[.:]/);
+    if(m){var h=+m[1];hourMap[h]=(hourMap[h]||0)+s.total;}
+  });
+  var hours=Object.keys(hourMap).map(function(h){return {h:+h,v:hourMap[h]};}).sort(function(a,b){return a.h-b.h;});
+  var maxH=hours.length?Math.max.apply(null,hours.map(function(x){return x.v;})):1;
+  el("dtPeakHour").innerHTML=hours.map(function(x){
+    return '<div class="bar-row"><div class="row"><small>'+String(x.h).padStart(2,"0")+':00</small><strong>'+fmt(x.v)+'</strong></div><div class="bar-bg"><div class="bar-fill" style="width:'+Math.round(x.v/maxH*100)+'%"></div></div></div>';
+  }).join("")||'<p class="note">Belum ada data.</p>';
+}
 el("mgmtApplyBtn").onclick=renderMgmt;
 el("mgmtResetBtn").onclick=function(){initMgmtDates();renderMgmt();};
 el("mgmtExportBtn").onclick=function(){
