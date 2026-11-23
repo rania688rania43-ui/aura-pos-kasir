@@ -343,21 +343,26 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 <div class="hero"><h1>✨ AURA POS SYSTEM ✨</h1><p id="shopSub">AURA International Perfume · 19 Outlets</p></div>
 
 <!-- ================= LOGIN ================= -->
+<!-- ================= LOGIN ================= -->
 <section id="loginScreen">
 <div class="card">
 <div class="adminhead" style="text-align:center;font-size:17px">🔐 AKSES MASUK AURA POS</div>
+
 <div id="loginOutletWrap">
   <label>Pilih Lokasi Outlet</label>
   <select id="loginOutletSelect"></select>
 </div>
+
 <label>Masuk Sebagai</label>
 <select id="loginRoleSelect">
 <option value="staff">1. Karyawan Toko</option>
 <option value="management">2. Management</option>
 <option value="admin">3. Admin</option>
 </select>
+
 <div id="emailLoginWrap"><label>PIN Toko (Wajib Diisi)</label><input id="loginEmailInput" type="password" inputmode="numeric" placeholder="Masukkan PIN Toko"></div>
 <div id="passLoginWrap" class="hide"><label>Password Akses</label><input id="loginPassInput" type="password" placeholder="Masukkan password"></div>
+
 <button type="button" class="btn" id="doLoginBtn">Masuk ke Sistem</button>
 <p class="note" id="loginHintText" style="text-align:center;margin-top:8px">Karyawan Toko: Akses Kasir, Closing & Order.</p>
 </div>
