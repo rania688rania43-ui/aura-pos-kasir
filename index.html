@@ -38,7 +38,7 @@
 <option value="owner">3. Owner</option>
 <option value="dev">4. Pengembang (Developer)</option>
 </select>
-<div id="emailLoginWrap"><label>Email Karyawan (Kosongkan jika bebas akses)</label><input id="loginEmailInput" type="email" placeholder="nama@email.com"></div>
+<div id="emailLoginWrap"><label>PIN Toko (Wajib Diisi)</label><input id="loginEmailInput" type="password" inputmode="numeric" placeholder="Masukkan PIN Toko"></div>
 <div id="passLoginWrap" class="hide"><label>Password Akses</label><input id="loginPassInput" type="password" placeholder="Masukkan password"></div>
 <button type="button" class="btn" id="doLoginBtn">Masuk ke Sistem</button>
 <p class="note" id="loginHintText" style="text-align:center;margin-top:8px">Karyawan Toko: Akses Kasir, Closing & Order.</p>
@@ -57,7 +57,7 @@
 <button type="button" class="tab role-dev hide" id="tStokAwal">Stok Awal</button>
 <button type="button" class="tab role-staff role-dev hide" id="tStokMasuk">Stok Masuk</button>
 <button type="button" class="tab role-dev hide" id="tAudit">Stok System</button>
-<button type="button" class="tab role-dev hide" id="tAkses">Akses Email</button>
+<button type="button" class="tab role-dev hide" id="tAkses">PIN Toko</button>
 <button type="button" class="tab role-dev hide" id="tAdmin">Master</button>
 </div>
 <section id="secKasir">
@@ -161,7 +161,7 @@
 </div>
 </section>
 <section id="secAkses" class="hide">
-<div class="card"><div class="adminhead">✉️ Pengaturan Email Karyawan per Outlet</div><p class="note">Kosong = bebas masuk. Diisi email = hanya email tersebut yang bisa masuk.</p><div id="outletEmailList"></div></div>
+<div class="card"><div class="adminhead">🔑 Pengaturan PIN Toko per Outlet</div><p class="note"><strong>Wajib diisi:</strong> Karyawan hanya bisa masuk menggunakan PIN Toko yang didaftarkan untuk outlet tersebut.</p><div id="outletEmailList"></div></div>
 </section>
 <section id="secAdmin" class="hide">
 <div class="card">
@@ -258,27 +258,28 @@ function updateLoginUI(){
 var role=el("loginRoleSelect").value,out=el("loginOutletSelect").value;
 if(role==="staff"){
 el("emailLoginWrap").classList.remove("hide");el("passLoginWrap").classList.add("hide");
-var reqEmail=(data.outletEmails[out]||"").trim();
-el("loginHintText").textContent=reqEmail?"Outlet ini dikunci khusus email karyawan terdaftar.":"Email outlet kosong: siapapun dapat langsung masuk sebagai Karyawan.";
+var reqPin=(data.outletEmails[out]||"").trim();
+el("loginHintText").textContent=reqPin?"Masukkan PIN Toko "+out+" untuk masuk sebagai Karyawan.":"⚠️ PIN Toko "+out+" belum diatur oleh Pengembang.";
 }else{
 el("emailLoginWrap").classList.add("hide");el("passLoginWrap").classList.remove("hide");
-el("loginHintText").textContent="Masuk menggunakan Password "+role.toUpperCase()+" (tanpa email).";
+el("loginHintText").textContent="Masuk menggunakan Password "+role.toUpperCase()+" (tanpa PIN Toko).";
 }
 }
 el("loginRoleSelect").onchange=updateLoginUI;el("loginOutletSelect").onchange=updateLoginUI;
 function renderLoginOutlets(){el("loginOutletSelect").innerHTML=data.outlets.map(function(o){return '<option value="'+esc(o)+'">'+esc(o)+'</option>';}).join("");updateLoginUI();}
-    el("doLoginBtn").onclick=function(){
+el("doLoginBtn").onclick=function(){
 var outlet=el("loginOutletSelect").value,role=el("loginRoleSelect").value;
 if(role==="staff"){
-var reqEmail=(data.outletEmails[outlet]||"").trim().toLowerCase(),inpEmail=el("loginEmailInput").value.trim().toLowerCase();
-if(reqEmail&&inpEmail!==reqEmail){alert("Akses ditolak! Email tidak sesuai dengan karyawan terdaftar di "+outlet);return;}
+var reqPin=(data.outletEmails[outlet]||"").trim(),inpPin=el("loginEmailInput").value.trim();
+if(!reqPin){alert("Akses ditolak! PIN Toko untuk "+outlet+" belum didaftarkan oleh Pengembang.");return;}
+if(!inpPin||inpPin!==reqPin){alert("Akses ditolak! PIN Toko salah untuk "+outlet+".");return;}
 }else{
 var pass=el("loginPassInput").value.trim();
 var validPass=role==="management"?(data.shop.mgmtPass||"2222"):(role==="owner"?(data.shop.ownerPass||"1234"):(data.shop.devPass||"9999"));
 if(pass!==validPass){alert("Password salah!");return;}
 }
 session={outlet:outlet,role:role};ensureOutletStock(outlet);
-el("loginPassInput").value="";el("loginScreen").classList.add("hide");el("mainApp").classList.remove("hide");
+el("loginEmailInput").value="";el("loginPassInput").value="";el("loginScreen").classList.add("hide");el("mainApp").classList.remove("hide");
 var roleLbl={staff:"KARYAWAN TOKO",management:"MANAGEMENT",owner:"OWNER",dev:"PENGEMBANG"};
 el("activeSessionLabel").textContent=outlet+" · "+roleLbl[role];
 document.querySelectorAll("#navTabs .tab").forEach(function(t){if(t.classList.contains("role-"+role))t.classList.remove("hide");else t.classList.add("hide");});
@@ -513,9 +514,8 @@ stocks[session.outlet].initialDate=todayStr();
 saveStocks();all();alert("Berhasil pindah ke Stok Awal Tahun Baru!");
 });
 };
-    function renderOutletEmails(){el("outletEmailList").innerHTML=data.outlets.map(function(o){var em=data.outletEmails[o]||"";return '<div class="item"><label style="margin:0 0 4px">'+esc(o)+'</label><div class="row"><input value="'+esc(em)+'" placeholder="Kosong = Bebas Akses" onchange="window._setOutEmail(\''+esc(o)+'\',this.value)"><span class="badge '+(em?"ok":"wait")+'">'+(em?"Terkunci":"Bebas")+'</span></div></div>';}).join("");}
+function renderOutletEmails(){el("outletEmailList").innerHTML=data.outlets.map(function(o){var pin=data.outletEmails[o]||"";return '<div class="item"><label style="margin:0 0 4px">'+esc(o)+'</label><div class="row"><input type="text" inputmode="numeric" value="'+esc(pin)+'" placeholder="Masukkan PIN Toko (misal: 1122)" onchange="window._setOutEmail(\''+esc(o)+'\',this.value)"><span class="badge '+(pin?"ok":"alert")+'">'+(pin?"Aktif":"Belum Diatur")+'</span></div></div>';}).join("");}
 window._setOutEmail=function(out,val){data.outletEmails[out]=val.trim();saveMaster();renderOutletEmails();};
-
 function renderReport(){
 if(!session)return;var d=el("reportDate").value||todayStr(),list=sales.filter(function(s){return s.outlet===session.outlet&&s.date===d;}),omzet=0,cash=0,nonCash=0,unsynced=0;
 list.forEach(function(s){omzet+=s.total;if(s.method==="Tunai")cash+=s.total;else nonCash+=s.total;if(!s.synced)unsynced++;});
@@ -595,7 +595,26 @@ window._ed=function(k,i){var item=data[k][i];modal("Edit Data",'<label>Nama</lab
 window._dl=function(k,i){modal("Hapus Data",'<p class="note">Hapus item ini?</p>',function(){data[k].splice(i,1);saveMaster();all();});};
 function renderOutlets(){el("outletList").innerHTML=data.outlets.map(function(o,i){return '<div class="item"><div class="row"><strong>'+esc(o)+'</strong><div class="item-actions"><button type="button" onclick="window._edOut('+i+')">Ubah Nama</button></div></div></div>';}).join("");}
 window._edOut=function(i){modal("Ubah Nama Outlet",'<input id="mOut" value="'+esc(data.outlets[i])+'">',function(){var v=el("mOut").value.trim();if(v){data.outlets[i]=v;saveMaster();renderOutlets();renderLoginOutlets();}});};
-    function all(){
+function renderGrafik(){
+if(!session)return;
+var scope=el("chartScopeSelect").value,ym=todayStr().slice(0,7);
+var listSales=sales.filter(function(s){return (scope==="all"||s.outlet===session.outlet)&&s.date.indexOf(ym)===0;});
+var listIn=stockIns.filter(function(x){return (scope==="all"||x.outlet===session.outlet)&&x.date.indexOf(ym)===0;});
+var mOmzet=0,mVol=0,mCost=0;
+listSales.forEach(function(s){mOmzet+=s.total;s.items.forEach(function(i){mVol+=(i.vol||0);});});
+listIn.forEach(function(x){mCost+=(x.cost||0);});
+el("gMonthOmzet").textContent=fmt(mOmzet);el("gMonthCost").textContent=fmt(mCost);el("gMonthProfit").textContent=fmt(mOmzet-mCost);el("gMonthVol").textContent=mVol+" ml";
+var days=[],maxD=1;
+for(var i=6;i>=0;i--){var d=new Date();d.setDate(d.getDate()-i);var ds=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");var sum=sales.filter(function(s){return (scope==="all"||s.outlet===session.outlet)&&s.date===ds;}).reduce(function(a,b){return a+b.total;},0);if(sum>maxD)maxD=sum;days.push({lbl:ds.slice(5),val:sum});}
+el("chart7Days").innerHTML=days.map(function(x){return '<div class="bar-row"><div class="row"><small>'+x.lbl+'</small><strong>'+fmt(x.val)+'</strong></div><div class="bar-bg"><div class="bar-fill" style="width:'+Math.round(x.val/maxD*100)+'%"></div></div></div>';}).join("");
+var pMap={};listSales.forEach(function(s){s.items.forEach(function(i){if(i.parfum)pMap[i.parfum]=(pMap[i.parfum]||0)+(i.vol||1);});});
+var topP=Object.keys(pMap).map(function(k){return {name:k,vol:pMap[k]};}).sort(function(a,b){return b.vol-a.vol;}).slice(0,5),maxP=topP.length?topP.vol:1;
+el("chartTopParfum").innerHTML=topP.map(function(x){return '<div class="bar-row"><div class="row"><small>'+esc(x.name)+'</small><strong>'+x.vol+' ml</strong></div><div class="bar-bg"><div class="bar-fill" style="width:'+Math.round(x.vol/maxP*100)+'%"></div></div></div>';}).join("")||'<p class="note">Belum ada data penjualan bulan ini.</p>';
+var oList=data.outlets.map(function(o){return {name:o,val:sales.filter(function(s){return s.outlet===o&&s.date.indexOf(ym)===0;}).reduce(function(a,b){return a+b.total;},0)};}).filter(function(x){return x.val>0;}).sort(function(a,b){return b.val-a.val;}),maxO=oList.length?oList.val:1;
+el("chartOutlets").innerHTML=oList.map(function(x){return '<div class="bar-row"><div class="row"><small>'+esc(x.name)+'</small><strong>'+fmt(x.val)+'</strong></div><div class="bar-bg"><div class="bar-fill" style="width:'+Math.round(x.val/maxO*100)+'%"></div></div></div>';}).join("")||'<p class="note">Belum ada omzet outlet bulan ini.</p>';
+}
+el("chartScopeSelect").onchange=renderGrafik;
+  function all(){
 el("shopName").value=data.shop.name||"";el("shopAddr").value=data.shop.addr||"";el("sheetWebhook").value=data.shop.webhook||"";
 el("mgmtPassInput").value=data.shop.mgmtPass||"2222";el("ownerPassInput").value=data.shop.ownerPass||"1234";el("devPassInput").value=data.shop.devPass||"9999";
 el("shopSub").textContent=data.shop.name||"AURA International Perfume";
