@@ -346,10 +346,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 <section id="loginScreen">
 <div class="card">
 <div class="adminhead" style="text-align:center;font-size:17px">🔐 AKSES MASUK AURA POS</div>
-<div id="loginOutletWrap">
-  <label>Pilih Lokasi Outlet</label>
-  <select id="loginOutletSelect"></select>
-</div>
+<label>Pilih Lokasi Outlet</label><select id="loginOutletSelect"></select>
 <label>Masuk Sebagai</label>
 <select id="loginRoleSelect">
 <option value="staff">1. Karyawan Toko</option>
@@ -734,8 +731,9 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 <div class="card">
   <div class="row">
     <div class="adminhead" style="margin:0">📊 Laporan Management</div>
-        <select id="mgmtScope" class="hide" style="width:auto;padding:6px 10px;font-size:12px">
+    <select id="mgmtScope" style="width:auto;padding:6px 10px;font-size:12px">
       <option value="all">Semua Outlet</option>
+      <option value="outlet">Outlet Ini</option>
     </select>
   </div>
   <div class="laporan-filter">
@@ -743,7 +741,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
     <input type="date" id="mgmtTo">
     <button type="button" class="btn sm" id="mgmtApplyBtn" style="margin:0">Terapkan</button>
     <button type="button" class="btn secondary sm" id="mgmtResetBtn" style="margin:0">Bulan Ini</button>
-    <button type="button" class="btn secondary sm" id="btnExportBaru" style="margin:0">📤 Export</button>
+    <button type="button" class="btn secondary sm" id="mgmtExportBtn" style="margin:0">📤 Export</button>
   </div>
   <p class="note" id="mgmtPeriodLabel">—</p>
 </div>
@@ -1114,14 +1112,6 @@ function hasStokMinOverride(outlet,cat,name){
 /* ================== LOGIN 3 ROLE ================== */
 function updateLoginUI(){
   var role=el("loginRoleSelect").value,out=el("loginOutletSelect").value;
-  
-  // Jika Management, sembunyikan pilihan outlet
-  if(role==="management"){
-    el("loginOutletWrap").style.display = "none";
-  }else{
-    el("loginOutletWrap").style.display = "block";
-  }
-
   if(role==="staff"){
     el("emailLoginWrap").classList.remove("hide");
     el("passLoginWrap").classList.add("hide");
@@ -1157,12 +1147,8 @@ el("doLoginBtn").onclick=function(){
   ensureOutletStock(outlet);
   el("loginEmailInput").value="";el("loginPassInput").value="";
   el("loginScreen").classList.add("hide");el("mainApp").classList.remove("hide");
-    var roleLbl={staff:"KARYAWAN TOKO",management:"MANAGEMENT",admin:"ADMIN"};
-  if(role === "management"){
-    el("activeSessionLabel").textContent = "Semua Outlet · MANAGEMENT";
-  } else {
-    el("activeSessionLabel").textContent = outlet + " · " + roleLbl[role];
-  }
+  var roleLbl={staff:"KARYAWAN TOKO",management:"MANAGEMENT",admin:"ADMIN"};
+  el("activeSessionLabel").textContent=outlet+" · "+roleLbl[role];
   document.querySelectorAll("#navTabs .tab").forEach(function(t){
     if(t.classList.contains("role-"+role))t.classList.remove("hide");
     else t.classList.add("hide");
@@ -2525,7 +2511,7 @@ function initMgmtDates(){
   el("mgmtTo").value=mgmtTo;
 }
 function getMgmtData(){
-   var scope = "all"; // Management selalu melihat semua
+  var scope=el("mgmtScope").value;
   var from=el("mgmtFrom").value||mgmtFrom;
   var to=el("mgmtTo").value||mgmtTo;
   var outletFilter=(scope==="all")?null:session.outlet;
@@ -2967,25 +2953,7 @@ el("addPurchase").onclick=function(){
   data.purchases.push({name:n,price:v,buy:b,min:mn});
   el("newPurchaseName").value="";el("newPurchasePrice").value="";el("newPurchaseBuyPrice").value="0";saveMaster();all();
 };
-el("btnExportBaru").onclick = function(){
-  if(!session) return;
-  var from = el("mgmtFrom").value || mgmtFrom;
-  var to = el("mgmtTo").value || mgmtTo;
-  var listSales = sales.filter(function(s){ return s.date>=from && s.date<=to; });
-  if(!listSales.length){ toast("Belum ada data untuk diexport.","err"); return; }
-  
-  var rows = [["OUTLET","TANGGAL","NO_NOTA","METODE","TOTAL"]];
-  listSales.forEach(function(s){ rows.push([s.outlet, s.date, s.id, s.method, s.total]); });
-  
-  var csv = "\uFEFF" + rows.map(function(r){
-    return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(",");
-  }).join("\r\n");
-  
-  var a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
-  a.download = "LaporanMgmt_" + todayStr() + ".csv";
-  a.click();
-};
+
 /* ================== INIT ================== */
 pruneOldData();
 renderLoginOutlets();
