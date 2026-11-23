@@ -776,10 +776,10 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
     <div class="kpi-card"><div class="kp-label">TOTAL BELANJA (NORMAL)</div><div class="kp-val" id="rpBelanjaNormal">Rp0</div><div class="kp-sub flat">qty masuk × harga beli</div></div>
     <div class="kpi-card"><div class="kp-label">TOTAL BELANJA (NETTO)</div><div class="kp-val" id="rpBelanjaNetto">Rp0</div><div class="kp-sub flat">setelah susut 2,5%</div></div>
     <div class="kpi-card"><div class="kp-label">RASIO HPP / OMZET</div><div class="kp-val" id="rpHppRatio">0%</div><div class="kp-sub flat">semakin kecil semakin baik</div></div>
-    <div class="kpi-card"><div class="kp-label">LABA KOTOR</div><div class="kp-val" id="rpLabaKotor">Rp0</div><div class="kp-sub flat">omzet − belanja netto</div></div>
+        <!-- Laba Kotor disembunyikan -->
   </div>
   <div class="card"><div class="adminhead">📊 Perbandingan Harian</div><div id="rpBelanjaChart"></div></div>
-  <div class="card"><div class="adminhead">📅 Rekap Bulanan</div>
+    <div class="card"><div class="adminhead">📅 Rekap Bulanan</div>
     <div style="overflow-x:auto"><table class="data-table" id="rpBulananTable"></table></div>
   </div>
 </div>
@@ -2548,10 +2548,10 @@ function renderMgmtBelanja(d){
   var totalN=0,totalNet=0;
   d.listDist.forEach(function(x){totalN+=x.totalNormal;totalNet+=x.totalNetto;});
   var omzet=0;d.listSales.forEach(function(s){omzet+=s.total;});
-  el("rpBelanjaNormal").textContent=fmt(totalN);
+    el("rpBelanjaNormal").textContent=fmt(totalN);
   el("rpBelanjaNetto").textContent=fmt(totalNet);
   el("rpHppRatio").textContent=omzet>0?Math.round(totalNet/omzet*100)+"%":"0%";
-  el("rpLabaKotor").textContent=fmt(omzet-totalNet);
+  // Baris laba kotor dihapus
   // chart daily
   var days={};
   d.listSales.forEach(function(s){days[s.date]=days[s.date]||{omzet:0,belanja:0};days[s.date].omzet+=s.total;});
@@ -2574,15 +2574,14 @@ function renderMgmtBelanja(d){
     byMonth[m]=byMonth[m]||{omzet:0,belanja:0};
     byMonth[m].belanja+=x.totalNetto;
   });
-  var mkeys=Object.keys(byMonth).sort();
-  var mhtml='<tr><th>Bulan</th><th class="right">Omzet</th><th class="right">Belanja</th><th class="right">Laba Kotor</th><th class="right">HPP %</th></tr>';
+   var mkeys=Object.keys(byMonth).sort();
+  var mhtml='<tr><th>Bulan</th><th class="right">Omzet</th><th class="right">Belanja</th><th class="right">HPP %</th></tr>';
   mkeys.forEach(function(m){
     var x=byMonth[m];
-    var laba=x.omzet-x.belanja;
     var hpp=x.omzet>0?Math.round(x.belanja/x.omzet*100):0;
-    mhtml+='<tr><td>'+m+'</td><td class="right">'+fmt(x.omzet)+'</td><td class="right">'+fmt(x.belanja)+'</td><td class="right" style="color:'+(laba>=0?'#16a34a':'#dc2626')+'">'+fmt(laba)+'</td><td class="right">'+hpp+'%</td></tr>';
+    mhtml+='<tr><td>'+m+'</td><td class="right">'+fmt(x.omzet)+'</td><td class="right">'+fmt(x.belanja)+'</td><td class="right">'+hpp+'%</td></tr>';
   });
-  if(!mkeys.length)mhtml+='<tr><td colspan="5" class="note">Belum ada data.</td></tr>';
+  if(!mkeys.length)mhtml+='<tr><td colspan="4" class="note">Belum ada data.</td></tr>';
   el("rpBulananTable").innerHTML=mhtml;
 }
 function renderMgmtStok(d){
@@ -2691,9 +2690,9 @@ function renderGrafik(){
   var mOmzet=0,mVol=0,mCost=0;
   listSales.forEach(function(s){mOmzet+=s.total;s.items.forEach(function(i){mVol+=(i.vol||0);});});
   listDist.forEach(function(x){mCost+=(x.totalNetto||0);});
-  el("gMonthOmzet").textContent=fmt(mOmzet);
+    el("gMonthOmzet").textContent=fmt(mOmzet);
   el("gMonthCost").textContent=fmt(mCost);
-  el("gMonthProfit").textContent=fmt(mOmzet-mCost);
+  // el("gMonthProfit").textContent=fmt(mOmzet-mCost); // dihapus
   el("gMonthVol").textContent=mVol+" ml";
   var days=[],maxD=1;
   for(var i=6;i>=0;i--){
