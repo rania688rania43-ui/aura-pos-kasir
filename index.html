@@ -502,6 +502,7 @@ var st=a.diff<0?("LOSE "+Math.abs(a.diff)+a.unit):(a.diff>0?("+"+a.diff+a.unit):
 txt+="- "+a.name+" ("+a.date+"): Sys "+a.sys+" | Fisik "+a.act+" -> *"+st+"*\n";
 });
 window.open("https://wa.me"+encodeURIComponent(txt),"_blank");
+  
 };
 
 el("filterAudit").oninput=renderOwnerAudit;
