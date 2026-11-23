@@ -1164,15 +1164,25 @@ el("exitSaveBtn").onclick=async function(){
 function renderPerfumeOptions(filter){
   var q=(filter||"").toLowerCase().trim();
   var list=data.perfumes.map(function(x,i){return {x:x,i:i};}).filter(function(o){return !q||o.x.name.toLowerCase().indexOf(q)>=0;});
-  if(!list.length){el("perfumeSelect").innerHTML='<option value="-1">Tidak ditemukan</option>';}
-  else{el("perfumeSelect").innerHTML=list.map(function(o){return '<option value="'+o.i+'">'+esc(o.x.name)+' — '+fmt(o.x.price)+'/ml</option>';}).join("");}
+  
+  if(!list.length){
+    el("perfumeSelect").innerHTML='<option value="-1">Tidak ditemukan</option>';
+  }else{
+    // Buat opsi dengan warna selang-seling (hanya nama, tanpa harga)
+    el("perfumeSelect").innerHTML=list.map(function(o, idx){
+      var bgColor = (idx % 2 === 0) ? "#ffffff" : "#eff6ff"; // Putih dan Biru Muda
+      var style = 'style="background-color:'+bgColor+'; color:#0f172a; padding:10px; font-weight:600;"';
+      return '<option value="'+o.i+'" '+style+'>'+esc(o.x.name)+'</option>';
+    }).join("");
+  }
   calcCurrentItem();
 }
 function renderSelects(){
   renderPerfumeOptions(el("searchParfum").value);
   el("mixSelect").innerHTML=data.mixes.map(function(x,i){return '<option value="'+i+'">'+esc(x.name)+' ('+(x.price===0?"Gratis":fmt(x.price)+"/ml")+')</option>';}).join("");
-  var caps=data.capacities.map(function(x,i){return {x:x,i:i};}).sort(function(a,b){return a.x.size-b.x.size;});
-  el("capacitySelect").innerHTML=caps.map(function(o){return '<option value="'+o.i+'">'+o.x.size+' ml</option>';}).join("");
+    var caps=data.capacities.map(function(x,i){return {x:x,i:i};}).sort(function(a,b){return a.x.size-b.x.size;});
+  // Tambahkan opsi default "0 ml" di paling atas
+  el("capacitySelect").innerHTML = '<option value="-1">0 ml</option>' + caps.map(function(o){return '<option value="'+o.i+'">'+o.x.size+' ml</option>';}).join("");
   var sortedB=data.purchases.map(function(x,i){return {x:x,i:i};}).sort(function(a,b){
     if(a.x.name.toLowerCase()==="refill")return -1;
     if(b.x.name.toLowerCase()==="refill")return 1;
@@ -1202,8 +1212,12 @@ knob.addEventListener("pointercancel",function(){dragging=false;});
 /* ================== CALC ITEM ================== */
 function calcCurrentItem(){
   var idx=+el("perfumeSelect").value;
-  if(idx<0||isNaN(idx)||!data.perfumes[idx]||!data.mixes.length||!data.capacities.length||!data.purchases.length){
-    el("itemSubtotal").textContent="Rp0";el("itemFormula").textContent="—";
+  var capIdx=+el("capacitySelect").value;
+  
+  // Jika parfum tidak dipilih (-1) ATAU kapasitas masih 0ml (-1), reset harganya
+  if(idx<0 || isNaN(idx) || capIdx<0 || isNaN(capIdx) || !data.perfumes[idx] || !data.mixes.length || !data.capacities.length || !data.purchases.length){
+    el("itemSubtotal").textContent="Rp0";
+    el("itemFormula").textContent="—";
     if(el("ksItemVal"))el("ksItemVal").textContent="Rp0";
     if(el("ksItemDesc"))el("ksItemDesc").textContent="—";
     return null;
