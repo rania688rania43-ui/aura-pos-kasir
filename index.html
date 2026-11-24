@@ -97,7 +97,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 }
 .dropdown.open{display:block;animation:fadeIn .15s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
-.dropdown button{
+  .dropdown button{
   width:100%;border:0;background:none;text-align:left;
   padding:9px 11px;font-size:13px;border-radius:7px;cursor:pointer;
   display:flex;align-items:center;gap:8px;color:var(--text);
@@ -197,7 +197,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
   background:linear-gradient(135deg,#eff6ff,#f0fdf4);
   border:1px solid #bfdbfe;border-radius:12px;padding:12px;margin-bottom:10px;
 }
-.audit-progress{height:12px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin:8px 0}
+  .audit-progress{height:12px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin:8px 0}
 .audit-progress .fill{height:100%;background:linear-gradient(90deg,#0d6efd,#16a34a);transition:width .3s}
 .audit-item-row{
   display:grid;grid-template-columns:1fr 90px;gap:8px;align-items:center;
@@ -296,7 +296,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 .data-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
 .data-table th,.data-table td{border:1px solid #e2e8f0;padding:7px 8px;text-align:left}
 .data-table th{background:#eff6ff;color:#0369a1;font-weight:800}
-.data-table tr:nth-child(even){background:#f8fafc}
+  .data-table tr:nth-child(even){background:#f8fafc}
 .data-table td.right{text-align:right}
 .data-table td.center{text-align:center}
 .data-table .total-row{background:#eff6ff;font-weight:800}
@@ -396,7 +396,6 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 <button type="button" class="tab role-mgmt role-admin hide" id="tMgmt">Laporan <span id="notifBadge" class="badge alert hide">0</span></button>
 <button type="button" class="tab role-admin hide" id="tNotif">🔔 Notif <span id="notifBadgeAdmin" class="badge alert hide">0</span></button>
 </div>
-
 <!-- ============ KASIR ============ -->
 <section id="secKasir">
 <div class="kasir-sticky">
@@ -427,7 +426,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
   
   <button type="button" id="pctPlusBtn" style="width:34px; height:34px; border-radius:8px; border:1px solid #bfdbfe; background:#eff6ff; color:#0d6efd; font-size:18px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">▶</button>
 </div>
-<div class="status good" id="status">★ RECOMMENDED ★</div>
+<div class="status good" id="status">☑️ RECOMMENDED ☑️</div>
 </div>
 <div class="line"><span id="itemFormula">Komposisi</span><strong id="itemSubtotal">Rp0</strong></div>
 <button type="button" class="btn secondary" id="addToCartBtn">+ Tambah ke Keranjang</button>
@@ -482,7 +481,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 <div class="stat-box"><div class="small">Est. Laba Kotor</div><div class="stat-val" id="gMonthProfit" style="color:var(--green)">Rp0</div></div>
 <div class="stat-box"><div class="small">Total Volume Terjual</div><div class="stat-val" id="gMonthVol">0 ml</div></div>
 </div>
-<div class="card"><div class="adminhead">📊 Grafik Omzet 7 Hari Terakhir</div><div id="chart7Days"></div></div>
+<div class="card"><div class="adminhead">📉 Grafik Omzet 7 Hari Terakhir</div><div id="chart7Days"></div></div>
 <div class="card"><div class="adminhead">🏆 5 Parfum Terlaris (Top Sales)</div><div id="chartTopParfum"></div></div>
 <div class="card"><div class="adminhead">🏪 Perbandingan Omzet Antar Outlet</div><div id="chartOutlets"></div></div>
 </div>
@@ -491,11 +490,11 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 <!-- ============ STOK AWAL ============ -->
 <section id="secStokAwal" class="hide">
 <div class="card">
-<div class="adminhead">📅 Pengaturan Stok Awal Outlet</div>
+<div class="adminhead">✅ Pengaturan Stok Awal Outlet</div>
 <label>Tanggal Berlaku Stok Awal</label><input type="date" id="stokAwalDateInput">
 <button type="button" class="btn" id="saveStokAwalDateBtn">Simpan Tanggal Stok Awal</button>
 <div class="admin-section">
-<div class="adminhead">Export & Import Stok Awal (CSV / Excel)</div>
+  <div class="adminhead">Export & Import Stok Awal (CSV / Excel)</div>
 <button type="button" class="btn secondary" id="exportStokAwalBtn">📤 Export Stok Awal (CSV)</button>
 <label style="margin-top:10px">📥 Import File Stok Awal (CSV)</label><input type="file" id="importStokAwalInput" accept=".csv,text/csv">
 </div>
@@ -572,7 +571,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 </div>
 
 <div class="card">
-  <div class="adminhead">📅 Rekap Distribusi</div>
+  <div class="adminhead">✅ Rekap Distribusi</div>
   <div class="grid">
     <div><label>Dari Tanggal</label><input type="date" id="distRekapFrom"></div>
     <div><label>Sampai Tanggal</label><input type="date" id="distRekapTo"></div>
@@ -595,7 +594,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 <!-- ============ CEK STOK (SESI) ============ -->
 <section id="secAudit" class="hide">
 <div class="sticky-head">
-  <h2>🛡️ Cek Stok per Sesi</h2>
+    <h2>🛡️ Cek Stok per Sesi</h2>
   <button type="button" class="btn-save-all" id="saveAuditSessionBtn">💾 Simpan Sesi</button>
 </div>
 
@@ -642,12 +641,12 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 <!-- ============ STOK MINIM PER OUTLET ============ -->
 <section id="secStokMin" class="hide">
 <div class="sticky-head">
-  <h2>⚖️ Stok Minim per Outlet</h2>
+  <h2>⚠️ Stok Minim per Outlet</h2>
   <span class="small" style="color:#0369a1;font-weight:700">Gunakan tombol 💾 di atas</span>
 </div>
 
 <div class="card">
-  <div class="adminhead">📌 Pengaturan Stok Minim</div>
+  <div class="adminhead">🔌 Pengaturan Stok Minim</div>
   <p class="note">Nilai default diambil dari Master Parfum. Anda bisa override per outlet. Baris berwarna kuning berarti nilainya sudah di-override.</p>
   <div class="grid">
     <div><label>Pilih Outlet</label><select id="minOutletSelect"></select></div>
@@ -694,8 +693,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
   <span class="small" style="color:#0369a1;font-weight:700">Gunakan tombol 💾 di atas</span>
 </div>
 <div class="card">
-
-<label>Nama Brand / Toko</label><input id="shopName">
+  <label>Nama Brand / Toko</label><input id="shopName">
 <label>Slogan / Alamat Kop Struk</label><input id="shopAddr">
 <label>Link Google Sheets Closing</label><input id="sheetWebhook" placeholder="https://script.google.com/macros/s/...">
 <label>Nomor WA Notifikasi Admin</label><input id="devWaInput" type="tel" placeholder="628123456789">
@@ -794,9 +792,9 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
       <div class="kpi-card"><div class="kp-label">TOTAL BELANJA (NETTO)</div><div class="kp-val" id="rpBelanjaNetto">Rp0</div><div class="kp-sub flat">setelah susut 2,5%</div></div>
       <div class="kpi-card"><div class="kp-label">RASIO HPP / OMZET</div><div class="kp-val" id="rpHppRatio">0%</div><div class="kp-sub flat">semakin kecil semakin baik</div></div>
       <div class="kpi-card"><div class="kp-label">LABA KOTOR</div><div class="kp-val" id="rpLabaKotor">Rp0</div><div class="kp-sub flat">omzet − belanja netto</div></div>
-    </div>
+          </div>
     <div class="card"><div class="adminhead">📊 Perbandingan Harian</div><div id="rpBelanjaChart"></div></div>
-    <div class="card"><div class="adminhead">📅 Rekap Bulanan</div>
+    <div class="card"><div class="adminhead">✅ Rekap Bulanan</div>
       <div style="overflow-x:auto"><table class="data-table" id="rpBulananTable"></table></div>
     </div>
   </div>
@@ -826,7 +824,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 
 <!-- ================= TAMPILAN DETAIL TOKO ================= -->
 <div id="mgmtDetailView" class="hide">
-    <button type="button" class="btn secondary" id="mgmtBackBtn" style="margin-bottom:12px">⬅ Kembali</button>
+    <button type="button" class="btn secondary" id="mgmtBackBtn" style="margin-bottom:12px">↩️ Kembali</button>
   
   <div class="card" style="background:linear-gradient(135deg,#e0f2fe,#dcfce7); border-color:#7dd3fc;">
     <div class="adminhead" id="mgmtDetailTitle" style="font-size:18px; color:#0369a1; margin:0;">Detail Outlet</div>
@@ -993,7 +991,7 @@ function pruneOldData(){
   stockIns=stockIns.filter(function(s){return s.date>=cutStr;});
   saveSales();saveStockIns();
 }
-
+  
 /* ================== TOAST ================== */
 function toast(msg,type){
   var w=el("toastWrap");var t=document.createElement("div");
@@ -1050,7 +1048,7 @@ function dropdownHTML(uid,items){
   var btns=items.map(function(it){
     return '<button type="button" class="'+(it.danger?"danger":"")+'" onclick="'+it.onclick+'">'+it.label+'</button>';
   }).join("");
-  return '<div class="menu-wrap"><button type="button" class="btn-dots" onclick="window._toggleMenu(\''+uid+'\',event)">⋯</button><div class="dropdown" id="dd_'+uid+'">'+btns+'</div></div>';
+  return '<div class="menu-wrap"><button type="button" class="btn-dots" onclick="window._toggleMenu(\''+uid+'\',event)">⋮</button><div class="dropdown" id="dd_'+uid+'">'+btns+'</div></div>';
 }
 window._toggleMenu=function(uid,e){
   e.stopPropagation();
@@ -1092,7 +1090,7 @@ function ensureOutletStock(outlet){
   data.purchases.forEach(function(b){
     if(s.initial.purchases[b.name]===undefined)s.initial.purchases[b.name]=b.price===0?9999:30;
     if(s.current.purchases[b.name]===undefined)s.current.purchases[b.name]=s.initial.purchases[b.name];
-  });
+      });
   saveStocks();
 }
 
@@ -1192,7 +1190,7 @@ el("exitNoSaveBtn").onclick=function(){el("exitModal").classList.add("hide");per
 el("exitSaveBtn").onclick=async function(){
   el("exitModal").classList.add("hide");
   await globalSaveAll();
-  performLogout();
+    performLogout();
 };
   /* ================== KASIR: PERFUME / SELECTS ================== */
 function renderPerfumeOptions(filter){
@@ -1291,7 +1289,7 @@ function calcCurrentItem(){
   var step=Math.max(1,+data.rounding||1000);
   var sub=Math.ceil(raw/step)*step;
   el("pctLabel").textContent=pct+"%";
-  el("status").textContent=pct<=30?"NOT RECOMMENDED":"★ RECOMMENDED ★";
+    el("status").textContent=pct<=30?"NOT RECOMMENDED":"☑️ RECOMMENDED ☑️";
   el("status").className="status "+(pct<=30?"bad":"good");
   var desc=oil.toFixed(1)+"ml bibit + "+sol.toFixed(1)+"ml "+m.name+" + "+b.name;
   el("itemFormula").textContent=desc;
@@ -1391,7 +1389,7 @@ el("checkoutBtn").onclick=function(){
   renderCart();all();
   showReceiptPreview(buildReceipt58(trx));
   toast("✅ Transaksi tersimpan.","ok");
-};
+  };
 
 /* ================== LOW STOCK / ORDER (PER OUTLET) ================== */
 function getLowStockItems(outlet){
@@ -1482,7 +1480,8 @@ el("importStokAwalInput").onchange=function(e){
 };
 el("filterStokAwal").oninput=renderStokAwal;
   /* ================== DISTRIBUSI STOK MASUK ================== */
-var DIST_KEY="auraPos19DistV9";
+// DIST_KEY sudah dideklarasikan di bagian_10 (var DIST_KEY="auraPos19DistV9").
+// Tidak dideklarasikan ulang di sini untuk menghindari duplikasi.
 var distHistory=[];
 try{distHistory=JSON.parse(localStorage.getItem(DIST_KEY))||[];}catch(e){distHistory=[];}
 function saveDistHistory(){try{localStorage.setItem(DIST_KEY,JSON.stringify(distHistory));}catch(e){toast("⚠️ Penyimpanan penuh!","err");}}
@@ -1490,7 +1489,7 @@ function saveDistHistory(){try{localStorage.setItem(DIST_KEY,JSON.stringify(dist
 function getHargaBeli(cat,name){
   var list=data[cat];if(!list)return 0;
   var item=list.find(function(x){return x.name===name;});
-  return item?(item.buy||0):0;
+    return item?(item.buy||0):0;
 }
 function getSusutRate(cat){
   if(cat==="purchases")return 0;
@@ -1590,7 +1589,7 @@ function updateDistHargaBeliWarn(){
   if(list.length>0){
     el("distHargaBeliWarn").style.display="flex";
     el("distHargaBeliWarnTxt").textContent="⚠️ Ada "+list.length+" parfum dengan harga beli 0. Distribusi diblokir sampai dilengkapi.";
-  }else{
+      }else{
     el("distHargaBeliWarn").style.display="none";
   }
 }
@@ -1656,6 +1655,9 @@ el("distRetryAllBtn").onclick=function(){
   distQueue.filter(function(d){return d.status!=="sent";}).forEach(function(d){trySendDist(d.id);});
 };
 
+// Catatan: mode "no-cors" dipakai karena Google Apps Script tidak mengirim CORS header.
+// Konsekuensi: response bersifat opaque, jadi status "terkirim" bersifat optimistis
+// (dianggap terkirim jika network OK). Kalau butuh verifikasi server, perlu proxy CORS.
 async function trySendDist(id){
   var d=distQueue.find(function(x){return x.id===id;});
   if(!d||d.status==="sent")return;
@@ -1689,7 +1691,7 @@ setInterval(function(){
   if(navigator.onLine){
     distQueue.filter(function(d){return d.status!=="sent";}).forEach(function(d){trySendDist(d.id);});
   }
-},120000);
+  },120000);
 
 /* RIWAYAT & REKAP DISTRIBUSI */
 function renderDistHistory(){
@@ -1711,9 +1713,17 @@ window._viewDist=function(id){
     html+='<div class="dist-item"><div><div class="di-name">'+esc(it.name)+'</div><div class="di-sub">'+it.qtyIn+' → '+it.qtyNet+' '+it.unit+' @'+fmt(it.hargaBeli)+'</div></div><div class="di-qty"><div class="di-val">'+fmt(it.nilaiNetto)+'</div></div></div>';
   });
   html+='</div><div class="dist-summary"><div class="ds-row"><span>Total Normal</span><strong>'+fmt(d.totalNormal)+'</strong></div><div class="ds-row total"><span>Total Netto</span><strong>'+fmt(d.totalNetto)+'</strong></div></div>';
+  // Simpan handler global modalSave & teks tombol, lalu restore setelah modal ditutup
+  var oldSaveHandler = el("modalSave").onclick;
+  var oldSaveText = el("modalSave").textContent;
   modal("Detail Distribusi "+d.id,html,null);
   el("modalSave").textContent="Tutup";
-  el("modalSave").onclick=function(){el("editModal").classList.add("hide");el("modalSave").textContent="Simpan";el("modalSave").onclick=function(){if(act){var r=act();if(r===false)return;}el("editModal").classList.add("hide");act=null;};};
+  el("modalSave").onclick=function(){
+    el("editModal").classList.add("hide");
+    act=null;
+    el("modalSave").textContent=oldSaveText;
+    el("modalSave").onclick=oldSaveHandler;
+  };
 };
 
 function renderDistRekap(){
@@ -1789,7 +1799,7 @@ function createAuditDraft(){
     status:"draft",items:items
   };
   auditSessions.unshift(draft);saveAuditSessions();markDirty();renderAuditSession();
-  toast("Sesi baru dibuat. Isi stok fisik semua item.","ok");
+    toast("Sesi baru dibuat. Isi stok fisik semua item.","ok");
 }
 function renderAuditSession(){
   if(!session)return;
@@ -1888,8 +1898,8 @@ function renderAuditHistoryNew(){
     var st=s.stats||{lose:0,gain:0,same:0,total:s.items.length};
     return '<div class="audit-session-card" data-id="'+s.id+'">'+
       '<div class="as-head"><div class="as-id">'+s.id+'</div><span class="badge ok">Final</span></div>'+
-      '<div class="as-meta">📅 '+s.date+' · '+s.createdAt+' · '+st.total+' item</div>'+
-      '<div class="as-stat"><span style="color:#16a34a">✅ '+st.same+' sesuai</span><span style="color:#dc2626">⚠️ '+st.lose+' lose</span><span style="color:#0284c7">➕ '+st.gain+' lebih</span></div></div>';
+            '<div class="as-meta">📅 '+s.date+' · '+s.createdAt+' · '+st.total+' item</div>'+
+      '<div class="as-stat"><span style="color:#16a34a">✅ '+st.same+' sesuai</span><span style="color:#dc2626">❌ '+st.lose+' lose</span><span style="color:#0284c7">➕ '+st.gain+' lebih</span></div></div>';
   }).join("");
   document.querySelectorAll(".audit-session-card").forEach(function(c){
     c.onclick=function(){showAuditDetail(this.getAttribute("data-id"));};
@@ -1982,13 +1992,13 @@ el("waAuditBtn").onclick=function(){
   var s=auditSessions.find(function(x){return x.id===currentAuditDetailId;});
   if(!s)return;
   var st=s.stats||{lose:0,gain:0,same:0,total:s.items.length};
-  var txt="*REKAP CEK STOK "+s.id+"*\nOutlet: "+s.outlet+"\nTanggal: "+s.date+"\n\nTotal: "+st.total+"\n✅ Sesuai: "+st.same+"\n⚠️ Lose: "+st.lose+"\n➕ Lebih: "+st.gain+"\n\n*Detail Lose/Lebih:*\n";
+  var txt="*REKAP CEK STOK "+s.id+"*\nOutlet: "+s.outlet+"\nTanggal: "+s.date+"\n\nTotal: "+st.total+"\n✅ Sesuai: "+st.same+"\n❌ Lose: "+st.lose+"\n➕ Lebih: "+st.gain+"\n\n*Detail Lose/Lebih:*\n";
   s.items.forEach(function(it){
     var diff=+(it.act-it.sys).toFixed(1);
     if(diff!==0)txt+="- "+it.name+": "+it.sys+" → "+it.act+" ("+(diff>0?"+":"")+diff+" "+it.unit+")\n";
   });
   openWaModal(txt,data.shop.pusatWa);
-};
+  };
 
 /* ================== STOK MINIM PER OUTLET ================== */
 function renderMinOutletSelect(){
@@ -2085,9 +2095,8 @@ el("minImportInput").onchange=function(e){
   };
   reader.readAsText(file);this.value="";
 };
-el("minExportBtn").onclick=el("minExportBtn").onclick;
   /* ================== PIN TOKO ================== */
-function renderOutletEmails(){
+ function renderOutletEmails(){
   el("outletEmailList").innerHTML=data.outlets.map(function(o){
     var pin=data.outletEmails[o]||"";
     return '<div class="item"><label style="margin:0 0 4px">'+esc(o)+'</label><div class="row"><input type="text" inputmode="numeric" value="'+esc(pin)+'" placeholder="PIN Toko" data-outlet="'+esc(o)+'" class="pin-input"><span class="badge '+(pin?"ok":"alert")+'">'+(pin?"Aktif":"Belum Diatur")+'</span></div></div>';
@@ -2133,6 +2142,8 @@ async function globalSaveAll(){
 el("globalSaveBtn").onclick=globalSaveAll;
 el("saveProfileBtn").onclick=globalSaveAll;
 
+// Catatan: outletEmails sengaja dikosongkan (tidak dikirim ke cloud) untuk keamanan PIN.
+// Konsekuensi: PIN tidak sync antar device. Kalau butuh sync, hapus baris sanitized.outletEmails={}.
 async function pushCloudMaster(){
   if(!data.shop.webhook)return;
   var sanitized=clone(data);
@@ -2168,7 +2179,25 @@ async function pullCloudData(){
     if(j&&Array.isArray(j.sales)&&j.sales.length){
       j.sales.forEach(function(cs){
         if(cs.id&&!sales.some(function(ls){return ls.id===cs.id;})){
-          sales.push({outlet:cs.outlet,id:cs.id,date:String(cs.date).slice(0,10),time:cs.time,method:cs.method,items:[{parfum:cs.summary,vol:0,pct:0,campuran:"",botol:"",subtotal:cs.total}],total:cs.total,synced:true});
+          // Perbaikan: pakai vol dari cloud jika ada (jangan hardcode 0),
+          // supaya laporan Top Parfum / volume tetap akurat.
+          sales.push({
+            outlet:cs.outlet,
+            id:cs.id,
+            date:String(cs.date).slice(0,10),
+            time:cs.time,
+            method:cs.method,
+            items:[{
+              parfum:cs.summary,
+              vol:(typeof cs.vol==="number"?cs.vol:0),
+              pct:(typeof cs.pct==="number"?cs.pct:0),
+              campuran:cs.campuran||"",
+              botol:cs.botol||"",
+              subtotal:cs.total
+            }],
+            total:cs.total,
+            synced:true
+          });
         }
       });
       saveSales();if(session)renderGrafik();
@@ -2187,7 +2216,7 @@ el("importMasterInput").onchange=function(e){
   reader.onload=async function(ev){
     try{
       var parsed=JSON.parse(ev.target.result);
-      if(parsed&&parsed.perfumes&&parsed.outlets){
+            if(parsed&&parsed.perfumes&&parsed.outlets){
         var keepHook=data.shop.webhook;
         var keepPass={mgmt:data.shop.mgmtPass,dev:data.shop.devPass};
         data=parsed;
@@ -2286,7 +2315,7 @@ window._reprint=function(id){
   if(trx)showReceiptPreview(buildReceipt58(trx));
 };
 window._editSale=function(id){
-  var trx=sales.find(function(s){return s.id===id;});
+    var trx=sales.find(function(s){return s.id===id;});
   if(!trx||session.role!=="admin")return;
   modal("Edit Penjualan "+trx.id,
     '<label>Tanggal Transaksi</label><input type="date" id="mSaleDate" value="'+trx.date+'">'+
@@ -2319,6 +2348,8 @@ window._devDelSale=function(id){
     });
 };
 
+// Catatan: mode "no-cors" dipakai untuk kompatibilitas Google Apps Script.
+// Response opaque → status "berhasil" bersifat optimistis (network OK = dianggap terkirim).
 el("closingBtn").onclick=async function(){
   if(!session)return;
   if(this.disabled)return;
@@ -2386,7 +2417,7 @@ el("csvFileInput").onchange=function(e){
     saveMaster();all();await pushCloudMaster();
     toast("✅ "+added+" baru, "+updated+" diperbarui.","ok");
   };
-  reader.readAsText(file);
+    reader.readAsText(file);
 };
 
 /* ================== AJUKAN HAPUS & BATAL ================== */
@@ -2439,7 +2470,7 @@ function renderAdminNotif(){
   var zero=getHargaBeliZeroList();
   zero.forEach(function(p){
     items.push({
-      html:'<div class="notif-item"><div class="ni-head">⚠️ Harga Beli 0: '+esc(p.name)+'</div><div class="ni-sub">Parfum ini belum diisi harga beli. Distribusi stok masuk diblokir sampai dilengkapi.</div><div class="ni-actions"><button type="button" class="btn-fix" onclick="window._goFixHargaBeli(\''+esc(p.name).replace(/'/g,"\\'")+'\')">🔗 Buka & Isi</button></div></div>'
+      html:'<div class="notif-item"><div class="ni-head">⚠️ Harga Beli 0: '+esc(p.name)+'</div><div class="ni-sub">Parfum ini belum diisi harga beli. Distribusi stok masuk diblokir sampai dilengkapi.</div><div class="ni-actions"><button type="button" class="btn-fix" onclick="window._goFixHargaBeli(\''+esc(p.name).replace(/'/g,"\\'")+'\')">🔧 Buka & Isi</button></div></div>'
     });
   });
   var pend=delReqs.filter(function(r){return r.status==="pending";});
@@ -2485,7 +2516,7 @@ window._acceptReq=async function(reqId){
   if(!r||session.role!=="admin")return;
   if(r.type==="sale"){
     var idx=sales.findIndex(function(s){return s.id===r.targetId;});
-    if(idx>=0){
+        if(idx>=0){
       var trx=sales[idx];ensureOutletStock(trx.outlet);
       var cur=stocks[trx.outlet].current;
       trx.items.forEach(function(it){
@@ -2585,7 +2616,7 @@ function renderMgmtOmzet(d){
     var border = x.omzet>0 ? "#16a34a" : "#cbd5e1";
     html+='<div class="item" style="cursor:pointer; border-left:4px solid '+border+'; padding:12px; background:#fff;" onclick="window._openMgmtDetail(\''+esc(x.name)+'\')">'+
       '<div class="row"><strong>🏪 '+esc(x.name)+'</strong><span style="font-weight:900; color:#0d6efd">'+fmt(x.omzet)+'</span></div>'+
-      '<div class="small" style="margin-top:4px">Nota: '+x.nota+' · Rata-rata: '+fmt(x.avg)+'</div>'+
+            '<div class="small" style="margin-top:4px">Nota: '+x.nota+' · Rata-rata: '+fmt(x.avg)+'</div>'+
     '</div>';
   });
   
@@ -2684,7 +2715,7 @@ function renderMgmtStok(d){
   // low stock per outlet
   var lowHtml="";
   var outletsToCheck=(d.scope==="all")?data.outlets:[session.outlet];
-  outletsToCheck.forEach(function(o){
+    outletsToCheck.forEach(function(o){
     var low=getLowStockItems(o);
     if(low.length>0){
       lowHtml+='<div class="item"><strong>'+esc(o)+'</strong> <span class="badge alert">'+low.length+' item</span><div class="small">'+low.slice(0,5).map(function(x){return x.name;}).join(", ")+(low.length>5?'...':'')+'</div></div>';
@@ -2784,7 +2815,7 @@ function renderMgmtDetail(outletName){
   el("dtTopParfum").innerHTML=topP.map(function(x){
     return '<div class="bar-row"><div class="row"><small>'+esc(x.name)+'</small><strong>'+x.vol.toFixed(1)+' ml</strong></div><div class="bar-bg"><div class="bar-fill" style="width:'+Math.round(x.vol/maxP*100)+'%"></div></div></div>';
   }).join("")||'<p class="note">Belum ada penjualan.</p>';
-
+  
   // 3. Metode Bayar
   var payMap={};
   listSales.forEach(function(s){payMap[s.method]=(payMap[s.method]||0)+s.total;});
@@ -2883,7 +2914,7 @@ function all(){
   if(el("mgmtPassInput"))el("mgmtPassInput").value=data.shop.mgmtPass||"2222";
   if(el("devPassInput"))el("devPassInput").value=data.shop.devPass||"9999";
   if(el("shopSub"))el("shopSub").textContent=data.shop.name||"AURA International Perfume";
-  renderSelects();
+    renderSelects();
   renderOutlets();
   renderOutletEmails();
   listRender("perfumes","perfumeList",el("filterMasterParfum")?el("filterMasterParfum").value:"");
