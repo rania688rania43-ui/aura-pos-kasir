@@ -15,7 +15,7 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
-  body, .card, .btn, .kasir-sticky {
+body, .card, .btn, .kasir-sticky {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -399,7 +399,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 <button type="button" class="tab role-staff role-admin" id="tLaporan">Closing</button>
 <button type="button" class="tab role-staff role-admin" id="tOrder">Order <span id="orderBadgeCount" class="badge alert hide">0</span></button>
 <button type="button" class="tab role-staff role-mgmt role-admin" id="tGrafik">Grafik</button>
-<button type="button" class="tab role-admin hide" id="tStokAwal">Stok Awal</button>
+<button type="button" class="tab role-admin hide" id="tStokAwal">Stok</button>
 <button type="button" class="tab role-staff role-admin hide" id="tStokMasuk">Stok Masuk</button>
 <button type="button" class="tab role-admin hide" id="tAudit">Cek Stok</button>
 <button type="button" class="tab role-admin hide" id="tStokMin">Stok Minim</button>
@@ -499,19 +499,19 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 </div>
 </section>
 
-<!-- ============ STOK AWAL ============ -->
+<!-- ============ STOK (SISTEM) ============ -->
 <section id="secStokAwal" class="hide">
+<div class="sticky-head">
+  <h2>📦 Stok Sistem Outlet</h2>
+  <span class="small" id="stokDateInfo" style="color:#0369a1;font-weight:700">—</span>
+</div>
+
 <div class="card">
-<div class="adminhead">✅ Pengaturan Stok Awal Outlet</div>
-<label>Tanggal Berlaku Stok Awal</label><input type="date" id="stokAwalDateInput">
-<button type="button" class="btn" id="saveStokAwalDateBtn">Simpan Tanggal Stok Awal</button>
-<div class="admin-section">
-  <div class="adminhead">Export & Import Stok Awal (CSV / Excel)</div>
-<button type="button" class="btn secondary" id="exportStokAwalBtn">📤 Export Stok Awal (CSV)</button>
-<label style="margin-top:10px">📥 Import File Stok Awal (CSV)</label><input type="file" id="importStokAwalInput" accept=".csv,text/csv">
+  <div class="adminhead">Rekap Stok Sistem</div>
+  <p class="note">Daftar stok saat ini (sistem) yang tersedia di outlet ini. Mencakup Parfum, Campuran, dan Botol.</p>
+  <input id="filterStokSistem" placeholder="Cari item..." style="margin-bottom:8px">
+  <div id="stokSistemList"></div>
 </div>
-</div>
-<div class="card"><div class="adminhead">Daftar Stok Awal (<span id="lblTglStokAwal">-</span>)</div><input id="filterStokAwal" placeholder="Cari item..." style="margin-bottom:8px"><div id="stokAwalList"></div></div>
 </section>
 
 <!-- ============ STOK MASUK (DISTRIBUSI) ============ -->
@@ -603,6 +603,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
   <div id="distHistoryList"><p class="note">Belum ada distribusi.</p></div>
 </div>
 </section>
+
 <!-- ============ CEK STOK (SESI) ============ -->
 <section id="secAudit" class="hide">
 <div class="sticky-head">
@@ -612,13 +613,23 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 
 <div class="card">
   <div class="adminhead">📋 Sesi Cek Stok</div>
-  <p class="note">Buat sesi baru, isi stok fisik semua item, lalu simpan. Laporan lose muncul per sesi.</p>
-  <div class="grid">
-    <button type="button" class="btn" id="newAuditSessionBtn" style="margin:0">+ Mulai Sesi Baru</button>
-    <button type="button" class="btn secondary" id="exportAuditTemplateBtn" style="margin:0">📤 Template CSV</button>
+  <p class="note">Buat sesi baru, isi stok fisik semua item, lalu simpan. Hasil cek fisik akan menjadi Stok Sistem (Stok Awal) pada tanggal tersebut.</p>
+  <div class="grid" style="align-items:end">
+    <div>
+      <label>Tanggal Cek Stok</label>
+      <input type="date" id="auditDateInput">
+    </div>
+    <div>
+      <button type="button" class="btn" id="newAuditSessionBtn" style="margin:0; height:42px;">+ Mulai Sesi</button>
+    </div>
   </div>
-  <label style="margin-top:10px">📥 Import CSV Cek Stok (isi kolom STOK_FISIK)</label>
-  <input type="file" id="importAuditCsvInput" accept=".csv,text/csv">
+  <div class="grid" style="margin-top:8px">
+    <button type="button" class="btn secondary" id="exportAuditTemplateBtn" style="margin:0">📤 Template CSV</button>
+    <div>
+      <input type="file" id="importAuditCsvInput" accept=".csv,text/csv" style="display:none">
+      <button type="button" class="btn secondary" id="btnImportAudit" style="margin:0">📥 Import CSV</button>
+    </div>
+  </div>
 </div>
 
 <div class="card" id="auditDraftCard" style="display:none">
@@ -631,7 +642,12 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
   </div>
   <input id="filterAudit" placeholder="Cari item..." style="margin-bottom:8px">
   <div id="auditItemList" style="max-height:55vh;overflow-y:auto"></div>
-  <button type="button" class="btn" id="finalizeAuditBtn" style="margin-top:10px">✅ Simpan & Finalisasi Sesi</button>
+  
+  <div style="margin-top:12px">
+    <label>Tanggal Finalisasi (Menjadi Stok Awal)</label>
+    <input type="date" id="finalizeDateInput">
+  </div>
+  <button type="button" class="btn" id="finalizeAuditBtn" style="margin-top:8px">✅ Simpan & Finalisasi Sesi</button>
 </div>
 
 <div class="card">
@@ -666,9 +682,11 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
   </div>
   <div class="grid" style="margin-top:8px">
     <button type="button" class="btn secondary" id="minExportBtn" style="margin:0">📤 Export CSV</button>
-    <button type="button" class="btn secondary" id="minImportBtn" style="margin:0">📥 Import CSV</button>
+    <div>
+      <input type="file" id="minImportInput" accept=".csv,text/csv" style="display:none">
+      <button type="button" class="btn secondary" id="minImportBtn" style="margin:0;width:100%">📥 Import CSV</button>
+    </div>
   </div>
-  <input type="file" id="minImportInput" accept=".csv,text/csv" style="display:none">
   <button type="button" class="btn danger" id="minResetBtn" style="margin-top:8px">🔄 Reset Outlet Ini ke Default Master</button>
 </div>
 
@@ -747,9 +765,11 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
     <p class="note">Format: <code>KATEGORI,KODE,NAMA,HARGA</code>. KATEGORI = parfum / campuran / botol. Botol tidak pakai KODE.</p>
     <div class="grid">
       <button type="button" class="btn secondary" id="masterExportCsvBtn" style="margin:0">📤 Export CSV Gabungan</button>
-      <button type="button" class="btn secondary" id="masterImportCsvBtn" style="margin:0">📥 Import CSV Gabungan</button>
+      <div>
+        <input type="file" id="masterImportCsvInput" accept=".csv,text/csv" style="display:none">
+        <button type="button" class="btn secondary" id="masterImportCsvBtn" style="margin:0;width:100%">📥 Import CSV Gabungan</button>
+      </div>
     </div>
-    <input type="file" id="masterImportCsvInput" accept=".csv,text/csv" style="display:none">
   </div>
 </div>
 </section>
@@ -791,8 +811,10 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 <div class="card">
   <div class="adminhead">💾 Backup & Restore Master (JSON)</div>
   <button type="button" class="btn secondary" id="exportMasterBtn">📤 Download Master (JSON)</button>
-  <label style="margin-top:8px">📥 Upload Master (JSON)</label>
-  <input type="file" id="importMasterInput" accept=".json,application/json">
+  <div style="margin-top:8px">
+    <input type="file" id="importMasterInput" accept=".json,application/json" style="display:none">
+    <button type="button" class="btn secondary" id="btnImportMaster" style="margin:0;width:100%">📥 Upload Master (JSON)</button>
+  </div>
 </div>
 
 <div class="card">
@@ -800,6 +822,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
   <button type="button" class="btn danger" id="resetBtn">Reset Semua Data Bawaan</button>
 </div>
 </section>
+
 <!-- ============ LAPORAN MANAGEMENT (PRO) ============ -->
 <section id="secMgmt" class="hide">
 <div class="card">
@@ -961,105 +984,6 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
   </div>
   <button type="button" class="btn danger" id="exitNoSaveBtn" style="margin-top:8px">🚪 Keluar Tanpa Simpan</button>
 </div></div>
-    </div>
-    <div class="card"><div class="adminhead">📊 Perbandingan Harian</div><div id="rpBelanjaChart"></div></div>
-    <div class="card"><div class="adminhead">✅ Rekap Bulanan</div>
-      <div style="overflow-x:auto"><table class="data-table" id="rpBulananTable"></table></div>
-    </div>
-  </div>
-
-  <!-- STOK -->
-  <div class="report-section" data-rsec="stok">
-    <div class="card"><div class="adminhead">💎 Total Nilai Stok per Outlet</div>
-      <p class="note">Nilai = qty stok × harga.</p>
-      <div style="overflow-x:auto"><table class="data-table" id="rpNilaiStokTable"></table></div>
-    </div>
-    <div class="card"><div class="adminhead">⚠️ Item di Bawah Minimum</div><div id="rpLowStockList"></div></div>
-    <div class="card"><div class="adminhead">🧊 Dead Stock (Tidak Bergerak 60 Hari)</div><div id="rpDeadStockList"></div></div>
-  </div>
-
-  <!-- KASIR -->
-  <div class="report-section" data-rsec="kasir">
-    <div class="card"><div class="adminhead">💳 Porsi Metode Bayar</div><div id="rpMetodePorsi"></div></div>
-    <div class="card"><div class="adminhead">🕐 Jam Sibuk (Peak Hour)</div><div id="rpPeakHour"></div></div>
-    <div class="card"><div class="adminhead">📋 Rata-rata Transaksi per Nota</div>
-      <div class="stat-grid" style="margin-top:8px">
-        <div class="stat-box"><div class="small">Rata-rata Nota</div><div class="stat-val" id="rpAvgNota">Rp0</div></div>
-        <div class="stat-box"><div class="small">Rata-rata Item/Nota</div><div class="stat-val" id="rpAvgItems">0</div></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ================= TAMPILAN DETAIL TOKO ================= -->
-<div id="mgmtDetailView" class="hide">
-    <button type="button" class="btn secondary" id="mgmtBackBtn" style="margin-bottom:12px">↩️ Kembali</button>
-  
-  <div class="card" style="background:linear-gradient(135deg,#e0f2fe,#dcfce7); border-color:#7dd3fc;">
-    <div class="adminhead" id="mgmtDetailTitle" style="font-size:18px; color:#0369a1; margin:0;">Detail Outlet</div>
-    <div class="small" id="mgmtDetailPeriod" style="margin-top:4px;">—</div>
-  </div>
-
-  <div class="kpi-grid">
-    <div class="kpi-card"><div class="kp-label">OMZET TOKO INI</div><div class="kp-val" id="dtOmzet">Rp0</div></div>
-    <div class="kpi-card"><div class="kp-label">JUMLAH NOTA</div><div class="kp-val" id="dtNota">0</div></div>
-    <div class="kpi-card"><div class="kp-label">RATA-RATA / NOTA</div><div class="kp-val" id="dtAvg">Rp0</div></div>
-    <div class="kpi-card"><div class="kp-label">TOTAL BELANJA</div><div class="kp-val" id="dtBelanja">Rp0</div></div>
-  </div>
-
-  <div class="card"><div class="adminhead">🏆 Top 5 Parfum di Toko Ini</div><div id="dtTopParfum"></div></div>
-  <div class="card"><div class="adminhead">💳 Metode Bayar</div><div id="dtMetode"></div></div>
-  <div class="card"><div class="adminhead">🕐 Jam Tersibuk</div><div id="dtPeakHour"></div></div>
-</div>
-
-</section>
-<section id="secNotif" class="hide">
-<div class="card">
-  <div class="adminhead" style="color:#dc2626">🔔 Notifikasi Admin</div>
-  <p class="note">Daftar masalah yang perlu ditindaklanjuti. Klik <strong>Buka & Isi</strong> untuk langsung menuju bagian bermasalah.</p>
-  <div id="adminNotifList"><p class="note" style="color:#16a34a;font-weight:700">✅ Tidak ada masalah.</p></div>
-</div>
-<div class="card">
-  <div class="adminhead" style="color:#dc2626">📥 Pengajuan Hapus dari Karyawan</div>
-  <p class="note">Daftar pengajuan hapus dari karyawan. Klik <strong>Accept</strong> untuk menyetujui & menghapus, atau <strong>Tolak</strong> untuk menolak.</p>
-  <div id="devReqList"></div>
-</div>
-</section>
-
-</section>
-</main>
-
-<!-- ============ MODAL GENERIK ============ -->
-<div id="editModal" class="modal-bg hide"><div class="modal-box">
-<div class="adminhead" id="modalTitle">Edit</div>
-<div id="modalFields"></div>
-<div class="grid" style="margin-top:12px">
-<button type="button" class="btn secondary" id="modalCancel" style="margin:0">Batal</button>
-<button type="button" class="btn" id="modalSave" style="margin:0">Simpan</button>
-</div>
-</div></div>
-
-<!-- ============ MODAL PREVIEW STRUK ============ -->
-<div id="strukModal" class="modal-bg hide"><div class="modal-box">
-<div class="adminhead">🧾 Preview Struk 58mm</div>
-<div class="receipt-preview" id="strukPreview"></div>
-<div class="grid" style="margin-top:12px">
-<button type="button" class="btn secondary" id="strukCloseBtn" style="margin:0">Tutup</button>
-<button type="button" class="btn" id="strukBrowserBtn" style="margin:0">🖨️ Print Browser</button>
-</div>
-<button type="button" class="btn" id="strukRawBtBtn" style="background:#7c3aed">📱 Kirim ke RawBT (Android)</button>
-</div></div>
-
-<!-- MODAL KONFIRMASI KELUAR -->
-<div id="exitModal" class="modal-bg hide"><div class="modal-box">
-  <div class="adminhead">Keluar tanpa menyimpan?</div>
-  <p class="note">Perubahan yang belum disimpan akan hilang. Simpan dulu sebelum keluar?</p>
-  <div class="grid" style="margin-top:12px">
-    <button type="button" class="btn secondary" id="exitCancelBtn" style="margin:0">✖ Batal</button>
-    <button type="button" class="btn" id="exitSaveBtn" style="margin:0">💾 Simpan & Keluar</button>
-  </div>
-  <button type="button" class="btn danger" id="exitNoSaveBtn" style="margin-top:8px">🚪 Keluar Tanpa Simpan</button>
-</div></div>
 
 <!-- MODAL WA -->
 <div id="waModal" class="modal-bg hide"><div class="modal-box">
@@ -1079,11 +1003,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 /* ================== DEFAULT DATA ================== */
 var defaultOutlets=[];for(var o=1;o<=19;o++)defaultOutlets.push("Outlet "+String(o).padStart(2,"0"));
 var defaultCaps=[];for(var sz=10;sz<=100;sz+=5)defaultCaps.push({size:sz});
-// Struktur baru: {code, name, displayName, price}
-// - code        = kode unik (parfum: angka, campuran: Al/Et/Eta, botol: "")
-// - name        = nama lengkap gabungan "KODE - NAMA" (dipakai sebagai key stok, kompatibel data lama)
-// - displayName = nama tampilan tanpa kode
-// - price       = satu harga (jual = beli)
+
 var def={
 shop:{name:"AURA INTERNATIONAL PERFUME",addr:"Wangi Khas Pilihanmu",webhook:"https://script.google.com/macros/s/AKfycbw9R9Sf-DtOelDtlqWMDNARXT7-QNRCH8oMMAqBUSRpDxrHPB1KfD612sThQ6cnYQuV/exec",mgmtPass:"2222",devPass:"9999",devWa:"",pusatWa:""},
 outlets:defaultOutlets,
@@ -1123,7 +1043,6 @@ perfumes:[
 {code:"304",name:"304 - Afnan-Nine PM",displayName:"Afnan-Nine PM",price:2800},
 {code:"6208",name:"6208 - Marfa-Sotb Saff And Co",displayName:"Marfa-Sotb Saff And Co",price:3200}
 ],
-// Campuran: code Al=Alkohol, Et=Etanol, Eta=Etanol Jerman
 mixes:[
 {code:"Et",name:"Et - Etanol",displayName:"Etanol",price:200},
 {code:"Eta",name:"Eta - Etanol Jerman",displayName:"Etanol Jerman",price:400},
@@ -1177,8 +1096,6 @@ if(!data.shop.devPass)data.shop.devPass="9999";
 if(!data.stokMin)data.stokMin={};
 
 /* ===== MIGRASI DATA LAMA → STRUKTUR BARU ===== */
-// Data lama: {name:"101 - Adidas", price:2500, min:50, buy:2000}
-// Data baru: {code:"101", name:"101 - Adidas", displayName:"Adidas", price:2500}
 (function migrateData(){
   function migrateItem(it, cat){
     if(it.code===undefined){
@@ -1214,6 +1131,14 @@ try{delReqs=JSON.parse(localStorage.getItem(REQ_KEY))||[];}catch(e){delReqs=[];}
 try{distQueue=JSON.parse(localStorage.getItem(DISTQ_KEY))||[];}catch(e){distQueue=[];}
 try{stokMinOverride=JSON.parse(localStorage.getItem(STOKMIN_KEY))||{};}catch(e){stokMinOverride={};}
 
+var distHistory=[];
+try{distHistory=JSON.parse(localStorage.getItem(DIST_KEY))||[];}catch(e){distHistory=[];}
+function saveDistHistory(){try{localStorage.setItem(DIST_KEY,JSON.stringify(distHistory));}catch(e){toast("⚠️ Penyimpanan penuh!","err");}}
+
+var auditSessions=[];
+try{auditSessions=JSON.parse(localStorage.getItem(AUDIT_KEY))||[];}catch(e){auditSessions=[];}
+function saveAuditSessions(){try{localStorage.setItem(AUDIT_KEY,JSON.stringify(auditSessions));}catch(e){toast("⚠️ Penyimpanan penuh!","err");}}
+
 /* ================== HELPERS ================== */
 function el(id){return document.getElementById(id);}
 function fmt(n){return "Rp"+Math.round(n).toLocaleString("id-ID");}
@@ -1229,7 +1154,37 @@ function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){retur
 function todayStr(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 function nowTime(){return new Date().toLocaleString("id-ID",{dateStyle:"short",timeStyle:"short"});}
 
-/* ================== RETENSI 10 TAHUN ================== */
+// Helper Export yang kompatibel Android WebView
+function downloadFile(content, filename, type) {
+  try {
+    var blob = new Blob([content], {type: type||"text/csv;charset=utf-8;"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 2000);
+    toast("✅ File berhasil diunduh.", "ok");
+  } catch(e) {
+    toast("Gagal mengunduh file.", "err");
+  }
+}
+
+// Helper Import yang mendeteksi BOM & separator
+function readFile(file, callback) {
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    var text = ev.target.result;
+    // Hapus BOM jika ada
+    if(text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+    callback(text);
+  };
+  reader.readAsText(file);
+}
+
 function pruneOldData(){
   var cutoff=new Date();cutoff.setFullYear(cutoff.getFullYear()-10);
   var cutStr=cutoff.getFullYear()+"-"+String(cutoff.getMonth()+1).padStart(2,"0")+"-"+String(cutoff.getDate()).padStart(2,"0");
@@ -1237,15 +1192,13 @@ function pruneOldData(){
   stockIns=stockIns.filter(function(s){return s.date>=cutStr;});
   saveSales();saveStockIns();
 }
-  
-/* ================== TOAST ================== */
+
 function toast(msg,type){
   var w=el("toastWrap");var t=document.createElement("div");
   t.className="toast "+(type||"");t.textContent=msg;w.appendChild(t);
   setTimeout(function(){t.style.opacity="0";t.style.transition="opacity .3s";setTimeout(function(){t.remove();},300);},2600);
 }
 
-/* ================== DIRTY STATE ================== */
 var hasUnsavedChanges=false;
 function markDirty(){
   if(!session||session.role!=="admin")return;
@@ -1276,7 +1229,6 @@ window.addEventListener("beforeunload",function(e){
   if(hasUnsavedChanges){e.preventDefault();e.returnValue="";return "";}
 });
 
-/* ================== MODAL ================== */
 var act=null;
 function modal(title,html,fn){
   el("modalTitle").textContent=title;
@@ -1287,7 +1239,6 @@ function modal(title,html,fn){
 el("modalCancel").onclick=function(){el("editModal").classList.add("hide");act=null;};
 el("modalSave").onclick=function(){if(act){var r=act();if(r===false)return;}el("editModal").classList.add("hide");act=null;};
 
-/* ================== DROPDOWN ================== */
 function closeAllDropdowns(){document.querySelectorAll(".dropdown.open").forEach(function(d){d.classList.remove("open");});}
 document.addEventListener("click",function(e){if(!e.target.closest(".menu-wrap"))closeAllDropdowns();});
 function dropdownHTML(uid,items){
@@ -1304,7 +1255,6 @@ window._toggleMenu=function(uid,e){
   if(!isOpen)dd.classList.add("open");
 };
 
-/* ================== WA MODAL ================== */
 var waCurrentText="",waCurrentNumber="";
 function openWaModal(txt,number){
   waCurrentText=txt;waCurrentNumber=(number||"").replace(/\D/g,"");
@@ -1321,7 +1271,6 @@ el("waOpenBtn").onclick=function(){
   window.open(url,"_blank");
 };
 
-/* ================== STOCK INIT ================== */
 function ensureOutletStock(outlet){
   if(!stocks[outlet])stocks[outlet]={startDate:todayStr(),initial:{perfumes:{},mixes:{},purchases:{}},current:{perfumes:{},mixes:{},purchases:{}}};
   var s=stocks[outlet];
@@ -1336,13 +1285,10 @@ function ensureOutletStock(outlet){
   data.purchases.forEach(function(b){
     if(s.initial.purchases[b.name]===undefined)s.initial.purchases[b.name]=b.price===0?9999:30;
     if(s.current.purchases[b.name]===undefined)s.current.purchases[b.name]=s.initial.purchases[b.name];
-      });
+  });
   saveStocks();
 }
 
-/* ================== STOK MIN (OVERRIDE) ================== */
-// Karena master tidak punya "min" default, fallback = 0.
-// Min sepenuhnya diatur di halaman Stok Minim per Outlet (stokMinOverride).
 function getStokMin(outlet,cat,name){
   var key=outlet+"|"+cat+"|"+name;
   if(stokMinOverride[key]!==undefined&&stokMinOverride[key]!=="")return +stokMinOverride[key];
@@ -1402,7 +1348,6 @@ el("doLoginBtn").onclick=function(){
     if(t.classList.contains("role-"+role))t.classList.remove("hide");
     else t.classList.add("hide");
   });
-  // Sembunyikan opsi "Semua Outlet" di grafik untuk staff
   var allOpt=document.querySelector("#chartScopeSelect option[value='all']");
   if(allOpt){allOpt.style.display=(role==="staff")?"none":"block";}
   if(role==="staff")el("chartScopeSelect").value="outlet";
@@ -1437,7 +1382,8 @@ el("exitSaveBtn").onclick=async function(){
   await globalSaveAll();
     performLogout();
 };
-  /* ================== KASIR: PERFUME / SELECTS ================== */
+
+/* ================== KASIR: PERFUME / SELECTS ================== */
 function renderPerfumeOptions(filter){
   var q=(filter||"").toLowerCase().trim();
   var list=data.perfumes.map(function(x,i){return {x:x,i:i};}).filter(function(o){
@@ -1449,7 +1395,6 @@ function renderPerfumeOptions(filter){
   if(!list.length){
     el("perfumeSelect").innerHTML='<option value="-1">Tidak ditemukan</option>';
   }else{
-    // Tampilkan "KODE - displayName", value = index asli di data.perfumes
     el("perfumeSelect").innerHTML=list.map(function(o, idx){
       var bgColor = (idx % 2 === 0) ? "#ffffff" : "#eff6ff";
       var style = 'style="background-color:'+bgColor+'; color:#0f172a; padding:10px; font-weight:600;"';
@@ -1461,7 +1406,6 @@ function renderPerfumeOptions(filter){
 }
 function renderSelects(){
   renderPerfumeOptions(el("searchParfum").value);
-  // Campuran: tampilkan "KODE - Nama"
   el("mixSelect").innerHTML=data.mixes.map(function(x,i){
     var lbl=(x.code?x.code+" - ":"")+(x.displayName||x.name);
     return '<option value="'+i+'">'+esc(lbl)+' ('+(x.price===0?"Gratis":fmt(x.price)+"/ml")+')</option>';
@@ -1669,83 +1613,45 @@ el("sendOrderWaBtn").onclick=function(){
   openWaModal(txt,data.shop.pusatWa);
 };
 
-/* ================== STOK AWAL ================== */
-function renderStokAwal(){
+/* ================== STOK (SISTEM) ================== */
+function renderStokSistem(){
   if(!session)return;
   var out=session.outlet;ensureOutletStock(out);
   var s=stocks[out];
-  el("stokAwalDateInput").value=s.startDate||todayStr();
-  el("lblTglStokAwal").textContent=s.startDate||todayStr();
-  var q=(el("filterStokAwal").value||"").toLowerCase().trim(),rows=[];
-  data.perfumes.forEach(function(p){rows.push({cat:"Bibit",name:p.name,displayName:p.displayName||p.name,qty:s.initial.perfumes[p.name]||0,unit:"ml"});});
-  data.mixes.forEach(function(m){rows.push({cat:"Campuran",name:m.name,displayName:m.displayName||m.name,qty:s.initial.mixes[m.name]||0,unit:"ml"});});
-  data.purchases.forEach(function(b){if(b.price>0)rows.push({cat:"Botol",name:b.name,displayName:b.displayName||b.name,qty:s.initial.purchases[b.name]||0,unit:"pcs"});});
-  el("stokAwalList").innerHTML=rows.filter(function(r){
-    if(!q)return true;
-    return (r.name+" "+(r.displayName||"")).toLowerCase().indexOf(q)>=0;
-  }).map(function(r){
-    var lbl=(r.displayName||r.name);
-    return '<div class="item"><div class="row"><div><strong>'+esc(lbl)+'</strong><div class="small">'+r.cat+'</div></div><strong>'+r.qty+' '+r.unit+'</strong></div></div>';
-  }).join("");
-}
-el("saveStokAwalDateBtn").onclick=function(){
-  if(!session)return;
-  ensureOutletStock(session.outlet);
-  stocks[session.outlet].startDate=el("stokAwalDateInput").value||todayStr();
-  saveStocks();renderStokAwal();toast("Tanggal stok awal disimpan.","ok");
-};
-el("exportStokAwalBtn").onclick=function(){
-  if(!session)return;
-  var out=session.outlet;ensureOutletStock(out);
-  var s=stocks[out];
-  var rows=[["OUTLET","TANGGAL_AWAL","KATEGORI","KODE","NAMA_ITEM","STOK_AWAL"]];
-  data.perfumes.forEach(function(p){rows.push([out,s.startDate,"perfumes",p.code||"",p.displayName||p.name,s.initial.perfumes[p.name]||0]);});
-  data.mixes.forEach(function(m){rows.push([out,s.startDate,"mixes",m.code||"",m.displayName||m.name,s.initial.mixes[m.name]||0]);});
-  data.purchases.forEach(function(b){if(b.price>0)rows.push([out,s.startDate,"purchases","",b.displayName||b.name,s.initial.purchases[b.name]||0]);});
-  var csv="\uFEFF"+rows.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(",");}).join("\r\n");
-  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
-  a.download="StokAwal_"+out.replace(/\s+/g,"_")+"_"+s.startDate+".csv";a.click();
-};
-el("importStokAwalInput").onchange=function(e){
-  var file=e.target.files[0];if(!file||!session)return;
-  var reader=new FileReader();
-  reader.onload=function(ev){
-    var out=session.outlet;ensureOutletStock(out);
-    var s=stocks[out],cnt=0;
-    ev.target.result.split(/\r?\n/).forEach(function(ln){
-      var c=ln.split(",");
-      // Format baru: OUTLET,TANGGAL_AWAL,KATEGORI,KODE,NAMA_ITEM,STOK_AWAL
-      if(c.length>=6&&c[2]!=="KATEGORI"){
-        var cat=c[2].trim().replace(/^"|"$/g,"");
-        var code=c[3].trim().replace(/^"|"$/g,"");
-        var nm=c[4].trim().replace(/^"|"$/g,"");
-        var val=+c[5].trim().replace(/^"|"$/g,"");
-        // Cari key asli di data (name gabungan)
-        var keyName=nm;
-        if(cat==="perfumes"){
-          var found=data.perfumes.find(function(p){return (p.code===code&&p.displayName===nm)||p.name===nm;});
-          if(found)keyName=found.name;
-        }else if(cat==="mixes"){
-          var found2=data.mixes.find(function(m){return (m.code===code&&m.displayName===nm)||m.name===nm;});
-          if(found2)keyName=found2.name;
-        }else{
-          var found3=data.purchases.find(function(b){return b.name===nm||b.displayName===nm;});
-          if(found3)keyName=found3.name;
-        }
-        if(s.initial[cat]&&!isNaN(val)){s.initial[cat][keyName]=val;s.current[cat][keyName]=val;cnt++;}
-      }
-    });
-    saveStocks();all();toast("✅ Impor "+cnt+" item Stok Awal!","ok");
-  };
-  reader.readAsText(file);
-};
-el("filterStokAwal").oninput=renderStokAwal;
-  /* ================== DISTRIBUSI STOK MASUK ================== */
-// DIST_KEY sudah dideklarasikan di bagian_10.
-var distHistory=[];
-try{distHistory=JSON.parse(localStorage.getItem(DIST_KEY))||[];}catch(e){distHistory=[];}
-function saveDistHistory(){try{localStorage.setItem(DIST_KEY,JSON.stringify(distHistory));}catch(e){toast("⚠️ Penyimpanan penuh!","err");}}
+  if(el("stokDateInfo")) el("stokDateInfo").textContent = "Tgl Awal: " + (s.startDate||todayStr());
+  var q=(el("filterStokSistem").value||"").toLowerCase().trim();
+  var rows=[];
+  
+  // Parfum
+  data.perfumes.forEach(function(p){
+    var qty=s.current.perfumes[p.name]||0;
+    var lbl=(p.code?p.code+" - ":"")+(p.displayName||p.name);
+    if(q && lbl.toLowerCase().indexOf(q)<0) return;
+    rows.push({lbl:lbl, cat:"Parfum", qty:qty, unit:"ml"});
+  });
+  
+  // Campuran
+  data.mixes.forEach(function(m){
+    var qty=s.current.mixes[m.name]||0;
+    var lbl=(m.code?m.code+" - ":"")+(m.displayName||m.name);
+    if(q && lbl.toLowerCase().indexOf(q)<0) return;
+    rows.push({lbl:lbl, cat:"Campuran", qty:qty, unit:"ml"});
+  });
+  
+  // Botol
+  data.purchases.forEach(function(b){
+    var qty=s.current.purchases[b.name]||0;
+    var lbl=(b.displayName||b.name);
+    if(q && lbl.toLowerCase().indexOf(q)<0) return;
+    rows.push({lbl:lbl, cat:"Botol", qty:qty, unit:"pcs"});
+  });
 
+  el("stokSistemList").innerHTML=rows.map(function(r){
+    return '<div class="item"><div class="row"><div><strong>'+esc(r.lbl)+'</strong><div class="small">'+r.cat+'</div></div><strong style="color:var(--blue);font-size:15px;">'+r.qty+' '+r.unit+'</strong></div></div>';
+  }).join("")||'<p class="note">Tidak ada item ditemukan.</p>';
+}
+el("filterStokSistem").oninput=renderStokSistem;
+/* ================== DISTRIBUSI STOK MASUK ================== */
 function getHargaBeli(cat,name){
   var list=data[cat];if(!list)return 0;
   var item=list.find(function(x){return x.name===name;});
@@ -1833,7 +1739,6 @@ el("distClearBtn").onclick=function(){
     function(){distCart=[];renderDistCart();});
 };
 
-/* Cek harga 0 (hanya parfum, campuran gratis seperti Alkohol dikecualikan) */
 function hasHargaBeliZero(){
   return data.perfumes.some(function(p){return !p.price||p.price<=0;});
 }
@@ -1855,7 +1760,6 @@ function updateDistHargaBeliWarn(){
 }
 el("distHargaBeliFixBtn").onclick=function(){setTab("tNotif");};
 
-/* FIX STOK MASUK */
 el("distFixBtn").onclick=async function(){
   if(!session)return;
   if(!distCart.length){toast("Daftar distribusi masih kosong.","err");return;}
@@ -1877,14 +1781,12 @@ el("distFixBtn").onclick=async function(){
     totalNormal:totalN,totalNetto:totalNet,
     status:"pending",attempts:0,lastError:""
   };
-  // Update stok lokal
   ensureOutletStock(session.outlet);
   var cur=stocks[session.outlet].current;
   dist.items.forEach(function(it){
     cur[it.cat][it.name]=(cur[it.cat][it.name]||0)+it.qtyNet;
   });
   saveStocks();
-  // Simpan riwayat & antrian
   distHistory.unshift(dist);saveDistHistory();
   distQueue.push(dist);saveDistQueue();
   distCart=[];el("distDocInput").value="";
@@ -1893,7 +1795,6 @@ el("distFixBtn").onclick=async function(){
   trySendDist(dist.id);
 };
 
-/* ANTRIAN OFFLINE + RETRY */
 function renderDistQueue(){
   el("distQueueInfo").textContent="Antrian: "+distQueue.filter(function(d){return d.status!=="sent";}).length;
   if(!distQueue.length){
@@ -1915,8 +1816,6 @@ el("distRetryAllBtn").onclick=function(){
   distQueue.filter(function(d){return d.status!=="sent";}).forEach(function(d){trySendDist(d.id);});
 };
 
-// Catatan: mode "no-cors" dipakai karena Google Apps Script tidak mengirim CORS header.
-// Response opaque → status "terkirim" bersifat optimistis (network OK = dianggap terkirim).
 async function trySendDist(id){
   var d=distQueue.find(function(x){return x.id===id;});
   if(!d||d.status==="sent")return;
@@ -1945,14 +1844,12 @@ async function trySendDist(id){
     saveDistQueue();renderDistQueue();
   }
 }
-// Auto retry tiap 2 menit
 setInterval(function(){
   if(navigator.onLine){
     distQueue.filter(function(d){return d.status!=="sent";}).forEach(function(d){trySendDist(d.id);});
   }
   },120000);
 
-/* RIWAYAT & REKAP DISTRIBUSI */
 function renderDistHistory(){
   if(!session)return;
   var list=distHistory.filter(function(d){return d.outlet===session.outlet;}).slice(0,30);
@@ -2019,20 +1916,14 @@ el("distExportRekapBtn").onclick=function(){
     });
   });
   var csv="\uFEFF"+rows.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(",");}).join("\r\n");
-  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
-  a.download="RekapDistribusi_"+session.outlet.replace(/\s+/g,"_")+"_"+todayStr()+".csv";a.click();
+  downloadFile(csv, "RekapDistribusi_"+session.outlet.replace(/\s+/g,"_")+"_"+todayStr()+".csv", "text/csv;charset=utf-8;");
 };
 
-// Init display
 el("distDateInput").value=todayStr();
 el("distRekapFrom").value=todayStr().slice(0,7)+"-01";
 el("distRekapTo").value=todayStr();
-  /* ================== CEK STOK PER SESI ================== */
-var AUDIT_SESSION_KEY="auraPos19AuditSessionsV2";
-var auditSessions=[];
-try{auditSessions=JSON.parse(localStorage.getItem(AUDIT_SESSION_KEY))||[];}catch(e){auditSessions=[];}
-function saveAuditSessions(){try{localStorage.setItem(AUDIT_SESSION_KEY,JSON.stringify(auditSessions));}catch(e){toast("⚠️ Penyimpanan penuh!","err");}}
 
+/* ================== CEK STOK PER SESI ================== */
 function getActiveDraft(outlet){
   return auditSessions.find(function(s){return s.outlet===outlet&&s.status==="draft";});
 }
@@ -2045,19 +1936,20 @@ function createAuditDraft(){
       function(){renderAuditSession();});
     return;
   }
+  var tgl = el("auditDateInput").value || todayStr();
   ensureOutletStock(session.outlet);
   var items=[],cur=stocks[session.outlet].current;
-  // Semua parfum, semua campuran (termasuk Alkohol), semua botol berharga > 0
   data.perfumes.forEach(function(p){items.push({cat:"perfumes",name:p.name,displayName:p.displayName||p.name,unit:"ml",sys:+(cur.perfumes[p.name]||0),act:null});});
   data.mixes.forEach(function(m){items.push({cat:"mixes",name:m.name,displayName:m.displayName||m.name,unit:"ml",sys:+(cur.mixes[m.name]||0),act:null});});
   data.purchases.forEach(function(b){if(b.price>0)items.push({cat:"purchases",name:b.name,displayName:b.displayName||b.name,unit:"pcs",sys:+(cur.purchases[b.name]||0),act:null});});
   var now=new Date();
   var draft={
     id:"AUD-"+now.getTime().toString().slice(-6),
-    outlet:session.outlet,createdAt:nowTime(),date:todayStr(),
+    outlet:session.outlet,createdAt:nowTime(),date:tgl,
     status:"draft",items:items
   };
   auditSessions.unshift(draft);saveAuditSessions();markDirty();renderAuditSession();
+  if(el("finalizeDateInput")) el("finalizeDateInput").value = tgl;
     toast("Sesi baru dibuat. Isi stok fisik semua item.","ok");
 }
 function renderAuditSession(){
@@ -2067,6 +1959,8 @@ function renderAuditSession(){
   if(!draft){card.style.display="none";renderAuditHistoryNew();return;}
   card.style.display="block";
   el("auditDraftTitle").textContent="Sesi Draft · "+draft.id+" · "+draft.date;
+  if(el("finalizeDateInput") && !el("finalizeDateInput").value) el("finalizeDateInput").value = draft.date;
+  
   var filled=draft.items.filter(function(i){return i.act!==null&&i.act!=="";}).length;
   var pct=draft.items.length?Math.round(filled/draft.items.length*100):0;
   el("auditProgressTxt").textContent=filled+" / "+draft.items.length;
@@ -2124,6 +2018,7 @@ function finalizeAudit(){
   commitAuditDraft(draft);
 }
 function commitAuditDraft(draft){
+  var finalDate = el("finalizeDateInput").value || draft.date || todayStr();
   ensureOutletStock(draft.outlet);
   var cur=stocks[draft.outlet].current;
   var lose=0,gain=0,same=0;
@@ -2132,11 +2027,15 @@ function commitAuditDraft(draft){
     cur[it.cat][it.name]=it.act;
     if(diff<0)lose++;else if(diff>0)gain++;else same++;
   });
+  stocks[draft.outlet].initial = clone(stocks[draft.outlet].current);
+  stocks[draft.outlet].startDate = finalDate;
   saveStocks();
+  
+  draft.date = finalDate;
   draft.status="final";draft.finalizedAt=nowTime();
   draft.stats={lose:lose,gain:gain,same:same,total:draft.items.length};
-  saveAuditSessions();markDirty();renderAuditSession();renderAuditHistoryNew();
-  toast("✅ Sesi "+draft.id+" disimpan.","ok");
+  saveAuditSessions();markDirty();renderAuditSession();renderAuditHistoryNew();renderStokSistem();
+  toast("✅ Sesi "+draft.id+" disimpan. Stok Awal menjadi "+finalDate,"ok");
 }
 function cancelAuditDraft(){
   if(!session)return;
@@ -2192,8 +2091,7 @@ function exportAuditSessionCsv(sessionId){
     rows.push([ss.id,ss.outlet,ss.date,(it.displayName||it.name),it.unit,it.sys,it.act,diff,diff<0?"LOSE":(diff>0?"LEBIH":"SESUAI")]);
   });});
   var csv="\uFEFF"+rows.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(",");}).join("\r\n");
-  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
-  a.download="CekStok_"+(s?s.id:"ALL")+"_"+todayStr()+".csv";a.click();
+  downloadFile(csv, "CekStok_"+(s?s.id:"ALL")+"_"+todayStr()+".csv", "text/csv;charset=utf-8;");
 }
 function exportAuditTemplate(){
   if(!session)return;
@@ -2204,23 +2102,18 @@ function exportAuditTemplate(){
   data.mixes.forEach(function(m){rows.push([session.outlet,todayStr(),"mixes",m.code||"",(m.displayName||m.name),"ml",+(cur.mixes[m.name]||0),""]);});
   data.purchases.forEach(function(b){if(b.price>0)rows.push([session.outlet,todayStr(),"purchases","",(b.displayName||b.name),"pcs",+(cur.purchases[b.name]||0),""]);});
   var csv="\uFEFF"+rows.map(function(r){return r.join(",");}).join("\r\n");
-  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
-  a.download="Template_CekStok_"+session.outlet.replace(/\s+/g,"_")+"_"+todayStr()+".csv";a.click();
-  toast("Template diunduh.","ok");
+  downloadFile(csv, "Template_CekStok_"+session.outlet.replace(/\s+/g,"_")+"_"+todayStr()+".csv", "text/csv;charset=utf-8;");
 }
 function importAuditCsv(file){
   if(!file||!session)return;
-  var reader=new FileReader();
-  reader.onload=function(ev){
-    var lines=ev.target.result.split(/\r?\n/),items=[];
+  readFile(file, function(text){
+    var lines=text.split(/\r?\n/),items=[];
     lines.forEach(function(ln,idx){
       if(!ln.trim()||idx===0)return;
       var c=ln.split(",").map(function(x){return x.trim().replace(/^"|"$/g,"");});
-      // Format baru: OUTLET,TANGGAL,KATEGORI,KODE,NAMA_ITEM,SATUAN,STOK_SYSTEM,STOK_FISIK
       if(c.length<8)return;
       var cat=c[2],code=c[3],nm=c[4],unit=c[5],sys=+c[6],act=c[7]===""?null:+c[7];
       if(!cat||!nm||act===null||isNaN(act))return;
-      // Cari key asli (name gabungan)
       var keyName=nm;
       if(cat==="perfumes"){
         var f=data.perfumes.find(function(p){return (p.code===code&&p.displayName===nm)||p.name===nm;});
@@ -2248,8 +2141,7 @@ function importAuditCsv(file){
       auditSessions.unshift(draft);saveAuditSessions();markDirty();renderAuditSession();
       toast("✅ "+items.length+" item diimpor sebagai draft.","ok");
     }
-  };
-  reader.readAsText(file);
+  });
 }
 
 el("newAuditSessionBtn").onclick=createAuditDraft;
@@ -2257,7 +2149,10 @@ el("cancelAuditDraftBtn").onclick=cancelAuditDraft;
 el("finalizeAuditBtn").onclick=finalizeAudit;
 el("saveAuditSessionBtn").onclick=finalizeAudit;
 el("exportAuditTemplateBtn").onclick=exportAuditTemplate;
+
+el("btnImportAudit").onclick=function(){el("importAuditCsvInput").click();};
 el("importAuditCsvInput").onchange=function(e){importAuditCsv(e.target.files[0]);this.value="";};
+
 el("filterAudit").oninput=renderAuditSession;
 el("closeAuditDetailBtn").onclick=function(){el("auditDetailCard").style.display="none";};
 el("exportAuditCsvBtn").onclick=function(){exportAuditSessionCsv(currentAuditDetailId);};
@@ -2288,7 +2183,6 @@ function renderMinTable(){
   if(!outlet){el("minTableBody").innerHTML='<tr><td colspan="4" class="note">Pilih outlet.</td></tr>';return;}
   var q=(el("minFilterInput").value||"").toLowerCase().trim();
   var rows=[];
-  // Default = 0 (karena master tidak punya min). Override per outlet.
   data.perfumes.forEach(function(p){
     var lbl=(p.code?p.code+" - ":"")+(p.displayName||p.name);
     if(q&&lbl.toLowerCase().indexOf(q)<0)return;
@@ -2347,25 +2241,21 @@ el("minExportBtn").onclick=function(){
   data.mixes.forEach(function(m){rows.push([o,"mixes",m.code||"",(m.displayName||m.name),0,stokMinOverride[o+"|mixes|"+m.name]!==undefined?stokMinOverride[o+"|mixes|"+m.name]:""]);});
   data.purchases.forEach(function(b){if(b.price>0)rows.push([o,"purchases","",(b.displayName||b.name),0,stokMinOverride[o+"|purchases|"+b.name]!==undefined?stokMinOverride[o+"|purchases|"+b.name]:""]);});
   var csv="\uFEFF"+rows.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(",");}).join("\r\n");
-  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
-  a.download="StokMin_"+o.replace(/\s+/g,"_")+"_"+todayStr()+".csv";a.click();
+  downloadFile(csv, "StokMin_"+o.replace(/\s+/g,"_")+"_"+todayStr()+".csv", "text/csv;charset=utf-8;");
 };
 el("minImportBtn").onclick=function(){el("minImportInput").click();};
 el("minImportInput").onchange=function(e){
   var file=e.target.files[0];if(!file)return;
   var o=el("minOutletSelect").value;
   if(!o){toast("Pilih outlet dulu.","err");this.value="";return;}
-  var reader=new FileReader();
-  reader.onload=function(ev){
-    var lines=ev.target.result.split(/\r?\n/),cnt=0;
+  readFile(file, function(text){
+    var lines=text.split(/\r?\n/),cnt=0;
     lines.forEach(function(ln,idx){
       if(!ln.trim()||idx===0)return;
       var c=ln.split(",").map(function(x){return x.trim().replace(/^"|"$/g,"");});
-      // Format baru: OUTLET,KATEGORI,KODE,NAMA_ITEM,DEFAULT,MIN_OUTLET
       if(c.length<6)return;
       var out=c[0],cat=c[1],code=c[2],nm=c[3],ov=c[5];
       if(out!==o)return;
-      // Cari key asli (name gabungan)
       var keyName=nm;
       if(cat==="perfumes"){
         var f=data.perfumes.find(function(p){return (p.code===code&&p.displayName===nm)||p.name===nm;});
@@ -2383,11 +2273,11 @@ el("minImportInput").onchange=function(e){
     });
     saveStokMin();renderMinTable();markDirty();
     toast("✅ Impor "+cnt+" baris stok minim.","ok");
-  };
-  reader.readAsText(file);this.value="";
+  });
+  this.value="";
 };
-  /* ================== PIN TOKO ================== */
- /* ================== SETTING: OUTLET + PIN ================== */
+
+/* ================== PIN TOKO ================== */
 function renderOutletList(){
   el("outletList").innerHTML=data.outlets.map(function(o,i){
     var pin=data.outletEmails[o]||"";
@@ -2400,7 +2290,6 @@ function renderOutletList(){
     };
   });
 }
-// Kompatibilitas: panggilan lama renderOutletEmails → renderOutletList
 function renderOutletEmails(){renderOutletList();}
 
 /* ================== MASTER ================== */
@@ -2435,8 +2324,6 @@ async function globalSaveAll(){
 }
 el("globalSaveBtn").onclick=globalSaveAll;
 
-// Catatan: outletEmails sengaja dikosongkan (tidak dikirim ke cloud) untuk keamanan PIN.
-// Konsekuensi: PIN tidak sync antar device. Kalau butuh sync, hapus baris sanitized.outletEmails={}.
 async function pushCloudMaster(){
   if(!data.shop.webhook)return;
   var sanitized=clone(data);
@@ -2466,7 +2353,6 @@ async function pullCloudData(){
       if(!data.shop.devWa)data.shop.devWa="";
       if(!data.shop.pusatWa)data.shop.pusatWa="";
       if(!data.stokMin)data.stokMin={};
-      // Migrasi data cloud jika format lama
       (data.perfumes||[]).forEach(function(p){if(p.code===undefined){var mm=String(p.name||"").match(/^(\d+)\s*-\s*(.+)$/);if(mm){p.code=mm[1];p.displayName=mm[2];}else{p.code="";p.displayName=p.name||"";}}if(!p.displayName)p.displayName=p.name||"";if(p.price===undefined)p.price=(p.buy||0);delete p.min;delete p.buy;});
       (data.mixes||[]).forEach(function(m){if(m.code===undefined){var mm=String(m.name||"").match(/^(Al|Et|Eta)\s*-\s*(.+)$/i);if(mm){m.code=mm[1];m.displayName=mm[2];}else{m.code="";m.displayName=m.name||"";}}if(!m.displayName)m.displayName=m.name||"";if(m.price===undefined)m.price=(m.buy||0);delete m.min;delete m.buy;});
       (data.purchases||[]).forEach(function(b){if(b.code===undefined)b.code="";if(!b.displayName)b.displayName=b.name||"";if(b.price===undefined)b.price=(b.buy||0);delete b.min;delete b.buy;});
@@ -2502,15 +2388,14 @@ async function pullCloudData(){
 }
 el("exportMasterBtn").onclick=function(){
   var jsonStr=JSON.stringify(data,null,2);
-  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([jsonStr],{type:"application/json"}));
-  a.download="Master_AuraPOS_"+todayStr()+".json";a.click();
+  downloadFile(jsonStr, "Master_AuraPOS_"+todayStr()+".json", "application/json");
 };
+el("btnImportMaster").onclick=function(){el("importMasterInput").click();};
 el("importMasterInput").onchange=function(e){
   var file=e.target.files[0];if(!file)return;
-  var reader=new FileReader();
-  reader.onload=async function(ev){
+  readFile(file, async function(text){
     try{
-      var parsed=JSON.parse(ev.target.result);
+      var parsed=JSON.parse(text);
         if(parsed&&parsed.perfumes&&parsed.outlets){
         var keepHook=data.shop.webhook;
         var keepPass={mgmt:data.shop.mgmtPass,dev:data.shop.devPass};
@@ -2521,7 +2406,6 @@ el("importMasterInput").onchange=function(e){
         if(!data.shop.devPass)data.shop.devPass=keepPass.dev||"9999";
         if(!data.outletEmails)data.outletEmails={};
         if(!data.stokMin)data.stokMin={};
-        // Migrasi data import
         (data.perfumes||[]).forEach(function(p){if(p.code===undefined){var mm=String(p.name||"").match(/^(\d+)\s*-\s*(.+)$/);if(mm){p.code=mm[1];p.displayName=mm[2];}else{p.code="";p.displayName=p.name||"";}}if(!p.displayName)p.displayName=p.name||"";if(p.price===undefined)p.price=(p.buy||0);delete p.min;delete p.buy;});
         (data.mixes||[]).forEach(function(m){if(m.code===undefined){var mm=String(m.name||"").match(/^(Al|Et|Eta)\s*-\s*(.+)$/i);if(mm){m.code=mm[1];m.displayName=mm[2];}else{m.code="";m.displayName=m.name||"";}}if(!m.displayName)m.displayName=m.name||"";if(m.price===undefined)m.price=(m.buy||0);delete m.min;delete m.buy;});
         (data.purchases||[]).forEach(function(b){if(b.code===undefined)b.code="";if(!b.displayName)b.displayName=b.name||"";if(b.price===undefined)b.price=(b.buy||0);delete b.min;delete b.buy;});
@@ -2529,8 +2413,8 @@ el("importMasterInput").onchange=function(e){
         toast("✅ Master berhasil di-upload!","ok");
       }else toast("Format Master JSON tidak valid.","err");
     }catch(err){toast("File gagal dibaca.","err");}
-  };
-  reader.readAsText(file);
+  });
+  this.value="";
 };
 el("rounding").onchange=function(){markDirty();calcCurrentItem();};
 el("resetBtn").onclick=function(){
@@ -2538,7 +2422,6 @@ el("resetBtn").onclick=function(){
     function(){data=clone(def);saveMaster();all();pushCloudMaster();toast("Data dikembalikan ke bawaan.","warn");});
 };
 
-/* ================== MASTER LIST RENDER ================== */
 function listRender(k,id,filter){
   var q=(filter||"").toLowerCase().trim();
   el(id).innerHTML=data[k].map(function(x,i){return {x:x,i:i};}).filter(function(o){
@@ -2651,8 +2534,6 @@ window._devDelSale=function(id){
     });
 };
 
-// Catatan: mode "no-cors" untuk kompatibilitas Google Apps Script.
-// Response opaque → status "berhasil" bersifat optimistis (network OK = dianggap terkirim).
 el("closingBtn").onclick=async function(){
   if(!session)return;
   if(this.disabled)return;
@@ -2689,32 +2570,26 @@ el("exportSalesCsvBtn").onclick=function(){
     rows.push([s.outlet,s.id,s.date,s.time,s.method,det,s.total]);
   });
   var csv="\uFEFF"+rows.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(",");}).join("\r\n");
-  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
-  a.download="Laporan_AuraPOS_"+todayStr()+".csv";a.click();
+  downloadFile(csv, "Laporan_AuraPOS_"+todayStr()+".csv", "text/csv;charset=utf-8;");
 };
 
-/* ================== CSV GABUNGAN MASTER ================== */
 el("masterExportCsvBtn").onclick=function(){
   var rows=[["KATEGORI","KODE","NAMA","HARGA"]];
   data.perfumes.forEach(function(p){rows.push(["parfum",p.code||"",(p.displayName||p.name),p.price||0]);});
   data.mixes.forEach(function(m){rows.push(["campuran",m.code||"",(m.displayName||m.name),m.price||0]);});
   data.purchases.forEach(function(b){rows.push(["botol","",(b.displayName||b.name),b.price||0]);});
   var csv="\uFEFF"+rows.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(",");}).join("\r\n");
-  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
-  a.download="Master_AuraPOS_"+todayStr()+".csv";a.click();
-  toast("✅ CSV gabungan diunduh.","ok");
+  downloadFile(csv, "Master_AuraPOS_"+todayStr()+".csv", "text/csv;charset=utf-8;");
 };
 el("masterImportCsvBtn").onclick=function(){el("masterImportCsvInput").click();};
 el("masterImportCsvInput").onchange=function(e){
   var file=e.target.files[0];if(!file)return;
-  var reader=new FileReader();
-  reader.onload=async function(ev){
-    var lines=ev.target.result.split(/\r?\n/),added=0,updated=0;
+  readFile(file, async function(text){
+    var lines=text.split(/\r?\n/),added=0,updated=0;
     lines.forEach(function(ln,idx){
       if(!ln.trim()||idx===0)return;
       var sep=ln.indexOf(";")>=0?";":",";
       var c=ln.split(sep).map(function(x){return x.trim().replace(/^"|"$/g,"");});
-      // KATEGORI,KODE,NAMA,HARGA
       if(c.length<4)return;
       var kat=(c[0]||"").toLowerCase(),code=c[1]||"",nm=c[2]||"",pr=parseInt((c[3]||"0").replace(/\D/g,""),10)||0;
       if(!nm)return;
@@ -2737,11 +2612,9 @@ el("masterImportCsvInput").onchange=function(e){
     saveMaster();all();await pushCloudMaster();
     toast("✅ "+added+" baru, "+updated+" diperbarui.","ok");
     this.value="";
-  };
-  reader.readAsText(file);
+  });
 };
-  
-/* ================== AJUKAN HAPUS & BATAL ================== */
+
 window._reqDel=function(type,ref){
   if(!session)return;
   var desc="",targetId="",tgl=todayStr();
@@ -2778,7 +2651,6 @@ window._cancelReq=function(type,ref){
     });
 };
 
-/* ================== NOTIF ADMIN ================== */
 function countAdminProblems(){
   var c=0;
   c+=getHargaBeliZeroList().length;
@@ -2865,7 +2737,8 @@ window._rejectReq=async function(reqId){
   r.status="rejected";saveReqs();all();await pushCloudReqs();
   toast("Pengajuan ditolak.","warn");
 };
-  /* ================== LAPORAN MANAGEMENT (PRO) ================== */
+
+/* ================== LAPORAN MANAGEMENT (PRO) ================== */
 var mgmtFrom="",mgmtTo="";
 function initMgmtDates(){
   var now=new Date();
@@ -2923,6 +2796,7 @@ function renderMgmtOmzet(d){
   el("rpChart30").innerHTML='<div class="mini-chart">'+days.map(function(x){
     return '<div class="mc-bar" style="height:'+Math.max(2,Math.round(x.val/maxD*100))+'%"><span class="mc-lbl">'+x.lbl+'</span><span class="mc-val">'+(x.val>0?fmt(x.val):'')+'</span></div>';
   }).join("")+'</div>';
+  
   var outletRows=data.outlets.map(function(o){
     var oSales=d.listSales.filter(function(s){return s.outlet===o;});
     var sum=oSales.reduce(function(a,b){return a+b.total;},0);
@@ -2975,7 +2849,6 @@ function renderMgmtBelanja(d){
   el("rpBelanjaNormal").textContent=fmt(totalN);
   el("rpBelanjaNetto").textContent=fmt(totalNet);
   el("rpHppRatio").textContent=omzet>0?Math.round(totalNet/omzet*100)+"%":"0%";
-  // Balance = Omzet − Belanja Netto (ganti laba kotor)
   el("rpBalance").textContent=fmt(omzet-totalNet);
   var days={};
   d.listSales.forEach(function(s){days[s.date]=days[s.date]||{omzet:0,belanja:0};days[s.date].omzet+=s.total;});
@@ -3075,7 +2948,6 @@ function renderMgmtKasir(d){
   el("rpAvgNota").textContent=total?fmt(totRp/total):"Rp0";
   el("rpAvgItems").textContent=total?(totItems/total).toFixed(1):"0";
 }
-/* ================== LAPORAN DETAIL TOKO (DRILL-DOWN) ================== */
 var currentMgmtOutlet = "ALL";
 window._openMgmtDetail = function(outletName){
   currentMgmtOutlet = outletName;
@@ -3151,8 +3023,7 @@ el("mgmtExportBtn").onclick=function(){
   var rows=[["OUTLET","TANGGAL","NO_NOTA","METODE","TOTAL"]];
   d.listSales.forEach(function(s){rows.push([s.outlet,s.date,s.id,s.method,s.total]);});
   var csv="\uFEFF"+rows.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(",");}).join("\r\n");
-  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
-  a.download="LaporanMgmt_"+d.from+"_"+d.to+".csv";a.click();
+  downloadFile(csv, "LaporanMgmt_"+d.from+"_"+d.to+".csv", "text/csv;charset=utf-8;");
 };
 document.querySelectorAll(".report-tab").forEach(function(t){
   t.onclick=function(){
@@ -3165,7 +3036,6 @@ document.querySelectorAll(".report-tab").forEach(function(t){
   };
 });
 
-/* ================== SUB-TAB MASTER ================== */
 document.querySelectorAll(".master-tab").forEach(function(t){
   t.onclick=function(){
     document.querySelectorAll(".master-tab").forEach(function(x){x.classList.remove("active");});
@@ -3177,7 +3047,6 @@ document.querySelectorAll(".master-tab").forEach(function(t){
   };
 });
 
-/* ================== GRAFIK OUTLET ================== */
 function renderGrafik(){
   if(!session)return;
   var scope=el("chartScopeSelect").value;
@@ -3190,7 +3059,6 @@ function renderGrafik(){
   listDist.forEach(function(x){mCost+=(x.totalNetto||0);});
   el("gMonthOmzet").textContent=fmt(mOmzet);
   el("gMonthCost").textContent=fmt(mCost);
-  // Rasio Belanja / Omzet (ganti laba kotor)
   el("gMonthRatio").textContent=mOmzet>0?Math.round(mCost/mOmzet*100)+"%":"0%";
   el("gMonthVol").textContent=mVol+" ml";
   var days=[],maxD=1;
@@ -3223,7 +3091,6 @@ function renderGrafik(){
 }
 el("chartScopeSelect").onchange=renderGrafik;
 
-/* ================== ALL REFRESH ================== */
 function all(){
   if(el("shopName"))el("shopName").value=data.shop.name||"";
   if(el("shopAddr"))el("shopAddr").value=data.shop.addr||"";
@@ -3240,7 +3107,7 @@ function all(){
   listRender("purchases","purchaseList");
   if(el("rounding"))el("rounding").value=data.rounding;
   refreshKnob();calcCurrentItem();renderCart();
-  renderLowStock();renderReport();renderStokAwal();
+  renderLowStock();renderReport();renderStokSistem();
   renderDistItems();updateDistHargaBeliBox();renderDistCart();renderDistQueue();renderDistHistory();renderDistRekap();updateDistHargaBeliWarn();
   renderAuditSession();renderAuditHistoryNew();
   renderMinOutletSelect();
@@ -3248,14 +3115,12 @@ function all(){
   if(session&&session.role!=="staff")renderMgmt();
 }
 
-/* ================== TAB NAV ================== */
 var TAB_MAP={
   tKasir:"secKasir", tLaporan:"secLaporan", tOrder:"secOrder", tGrafik:"secGrafik",
   tStokAwal:"secStokAwal", tStokMasuk:"secStokMasuk", tAudit:"secAudit", tStokMin:"secStokMin",
   tAdmin:"secMaster", tSetting:"secSetting", tMgmt:"secMgmt", tNotif:"secNotif"
 };
 function setTab(id){
-  // PENGAMAN: Cegah akses tab admin/master oleh role selain admin
   var adminTabs = ["tStokAwal","tAudit","tStokMin","tAdmin","tSetting","tNotif"];
   if (adminTabs.indexOf(id) >= 0 && (!session || session.role !== "admin")) {
     toast("Akses ditolak! Halaman ini khusus Admin.","err");
@@ -3271,7 +3136,7 @@ function setTab(id){
   if(id==="tOrder")renderLowStock();
   if(id==="tLaporan")renderReport();
   if(id==="tGrafik")renderGrafik();
-  if(id==="tStokAwal")renderStokAwal();
+  if(id==="tStokAwal")renderStokSistem();
   if(id==="tStokMasuk"){renderDistItems();renderDistCart();renderDistQueue();renderDistHistory();renderDistRekap();updateDistHargaBeliWarn();}
   if(id==="tAudit"){renderAuditSession();renderAuditHistoryNew();}
   if(id==="tStokMin")renderMinOutletSelect();
@@ -3282,13 +3147,13 @@ function setTab(id){
 }
 Object.keys(TAB_MAP).forEach(function(id){if(el(id))el(id).onclick=function(){setTab(id);};});
 
-/* ================== INPUT BINDING ================== */
 el("searchParfum").oninput=function(){renderPerfumeOptions(this.value);};
 el("filterMasterParfum").oninput=function(){listRender("perfumes","perfumeList",this.value);};
 ["perfumeSelect","mixSelect","capacitySelect","purchaseSelect"].forEach(function(id){el(id).onchange=calcCurrentItem;});
 el("reportDate").value=todayStr();
 el("reportDate").onchange=renderReport;
 initMgmtDates();
+el("auditDateInput").value = todayStr();
 
 el("addOutletBtn").onclick=function(){
   var n=el("newOutletName").value.trim();
@@ -3325,7 +3190,6 @@ el("addPurchase").onclick=function(){
   toast("Botol ditambahkan.","ok");
 };
 
-/* ================== INIT ================== */
 pruneOldData();
 renderLoginOutlets();
 renderMinOutletSelect();
