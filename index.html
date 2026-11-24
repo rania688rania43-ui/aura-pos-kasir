@@ -441,7 +441,9 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 <div class="status good" id="status">☑️ RECOMMENDED ☑️</div>
 </div>
 <div class="line"><span id="itemFormula">Komposisi</span><strong id="itemSubtotal">Rp0</strong></div>
-<button type="button" class="btn secondary" id="addToCartBtn">+ Tambah ke Keranjang</button>
+<div class="grid">
+  <button type="button" class="btn secondary" id="downloadStokAwalTemplateBtn" style="margin:0">📄 Download Template CSV</button>
+  <button type="button" class="btn secondary" id="exportStokAwalBtn" style="margin:0">📤 Export Stok Awal (CSV)</button>
 </div>
 <div class="card">
 <div class="row"><div class="adminhead" style="margin:0">🛒 Keranjang (<span id="cartCount">0</span>)</div><button type="button" id="clearCartBtn" class="btn danger sm">Kosongkan</button></div>
@@ -1694,7 +1696,25 @@ el("saveStokAwalDateBtn").onclick=function(){
   stocks[session.outlet].startDate=el("stokAwalDateInput").value||todayStr();
   saveStocks();renderStokAwal();toast("Tanggal stok awal disimpan.","ok");
 };
-el("exportStokAwalBtn").onclick=function(){
+el("downloadStokAwalTemplateBtn").onclick=function(){
+  if(!session)return;
+  var out=session.outlet;
+  var today=todayStr();
+  var rows=[["OUTLET","TANGGAL_AWAL","KATEGORI","KODE","NAMA_ITEM","STOK_AWAL"]];
+  data.perfumes.forEach(function(p){
+    rows.push([out,today,"perfumes",p.code||"",(p.displayName||p.name),""]);
+  });
+  data.mixes.forEach(function(m){
+    rows.push([out,today,"mixes",m.code||"",(m.displayName||m.name),""]);
+  });
+  data.purchases.forEach(function(b){
+    if(b.price>0)rows.push([out,today,"purchases","",(b.displayName||b.name),""]);
+  });
+  var csv="\uFEFF"+rows.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(",");}).join("\r\n");
+  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download="Template_StokAwal_"+out.replace(/\s+/g,"_")+"_"+today+".csv";a.click();
+  toast("Template diunduh. Isi kolom STOK_AWAL lalu import.","ok");
+};
   if(!session)return;
   var out=session.outlet;ensureOutletStock(out);
   var s=stocks[out];
@@ -1719,7 +1739,10 @@ el("importStokAwalInput").onchange=function(e){
         var cat=c[2].trim().replace(/^"|"$/g,"");
         var code=c[3].trim().replace(/^"|"$/g,"");
         var nm=c[4].trim().replace(/^"|"$/g,"");
-        var val=+c[5].trim().replace(/^"|"$/g,"");
+        var rawVal=c[5].trim().replace(/^"|"$/g,"");
+if(rawVal==="")return;
+var val=+rawVal;
+if(isNaN(val))return;
         // Cari key asli di data (name gabungan)
         var keyName=nm;
         if(cat==="perfumes"){
