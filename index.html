@@ -333,18 +333,6 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 .notif-item .ni-actions .btn-fix{background:#b91c1c;color:#fff}
 .notif-item .ni-actions .btn-ignore{background:#fee2e2;color:#b91c1c}
 
-/* ==== MASTER SUB-TAB ==== */
-.master-tabs{display:flex;gap:6px;overflow-x:auto;padding:4px 0;margin:8px 0;scrollbar-width:none}
-.master-tabs::-webkit-scrollbar{display:none}
-.master-tab{
-  flex:0 0 auto;border:1px solid var(--line);border-radius:9px;
-  padding:8px 14px;background:#fff;font-weight:700;font-size:12.5px;
-  color:var(--text);cursor:pointer;white-space:nowrap;
-}
-.master-tab.active{background:linear-gradient(135deg,#eff6ff,#f0fdf4);border-color:#7dd3fc;color:var(--blue)}
-.master-section{display:none}
-.master-section.active{display:block}
-
 @media print{
   body *{visibility:hidden}
   #printArea,#printArea *{visibility:visible}
@@ -403,8 +391,8 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 <button type="button" class="tab role-staff role-admin hide" id="tStokMasuk">Stok Masuk</button>
 <button type="button" class="tab role-admin hide" id="tAudit">Cek Stok</button>
 <button type="button" class="tab role-admin hide" id="tStokMin">Stok Minim</button>
+<button type="button" class="tab role-admin hide" id="tAkses">PIN Toko</button>
 <button type="button" class="tab role-admin hide" id="tAdmin">Master <span id="reqBadgeCount" class="badge alert hide">0</span></button>
-<button type="button" class="tab role-admin hide" id="tSetting">⚙️ Setting</button>
 <button type="button" class="tab role-mgmt role-admin hide" id="tMgmt">Laporan <span id="notifBadge" class="badge alert hide">0</span></button>
 <button type="button" class="tab role-admin hide" id="tNotif">🔔 Notif <span id="notifBadgeAdmin" class="badge alert hide">0</span></button>
 </div>
@@ -441,9 +429,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 <div class="status good" id="status">☑️ RECOMMENDED ☑️</div>
 </div>
 <div class="line"><span id="itemFormula">Komposisi</span><strong id="itemSubtotal">Rp0</strong></div>
-<div class="grid">
-  <button type="button" class="btn secondary" id="downloadStokAwalTemplateBtn" style="margin:0">📄 Download Template CSV</button>
-  <button type="button" class="btn secondary" id="exportStokAwalBtn" style="margin:0">📤 Export Stok Awal (CSV)</button>
+<button type="button" class="btn secondary" id="addToCartBtn">+ Tambah ke Keranjang</button>
 </div>
 <div class="card">
 <div class="row"><div class="adminhead" style="margin:0">🛒 Keranjang (<span id="cartCount">0</span>)</div><button type="button" id="clearCartBtn" class="btn danger sm">Kosongkan</button></div>
@@ -492,7 +478,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 <div class="stat-grid" style="margin-top:10px">
 <div class="stat-box"><div class="small">Omzet Bulan Ini</div><div class="stat-val" id="gMonthOmzet">Rp0</div></div>
 <div class="stat-box"><div class="small">Est. Belanja / HPP</div><div class="stat-val" id="gMonthCost" style="color:#d97706">Rp0</div></div>
-<div class="stat-box"><div class="small">Rasio Belanja / Omzet</div><div class="stat-val" id="gMonthRatio" style="color:#0284c7">0%</div></div>
+<div class="stat-box"><div class="small">Est. Laba Kotor</div><div class="stat-val" id="gMonthProfit" style="color:var(--green)">Rp0</div></div>
 <div class="stat-box"><div class="small">Total Volume Terjual</div><div class="stat-val" id="gMonthVol">0 ml</div></div>
 </div>
 <div class="card"><div class="adminhead">📉 Grafik Omzet 7 Hari Terakhir</div><div id="chart7Days"></div></div>
@@ -524,7 +510,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 </div>
 
 <div class="warning-banner" id="distHargaBeliWarn" style="display:none">
-  <span id="distHargaBeliWarnTxt">⚠️ Ada parfum dengan harga 0.</span>
+  <span id="distHargaBeliWarnTxt">⚠️ Ada parfum dengan harga beli 0.</span>
   <button type="button" id="distHargaBeliFixBtn">Perbaiki</button>
 </div>
 
@@ -543,7 +529,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
   <select id="distItemSelect"></select>
 
   <div id="distHargaBeliBox" class="hide" style="margin-top:6px">
-    <div class="small" id="distHargaBeliInfo">Harga: —</div>
+    <div class="small" id="distHargaBeliInfo">Harga beli: —</div>
   </div>
 
   <div class="grid">
@@ -661,7 +647,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 
 <div class="card">
   <div class="adminhead">🔌 Pengaturan Stok Minim</div>
-  <p class="note">Nilai default = 0 (karena master tidak punya min). Anda bisa override per outlet. Baris berwarna kuning berarti nilainya sudah di-override.</p>
+  <p class="note">Nilai default diambil dari Master Parfum. Anda bisa override per outlet. Baris berwarna kuning berarti nilainya sudah di-override.</p>
   <div class="grid">
     <div><label>Pilih Outlet</label><select id="minOutletSelect"></select></div>
     <div><label>Cari Parfum</label><input id="minFilterInput" placeholder="Cari nama..."></div>
@@ -684,124 +670,66 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
       <tbody id="minTableBody"><tr><td colspan="4" class="note">Pilih outlet dulu.</td></tr></tbody>
     </table>
   </div>
-  <p class="note" style="margin-top:8px">💡 Kosongkan kolom "Min Outlet" untuk memakai default (0).</p>
+  <p class="note" style="margin-top:8px">💡 Kosongkan kolom "Min Outlet" untuk memakai default master.</p>
 </div>
 </section>
 
-<!-- ============ MASTER (PARFUM / CAMPURAN / BOTOL) ============ -->
-<section id="secMaster" class="hide">
+<!-- ============ PIN TOKO ============ -->
+<section id="secAkses" class="hide">
 <div class="sticky-head">
-  <h2>⚙️ Master Data</h2>
+  <h2>🔑 PIN Toko per Outlet</h2>
   <span class="small" style="color:#0369a1;font-weight:700">Gunakan tombol 💾 di atas</span>
 </div>
-
 <div class="card">
-  <div class="master-tabs">
-    <button type="button" class="master-tab active" data-mtab="parfum">🧴 Parfum</button>
-    <button type="button" class="master-tab" data-mtab="campuran">💧 Campuran</button>
-    <button type="button" class="master-tab" data-mtab="botol">🍾 Botol</button>
-  </div>
-
-  <!-- PARFUM -->
-  <div class="master-section active" data-msec="parfum">
-    <div class="adminhead">Master Parfum</div>
-    <div class="grid">
-      <div><label>Kode</label><input id="newPerfumeCode" placeholder="9110"></div>
-      <div><label>Nama</label><input id="newPerfumeName" placeholder="Baccarot"></div>
-      <div><label>Harga / ml</label><input id="newPerfumePrice" type="number"></div>
-      <div><label>Stok Awal (ml)</label><input id="newPerfumeStock" type="number" value="500"></div>
-      <div class="full"><button type="button" class="btn" id="addPerfume">+ Tambah Parfum</button></div>
-    </div>
-    <input id="filterMasterParfum" placeholder="Cari parfum..." style="margin-top:8px">
-    <div id="perfumeList"></div>
-  </div>
-
-  <!-- CAMPURAN -->
-  <div class="master-section" data-msec="campuran">
-    <div class="adminhead">Master Campuran (Additional)</div>
-    <div class="grid">
-      <div><label>Kode</label><input id="newMixCode" placeholder="Al / Et / Eta"></div>
-      <div><label>Nama</label><input id="newMixName" placeholder="Etanol"></div>
-      <div><label>Harga / ml</label><input id="newMixPrice" type="number"></div>
-      <div class="full"><button type="button" class="btn" id="addMix">+ Tambah Campuran</button></div>
-    </div>
-    <div id="mixList" style="margin-top:8px"></div>
-  </div>
-
-  <!-- BOTOL -->
-  <div class="master-section" data-msec="botol">
-    <div class="adminhead">Master Botol (Additional)</div>
-    <div class="grid">
-      <div><label>Nama Botol</label><input id="newPurchaseName" placeholder="P25 - SP 25"></div>
-      <div><label>Harga (Rp)</label><input id="newPurchasePrice" type="number"></div>
-      <div class="full"><button type="button" class="btn" id="addPurchase">+ Tambah Botol</button></div>
-    </div>
-    <div id="purchaseList" style="margin-top:8px"></div>
-  </div>
-
-  <div class="admin-section">
-    <div class="adminhead">Pembulatan Harga (Rp)</div>
-    <input id="rounding" type="number" step="500" value="1000">
-  </div>
-
-  <div class="admin-section">
-    <div class="adminhead">📤 Export / Import CSV Gabungan</div>
-    <p class="note">Format: <code>KATEGORI,KODE,NAMA,HARGA</code>. KATEGORI = parfum / campuran / botol. Botol tidak pakai KODE.</p>
-    <div class="grid">
-      <button type="button" class="btn secondary" id="masterExportCsvBtn" style="margin:0">📤 Export CSV Gabungan</button>
-      <button type="button" class="btn secondary" id="masterImportCsvBtn" style="margin:0">📥 Import CSV Gabungan</button>
-    </div>
-    <input type="file" id="masterImportCsvInput" accept=".csv,text/csv" style="display:none">
-  </div>
+<p class="note"><strong>Wajib diisi:</strong> Karyawan hanya bisa masuk menggunakan PIN Toko yang didaftarkan untuk outlet tersebut.</p>
+<div id="outletEmailList"></div>
 </div>
 </section>
 
-<!-- ============ SETTING ============ -->
-<section id="secSetting" class="hide">
+<!-- ============ MASTER ============ -->
+<section id="secAdmin" class="hide">
 <div class="sticky-head">
-  <h2>⚙️ Pengaturan</h2>
+  <h2>⚙️ Master Pengaturan</h2>
   <span class="small" style="color:#0369a1;font-weight:700">Gunakan tombol 💾 di atas</span>
 </div>
-
 <div class="card">
-  <div class="adminhead">🏪 Profil Toko</div>
   <label>Nama Brand / Toko</label><input id="shopName">
-  <label>Slogan / Alamat Kop Struk</label><input id="shopAddr">
-  <label>Link Google Sheets Closing</label><input id="sheetWebhook" placeholder="https://script.google.com/macros/s/...">
-  <label>Nomor WA Notifikasi Admin</label><input id="devWaInput" type="tel" placeholder="628123456789">
-  <label>Nomor WA Pusat (Order & Rekap)</label><input id="pusatWaInput" type="tel" placeholder="628123456789">
+<label>Slogan / Alamat Kop Struk</label><input id="shopAddr">
+<label>Link Google Sheets Closing</label><input id="sheetWebhook" placeholder="https://script.google.com/macros/s/...">
+<label>Nomor WA Notifikasi Admin</label><input id="devWaInput" type="tel" placeholder="628123456789">
+<label>Nomor WA Pusat (Order & Rekap)</label><input id="pusatWaInput" type="tel" placeholder="628123456789">
+<div class="grid"><div><label>Pass Management</label><input id="mgmtPassInput" type="text"></div><div><label>Pass Admin</label><input id="devPassInput" type="text"></div></div>
+<button type="button" class="btn" id="saveProfileBtn">Simpan Pengaturan & Password</button>
+
+<div class="admin-section"><div class="adminhead">📥 Import Parfum dari CSV (termasuk Harga Beli)</div><button type="button" class="btn secondary" id="dlSampleCsvBtn" style="margin-bottom:8px">📄 Download Contoh Template CSV Parfum</button>
+<input type="file" id="csvFileInput" accept=".csv,text/csv"></div>
+
+<div class="admin-section">
+<div class="adminhead">💾 Backup & Restore Semua Pengaturan Master</div>
+<button type="button" class="btn secondary" id="exportMasterBtn">📤 Download Master (JSON)</button>
+<label style="margin-top:8px">📥 Upload Master (JSON)</label>
+<input type="file" id="importMasterInput" accept=".json,application/json">
 </div>
 
-<div class="card">
-  <div class="adminhead">🔑 Password Akses</div>
-  <div class="grid">
-    <div><label>Pass Management</label><input id="mgmtPassInput" type="text"></div>
-    <div><label>Pass Admin</label><input id="devPassInput" type="text"></div>
-  </div>
-</div>
+<div class="admin-section"><div class="adminhead">Daftar Outlet</div><div class="grid"><div><input id="newOutletName" placeholder="Outlet Baru"></div><div><button type="button" class="btn" id="addOutletBtn" style="margin:0">+ Tambah</button></div></div><div id="outletList" style="margin-top:8px"></div></div>
 
-<div class="card">
-  <div class="adminhead">🏬 Daftar Outlet + PIN Toko</div>
-  <p class="note">Karyawan hanya bisa masuk menggunakan PIN Toko yang didaftarkan untuk outlet tersebut.</p>
-  <div class="grid">
-    <div><input id="newOutletName" placeholder="Outlet Baru"></div>
-    <div><button type="button" class="btn" id="addOutletBtn" style="margin:0">+ Tambah Outlet</button></div>
-  </div>
-  <div id="outletList" style="margin-top:8px"></div>
+<div class="admin-section"><div class="adminhead">Master Parfum</div>
+<div class="warning-banner" id="masterHargaBeliWarn" style="display:none">
+  <span id="masterHargaBeliWarnTxt">⚠️ Ada parfum dengan harga beli 0.</span>
+  <button type="button" id="masterHargaBeliFixBtn">Lihat</button>
 </div>
+<div class="grid"><div><label>Kode & Nama</label><input id="newPerfumeName"></div><div><label>Harga Jual / ml</label><input id="newPerfumePrice" type="number"></div><div><label>Harga Beli / ml</label><input id="newPerfumeBuyPrice" type="number" value="0"></div><div><label>Stok Awal</label><input id="newPerfumeStock" type="number" value="500"></div><div><label>Batas Min Default</label><input id="newPerfumeMin" type="number" value="50"></div><div class="full"><button type="button" class="btn" id="addPerfume">+ Tambah Parfum</button></div></div><input id="filterMasterParfum" placeholder="Cari parfum..." style="margin-top:8px"><div id="perfumeList"></div></div>
 
-<div class="card">
-  <div class="adminhead">💾 Backup & Restore Master (JSON)</div>
-  <button type="button" class="btn secondary" id="exportMasterBtn">📤 Download Master (JSON)</button>
-  <label style="margin-top:8px">📥 Upload Master (JSON)</label>
-  <input type="file" id="importMasterInput" accept=".json,application/json">
-</div>
+<div class="admin-section"><div class="adminhead">Master Campuran</div><div class="grid"><div><label>Nama Campuran</label><input id="newMixName"></div><div><label>Harga Jual / ml</label><input id="newMixPrice" type="number"></div><div><label>Harga Beli / ml</label><input id="newMixBuyPrice" type="number" value="0"></div><div><label>Batas Min Default</label><input id="newMixMin" type="number" value="200"></div><div class="full"><button type="button" class="btn" id="addMix">+ Tambah</button></div></div><div id="mixList"></div></div>
 
-<div class="card">
-  <div class="adminhead">🗑️ Reset</div>
-  <button type="button" class="btn danger" id="resetBtn">Reset Semua Data Bawaan</button>
+<div class="admin-section"><div class="adminhead">Master Botol (Refill Pertama)</div><div class="grid"><div><label>Nama Botol</label><input id="newPurchaseName"></div><div><label>Harga Jual (Rp)</label><input id="newPurchasePrice" type="number"></div><div><label>Harga Beli (Rp)</label><input id="newPurchaseBuyPrice" type="number" value="0"></div><div><label>Batas Min Default</label><input id="newPurchaseMin" type="number" value="10"></div><div class="full"><button type="button" class="btn" id="addPurchase">+ Tambah</button></div></div><div id="purchaseList"></div></div>
+
+<div class="admin-section"><div class="adminhead">Pembulatan Harga (Rp)</div><input id="rounding" type="number" step="500" value="1000"></div>
+
+<div class="admin-section"><button type="button" class="btn danger" id="resetBtn">Reset Semua Data Bawaan</button></div>
 </div>
 </section>
+<!-- ============ LAPORAN MANAGEMENT (PRO) ============ -->
 <!-- ============ LAPORAN MANAGEMENT (PRO) ============ -->
 <section id="secMgmt" class="hide">
 <div class="card">
@@ -860,11 +788,11 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
   <!-- BELANJA VS OMZET -->
   <div class="report-section" data-rsec="belanja">
     <div class="kpi-grid">
-      <div class="kpi-card"><div class="kp-label">TOTAL BELANJA (NORMAL)</div><div class="kp-val" id="rpBelanjaNormal">Rp0</div><div class="kp-sub flat">qty masuk × harga</div></div>
+      <div class="kpi-card"><div class="kp-label">TOTAL BELANJA (NORMAL)</div><div class="kp-val" id="rpBelanjaNormal">Rp0</div><div class="kp-sub flat">qty masuk × harga beli</div></div>
       <div class="kpi-card"><div class="kp-label">TOTAL BELANJA (NETTO)</div><div class="kp-val" id="rpBelanjaNetto">Rp0</div><div class="kp-sub flat">setelah susut 2,5%</div></div>
-      <div class="kpi-card"><div class="kp-label">RASIO BELANJA / OMZET</div><div class="kp-val" id="rpHppRatio">0%</div><div class="kp-sub flat">semakin dekat 100% semakin baik</div></div>
-      <div class="kpi-card"><div class="kp-label">BALANCE (OMZET − BELANJA)</div><div class="kp-val" id="rpBalance">Rp0</div><div class="kp-sub flat">selisih</div></div>
-    </div>
+      <div class="kpi-card"><div class="kp-label">RASIO HPP / OMZET</div><div class="kp-val" id="rpHppRatio">0%</div><div class="kp-sub flat">semakin kecil semakin baik</div></div>
+      <div class="kpi-card"><div class="kp-label">LABA KOTOR</div><div class="kp-val" id="rpLabaKotor">Rp0</div><div class="kp-sub flat">omzet − belanja netto</div></div>
+          </div>
     <div class="card"><div class="adminhead">📊 Perbandingan Harian</div><div id="rpBelanjaChart"></div></div>
     <div class="card"><div class="adminhead">✅ Rekap Bulanan</div>
       <div style="overflow-x:auto"><table class="data-table" id="rpBulananTable"></table></div>
@@ -874,106 +802,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
   <!-- STOK -->
   <div class="report-section" data-rsec="stok">
     <div class="card"><div class="adminhead">💎 Total Nilai Stok per Outlet</div>
-      <p class="note">Nilai = qty stok × harga.</p>
-      <div style="overflow-x:auto"><table class="data-table" id="rpNilaiStokTable"></table></div>
-    </div>
-    <div class="card"><div class="adminhead">⚠️ Item di Bawah Minimum</div><div id="rpLowStockList"></div></div>
-    <div class="card"><div class="adminhead">🧊 Dead Stock (Tidak Bergerak 60 Hari)</div><div id="rpDeadStockList"></div></div>
-  </div>
-
-  <!-- KASIR -->
-  <div class="report-section" data-rsec="kasir">
-    <div class="card"><div class="adminhead">💳 Porsi Metode Bayar</div><div id="rpMetodePorsi"></div></div>
-    <div class="card"><div class="adminhead">🕐 Jam Sibuk (Peak Hour)</div><div id="rpPeakHour"></div></div>
-    <div class="card"><div class="adminhead">📋 Rata-rata Transaksi per Nota</div>
-      <div class="stat-grid" style="margin-top:8px">
-        <div class="stat-box"><div class="small">Rata-rata Nota</div><div class="stat-val" id="rpAvgNota">Rp0</div></div>
-        <div class="stat-box"><div class="small">Rata-rata Item/Nota</div><div class="stat-val" id="rpAvgItems">0</div></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ================= TAMPILAN DETAIL TOKO ================= -->
-<div id="mgmtDetailView" class="hide">
-    <button type="button" class="btn secondary" id="mgmtBackBtn" style="margin-bottom:12px">↩️ Kembali</button>
-  
-  <div class="card" style="background:linear-gradient(135deg,#e0f2fe,#dcfce7); border-color:#7dd3fc;">
-    <div class="adminhead" id="mgmtDetailTitle" style="font-size:18px; color:#0369a1; margin:0;">Detail Outlet</div>
-    <div class="small" id="mgmtDetailPeriod" style="margin-top:4px;">—</div>
-  </div>
-
-  <div class="kpi-grid">
-    <div class="kpi-card"><div class="kp-label">OMZET TOKO INI</div><div class="kp-val" id="dtOmzet">Rp0</div></div>
-    <div class="kpi-card"><div class="kp-label">JUMLAH NOTA</div><div class="kp-val" id="dtNota">0</div></div>
-    <div class="kpi-card"><div class="kp-label">RATA-RATA / NOTA</div><div class="kp-val" id="dtAvg">Rp0</div></div>
-    <div class="kpi-card"><div class="kp-label">TOTAL BELANJA</div><div class="kp-val" id="dtBelanja">Rp0</div></div>
-  </div>
-
-  <div class="card"><div class="adminhead">🏆 Top 5 Parfum di Toko Ini</div><div id="dtTopParfum"></div></div>
-  <div class="card"><div class="adminhead">💳 Metode Bayar</div><div id="dtMetode"></div></div>
-  <div class="card"><div class="adminhead">🕐 Jam Tersibuk</div><div id="dtPeakHour"></div></div>
-</div>
-
-</section>
-<section id="secNotif" class="hide">
-<div class="card">
-  <div class="adminhead" style="color:#dc2626">🔔 Notifikasi Admin</div>
-  <p class="note">Daftar masalah yang perlu ditindaklanjuti. Klik <strong>Buka & Isi</strong> untuk langsung menuju bagian bermasalah.</p>
-  <div id="adminNotifList"><p class="note" style="color:#16a34a;font-weight:700">✅ Tidak ada masalah.</p></div>
-</div>
-<div class="card">
-  <div class="adminhead" style="color:#dc2626">📥 Pengajuan Hapus dari Karyawan</div>
-  <p class="note">Daftar pengajuan hapus dari karyawan. Klik <strong>Accept</strong> untuk menyetujui & menghapus, atau <strong>Tolak</strong> untuk menolak.</p>
-  <div id="devReqList"></div>
-</div>
-</section>
-
-</section>
-</main>
-
-<!-- ============ MODAL GENERIK ============ -->
-<div id="editModal" class="modal-bg hide"><div class="modal-box">
-<div class="adminhead" id="modalTitle">Edit</div>
-<div id="modalFields"></div>
-<div class="grid" style="margin-top:12px">
-<button type="button" class="btn secondary" id="modalCancel" style="margin:0">Batal</button>
-<button type="button" class="btn" id="modalSave" style="margin:0">Simpan</button>
-</div>
-</div></div>
-
-<!-- ============ MODAL PREVIEW STRUK ============ -->
-<div id="strukModal" class="modal-bg hide"><div class="modal-box">
-<div class="adminhead">🧾 Preview Struk 58mm</div>
-<div class="receipt-preview" id="strukPreview"></div>
-<div class="grid" style="margin-top:12px">
-<button type="button" class="btn secondary" id="strukCloseBtn" style="margin:0">Tutup</button>
-<button type="button" class="btn" id="strukBrowserBtn" style="margin:0">🖨️ Print Browser</button>
-</div>
-<button type="button" class="btn" id="strukRawBtBtn" style="background:#7c3aed">📱 Kirim ke RawBT (Android)</button>
-</div></div>
-
-<!-- MODAL KONFIRMASI KELUAR -->
-<div id="exitModal" class="modal-bg hide"><div class="modal-box">
-  <div class="adminhead">Keluar tanpa menyimpan?</div>
-  <p class="note">Perubahan yang belum disimpan akan hilang. Simpan dulu sebelum keluar?</p>
-  <div class="grid" style="margin-top:12px">
-    <button type="button" class="btn secondary" id="exitCancelBtn" style="margin:0">✖ Batal</button>
-    <button type="button" class="btn" id="exitSaveBtn" style="margin:0">💾 Simpan & Keluar</button>
-  </div>
-  <button type="button" class="btn danger" id="exitNoSaveBtn" style="margin-top:8px">🚪 Keluar Tanpa Simpan</button>
-</div></div>
-    </div>
-    <div class="card"><div class="adminhead">📊 Perbandingan Harian</div><div id="rpBelanjaChart"></div></div>
-    <div class="card"><div class="adminhead">✅ Rekap Bulanan</div>
-      <div style="overflow-x:auto"><table class="data-table" id="rpBulananTable"></table></div>
-    </div>
-  </div>
-
-  <!-- STOK -->
-  <div class="report-section" data-rsec="stok">
-    <div class="card"><div class="adminhead">💎 Total Nilai Stok per Outlet</div>
-      <p class="note">Nilai = qty stok × harga.</p>
+      <p class="note">Nilai = qty stok × harga beli per ml.</p>
       <div style="overflow-x:auto"><table class="data-table" id="rpNilaiStokTable"></table></div>
     </div>
     <div class="card"><div class="adminhead">⚠️ Item di Bawah Minimum</div><div id="rpLowStockList"></div></div>
@@ -1081,80 +910,34 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 /* ================== DEFAULT DATA ================== */
 var defaultOutlets=[];for(var o=1;o<=19;o++)defaultOutlets.push("Outlet "+String(o).padStart(2,"0"));
 var defaultCaps=[];for(var sz=10;sz<=100;sz+=5)defaultCaps.push({size:sz});
-// Struktur baru: {code, name, displayName, price}
-// - code        = kode unik (parfum: angka, campuran: Al/Et/Eta, botol: "")
-// - name        = nama lengkap gabungan "KODE - NAMA" (dipakai sebagai key stok, kompatibel data lama)
-// - displayName = nama tampilan tanpa kode
-// - price       = satu harga (jual = beli)
 var def={
 shop:{name:"AURA INTERNATIONAL PERFUME",addr:"Wangi Khas Pilihanmu",webhook:"https://script.google.com/macros/s/AKfycbw9R9Sf-DtOelDtlqWMDNARXT7-QNRCH8oMMAqBUSRpDxrHPB1KfD612sThQ6cnYQuV/exec",mgmtPass:"2222",devPass:"9999",devWa:"",pusatWa:""},
 outlets:defaultOutlets,
 outletEmails:{},
 perfumes:[
-{code:"101",name:"101 - Adidas",displayName:"Adidas",price:2500},
-{code:"4302",name:"4302 - Al Rehab - lovely",displayName:"Al Rehab - lovely",price:2700},
-{code:"7402",name:"7402 - Al Rehab - Soft",displayName:"Al Rehab - Soft",price:2700},
-{code:"202",name:"202 - Ana Sui - Secret Wish",displayName:"Ana Sui - Secret Wish",price:3500},
-{code:"207",name:"207 - Ana Sui - Flight Of Fancy",displayName:"Ana Sui - Flight Of Fancy",price:3700},
-{code:"9110",name:"9110 - Baccarot",displayName:"Baccarot",price:3200},
-{code:"9111",name:"9111 - Baccarot Oud",displayName:"Baccarot Oud",price:3200},
-{code:"503",name:"503 - Body Shop - White Musk A",displayName:"Body Shop - White Musk A",price:3700},
-{code:"502",name:"502 - Body Shop - Vanila",displayName:"Body Shop - Vanila",price:2700},
-{code:"801",name:"801 - Bvlgari - Aqua For Man A",displayName:"Bvlgari - Aqua For Man A",price:4700},
-{code:"804",name:"804 - Bvlgari - BLV Man A",displayName:"Bvlgari - BLV Man A",price:3600},
-{code:"808",name:"808 - Bvlgari - Extreme A",displayName:"Bvlgari - Extreme A",price:3700},
-{code:"811",name:"811 - Bvlgari - Omnia Crystal",displayName:"Bvlgari - Omnia Crystal",price:2700},
-{code:"1001",name:"1001 - Carolina Herrera - 212 Man",displayName:"Carolina Herrera - 212 Man",price:3800},
-{code:"1011",name:"1011 - Carolina Herrera - 212 VIP Rose",displayName:"Carolina Herrera - 212 VIP Rose",price:2500},
-{code:"1306",name:"1306 - Chanel - Allur Sport",displayName:"Chanel - Allur Sport",price:3600},
-{code:"1308",name:"1308 - Chanel - Blue Chance",displayName:"Chanel - Blue Chance",price:3100},
-{code:"1407",name:"1407 - Cristian Dior - Sauvage",displayName:"Cristian Dior - Sauvage",price:2800},
-{code:"1405",name:"1405 - Christian Dior - Jadore",displayName:"Christian Dior - Jadore",price:2300},
-{code:"1103",name:"1103 - Creed-Creed Adventus",displayName:"Creed-Creed Adventus",price:2800},
-{code:"2102",name:"2102 - Dunhill - Desire Blue",displayName:"Dunhill - Desire Blue",price:3100},
-{code:"2207",name:"2207 - E. Aigner - In Lather Man",displayName:"E. Aigner - In Lather Man",price:4000},
-{code:"3407",name:"3407 - Hugo Boss - Bottled",displayName:"Hugo Boss - Bottled",price:4000},
-{code:"3602",name:"3602 - Jaguar - Blue",displayName:"Jaguar - Blue",price:3500},
-{code:"9204",name:"9204 - JO Malone-engles spear",displayName:"JO Malone-engles spear",price:2700},
-{code:"4708",name:"4708 - Paco Rabane - One Million",displayName:"Paco Rabane - One Million",price:2600},
-{code:"5704",name:"5704 - Victoria Secret - Bombshell",displayName:"Victoria Secret - Bombshell",price:3500},
-{code:"5705",name:"5705 - Victoria Secret - Romantic Wish",displayName:"Victoria Secret - Romantic Wish",price:2900},
-{code:"5708",name:"5708 - Victoria Secret - Scandalos",displayName:"Victoria Secret - Scandalos",price:3600},
-{code:"5803",name:"5803 - YSL -Black Opium",displayName:"YSL -Black Opium",price:2700},
-{code:"5806",name:"5806 - YSL -Libre",displayName:"YSL -Libre",price:2700},
-{code:"304",name:"304 - Afnan-Nine PM",displayName:"Afnan-Nine PM",price:2800},
-{code:"6208",name:"6208 - Marfa-Sotb Saff And Co",displayName:"Marfa-Sotb Saff And Co",price:3200}
+{name:"101 - Adidas",price:2500,min:50,buy:2000},{name:"4302 - Al Rehab - lovely",price:2700,min:50,buy:2200},{name:"7402 - Al Rehab - Soft",price:2700,min:50,buy:2200},
+{name:"202 - Ana Sui - Secret Wish",price:3500,min:50,buy:2800},{name:"207 - Ana Sui - Flight Of Fancy",price:3700,min:50,buy:3000},{name:"9110 - Baccarot",price:3200,min:50,buy:2600},
+{name:"9111 - Baccarot Oud",price:3200,min:50,buy:2600},{name:"503 - Body Shop - White Musk A",price:3700,min:50,buy:3000},{name:"502 - Body Shop - Vanila",price:2700,min:50,buy:2200},
+{name:"801 - Bvlgari - Aqua For Man A",price:4700,min:50,buy:3800},{name:"804 - Bvlgari - BLV Man A",price:3600,min:50,buy:2900},{name:"808 - Bvlgari - Extreme A",price:3700,min:50,buy:3000},
+{name:"811 - Bvlgari - Omnia Crystal",price:2700,min:50,buy:2200},{name:"1001 - Carolina Herrera - 212 Man",price:3800,min:50,buy:3100},{name:"1011 - Carolina Herrera - 212 VIP Rose",price:2500,min:50,buy:2000},
+{name:"1306 - Chanel - Allur Sport",price:3600,min:50,buy:2900},{name:"1308 - Chanel - Blue Chance",price:3100,min:50,buy:2500},{name:"1407 - Cristian Dior - Sauvage",price:2800,min:50,buy:2300},
+{name:"1405 - Christian Dior - Jadore",price:2300,min:50,buy:1900},{name:"1103 - Creed-Creed Adventus",price:2800,min:50,buy:2300},{name:"2102 - Dunhill - Desire Blue",price:3100,min:50,buy:2500},
+{name:"2207 - E. Aigner - In Lather Man",price:4000,min:50,buy:3200},{name:"3407 - Hugo Boss - Bottled",price:4000,min:50,buy:3200},{name:"3602 - Jaguar - Blue",price:3500,min:50,buy:2800},
+{name:"9204 - JO Malone-engles spear",price:2700,min:50,buy:2200},{name:"4708 - Paco Rabane - One Million",price:2600,min:50,buy:2100},{name:"5704 - Victoria Secret - Bombshell",price:3500,min:50,buy:2800},
+{name:"5705 - Victoria Secret - Romantic Wish",price:2900,min:50,buy:2300},{name:"5708 - Victoria Secret - Scandalos",price:3600,min:50,buy:2900},{name:"5803 - YSL -Black Opium",price:2700,min:50,buy:2200},
+{name:"5806 - YSL -Libre",price:2700,min:50,buy:2200},{name:"304 - Afnan-Nine PM",price:2800,min:50,buy:2300},{name:"6208 - Marfa-Sotb Saff And Co",price:3200,min:50,buy:2600}
 ],
-// Campuran: code Al=Alkohol, Et=Etanol, Eta=Etanol Jerman
-mixes:[
-{code:"Et",name:"Et - Etanol",displayName:"Etanol",price:200},
-{code:"Eta",name:"Eta - Etanol Jerman",displayName:"Etanol Jerman",price:400},
-{code:"Al",name:"Al - Alkohol",displayName:"Alkohol",price:0}
-],
+mixes:[{name:"Etanol",price:200,min:200,buy:150},{name:"Etanol Jerman",price:400,min:200,buy:320},{name:"Alkohol",price:0,min:200,buy:0}],
 capacities:defaultCaps,
 purchases:[
-{name:"Refill",displayName:"Refill",price:0},
-{name:"P25 - SP 25",displayName:"P25 - SP 25",price:3000},
-{name:"P40 - SP 40",displayName:"P40 - SP 40",price:3000},
-{name:"P60 - SP 60",displayName:"P60 - SP 60",price:3000},
-{name:"R10 - Roll On Es 10",displayName:"R10 - Roll On Es 10",price:3000},
-{name:"K15 - SK 15",displayName:"K15 - SK 15",price:5000},
-{name:"K35 - SK 35",displayName:"K35 - SK 35",price:8000},
-{name:"K60 - SK 60",displayName:"K60 - SK 60",price:8000},
-{name:"H43 - H 443",displayName:"H43 - H 443",price:10000},
-{name:"GT30 - Gradasi Tabung 30",displayName:"GT30 - Gradasi Tabung 30",price:10000},
-{name:"GT50 - Gradasi Tabung 50",displayName:"GT50 - Gradasi Tabung 50",price:10000},
-{name:"V35 - Oval 35",displayName:"V35 - Oval 35",price:10000},
-{name:"C35 - Clasic 35",displayName:"C35 - Clasic 35",price:10000},
-{name:"CJ50 - Cristian Dior Joy",displayName:"CJ50 - Cristian Dior Joy",price:10000},
-{name:"mc35 - Marcedes",displayName:"mc35 - Marcedes",price:10000},
-{name:"HG50 - Hugo 50",displayName:"HG50 - Hugo 50",price:10000},
-{name:"HG30 - Hugo 30",displayName:"HG30 - Hugo 30",price:10000},
-{name:"GK50 - Gradasi Kotak 50",displayName:"GK50 - Gradasi Kotak 50",price:10000},
-{name:"GE35 - Gradasi Elips 35",displayName:"GE35 - Gradasi Elips 35",price:10000},
-{name:"HM30 - Gradasi Hermes 30",displayName:"HM30 - Gradasi Hermes 30",price:10000},
-{name:"STP50 - Stik 50 Polos",displayName:"STP50 - Stik 50 Polos",price:10000},
-{name:"GK100 - Gradasi Kotak 100",displayName:"GK100 - Gradasi Kotak 100",price:13000}
+{name:"Refill",price:0,min:0,buy:0},
+{name:"P25 - SP 25",price:3000,min:10,buy:2400},{name:"P40 - SP 40",price:3000,min:10,buy:2400},{name:"P60 - SP 60",price:3000,min:10,buy:2400},
+{name:"R10 - Roll On Es 10",price:3000,min:10,buy:2400},{name:"K15 - SK 15",price:5000,min:10,buy:4000},{name:"K35 - SK 35",price:8000,min:10,buy:6500},
+{name:"K60 - SK 60",price:8000,min:10,buy:6500},{name:"H43 - H 443",price:10000,min:10,buy:8000},{name:"GT30 - Gradasi Tabung 30",price:10000,min:10,buy:8000},
+{name:"GT50 - Gradasi Tabung 50",price:10000,min:10,buy:8000},{name:"V35 - Oval 35",price:10000,min:10,buy:8000},{name:"C35 - Clasic 35",price:10000,min:10,buy:8000},
+{name:"CJ50 - Cristian Dior Joy",price:10000,min:10,buy:8000},{name:"mc35 - Marcedes",price:10000,min:10,buy:8000},{name:"HG50 - Hugo 50",price:10000,min:10,buy:8000},
+{name:"HG30 - Hugo 30",price:10000,min:10,buy:8000},{name:"GK50 - Gradasi Kotak 50",price:10000,min:10,buy:8000},{name:"GE35 - Gradasi Elips 35",price:10000,min:10,buy:8000},
+{name:"HM30 - Gradasi Hermes 30",price:10000,min:10,buy:8000},{name:"STP50 - Stik 50 Polos",price:10000,min:10,buy:8000},{name:"GK100 - Gradasi Kotak 100",price:13000,min:10,buy:10500}
 ],
 rounding:1000,
 stokMin:{}
@@ -1162,7 +945,7 @@ stokMin:{}
 function clone(o){return JSON.parse(JSON.stringify(o));}
 
 /* ================== STORAGE ================== */
-var KEY="auraPos19MasterV11",SALES_KEY="auraPos19SalesV9",STOCK_KEY="auraPos19StockV9",IN_KEY="auraPos19InV9";
+var KEY="auraPos19MasterV10",SALES_KEY="auraPos19SalesV9",STOCK_KEY="auraPos19StockV9",IN_KEY="auraPos19InV9";
 var AUDIT_KEY="auraPos19AuditSessionsV2",REQ_KEY="auraPos19ReqV9";
 var DIST_KEY="auraPos19DistV9",DISTQ_KEY="auraPos19DistQueueV1",STOKMIN_KEY="auraPos19StokMinV1";
 
@@ -1177,37 +960,6 @@ if(!data.shop.pusatWa)data.shop.pusatWa="";
 if(!data.shop.mgmtPass)data.shop.mgmtPass="2222";
 if(!data.shop.devPass)data.shop.devPass="9999";
 if(!data.stokMin)data.stokMin={};
-
-/* ===== MIGRASI DATA LAMA → STRUKTUR BARU ===== */
-// Data lama: {name:"101 - Adidas", price:2500, min:50, buy:2000}
-// Data baru: {code:"101", name:"101 - Adidas", displayName:"Adidas", price:2500}
-(function migrateData(){
-  function migrateItem(it, cat){
-    if(it.code===undefined){
-      if(cat==="perfumes"){
-        var m = String(it.name||"").match(/^(\d+)\s*-\s*(.+)$/);
-        if(m){ it.code = m[1]; it.displayName = m[2]; }
-        else { it.code = ""; it.displayName = it.name || ""; }
-      } else if(cat==="mixes"){
-        var m2 = String(it.name||"").match(/^(Al|Et|Eta)\s*-\s*(.+)$/i);
-        if(m2){ it.code = m2[1]; it.displayName = m2[2]; }
-        else { it.code = ""; it.displayName = it.name || ""; }
-      } else {
-        it.code = ""; it.displayName = it.name || "";
-      }
-    }
-    if(!it.displayName) it.displayName = it.name || "";
-    if(it.price===undefined || it.price===null){
-      it.price = (it.buy!==undefined && it.buy!==null) ? it.buy : 0;
-    }
-    delete it.min;
-    delete it.buy;
-    return it;
-  }
-  (data.perfumes||[]).forEach(function(p){migrateItem(p,"perfumes");});
-  (data.mixes||[]).forEach(function(m){migrateItem(m,"mixes");});
-  (data.purchases||[]).forEach(function(b){migrateItem(b,"purchases");});
-})();
 
 try{sales=JSON.parse(localStorage.getItem(SALES_KEY))||[];}catch(e){sales=[];}
 try{stocks=JSON.parse(localStorage.getItem(STOCK_KEY))||{};}catch(e){stocks={};}
@@ -1268,11 +1020,11 @@ function showGlobalSaveBar(role){
 }
 document.addEventListener("input",function(e){
   if(!session||session.role!=="admin")return;
-  if(e.target.closest("#secMaster")||e.target.closest("#secSetting")||e.target.closest("#secStokMin")||e.target.closest("#secAudit"))markDirty();
+  if(e.target.closest("#secAdmin")||e.target.closest("#secAkses")||e.target.closest("#secStokMin")||e.target.closest("#secAudit"))markDirty();
 });
 document.addEventListener("change",function(e){
   if(!session||session.role!=="admin")return;
-  if(e.target.closest("#secMaster")||e.target.closest("#secSetting")||e.target.closest("#secStokMin")||e.target.closest("#secAudit"))markDirty();
+  if(e.target.closest("#secAdmin")||e.target.closest("#secAkses")||e.target.closest("#secStokMin")||e.target.closest("#secAudit"))markDirty();
 });
 window.addEventListener("beforeunload",function(e){
   if(hasUnsavedChanges){e.preventDefault();e.returnValue="";return "";}
@@ -1343,12 +1095,13 @@ function ensureOutletStock(outlet){
 }
 
 /* ================== STOK MIN (OVERRIDE) ================== */
-// Karena master tidak punya "min" default, fallback = 0.
-// Min sepenuhnya diatur di halaman Stok Minim per Outlet (stokMinOverride).
 function getStokMin(outlet,cat,name){
   var key=outlet+"|"+cat+"|"+name;
   if(stokMinOverride[key]!==undefined&&stokMinOverride[key]!=="")return +stokMinOverride[key];
-  return 0;
+  var list=data[cat];
+  if(!list)return 0;
+  var item=list.find(function(x){return x.name===name;});
+  return item?(item.min||0):0;
 }
 function setStokMin(outlet,cat,name,val){
   var key=outlet+"|"+cat+"|"+name;
@@ -1442,33 +1195,25 @@ el("exitSaveBtn").onclick=async function(){
   /* ================== KASIR: PERFUME / SELECTS ================== */
 function renderPerfumeOptions(filter){
   var q=(filter||"").toLowerCase().trim();
-  var list=data.perfumes.map(function(x,i){return {x:x,i:i};}).filter(function(o){
-    if(!q)return true;
-    var hay=((o.x.code||"")+" "+(o.x.displayName||o.x.name||"")).toLowerCase();
-    return hay.indexOf(q)>=0;
-  });
+  var list=data.perfumes.map(function(x,i){return {x:x,i:i};}).filter(function(o){return !q||o.x.name.toLowerCase().indexOf(q)>=0;});
   
   if(!list.length){
     el("perfumeSelect").innerHTML='<option value="-1">Tidak ditemukan</option>';
   }else{
-    // Tampilkan "KODE - displayName", value = index asli di data.perfumes
+    // Buat opsi dengan warna selang-seling (hanya nama, tanpa harga)
     el("perfumeSelect").innerHTML=list.map(function(o, idx){
-      var bgColor = (idx % 2 === 0) ? "#ffffff" : "#eff6ff";
+      var bgColor = (idx % 2 === 0) ? "#ffffff" : "#eff6ff"; // Putih dan Biru Muda
       var style = 'style="background-color:'+bgColor+'; color:#0f172a; padding:10px; font-weight:600;"';
-      var lbl = (o.x.code?o.x.code+" - ":"")+(o.x.displayName||o.x.name);
-      return '<option value="'+o.i+'" '+style+'>'+esc(lbl)+'</option>';
+      return '<option value="'+o.i+'" '+style+'>'+esc(o.x.name)+'</option>';
     }).join("");
   }
   calcCurrentItem();
 }
 function renderSelects(){
   renderPerfumeOptions(el("searchParfum").value);
-  // Campuran: tampilkan "KODE - Nama"
-  el("mixSelect").innerHTML=data.mixes.map(function(x,i){
-    var lbl=(x.code?x.code+" - ":"")+(x.displayName||x.name);
-    return '<option value="'+i+'">'+esc(lbl)+' ('+(x.price===0?"Gratis":fmt(x.price)+"/ml")+')</option>';
-  }).join("");
-  var caps=data.capacities.map(function(x,i){return {x:x,i:i};}).sort(function(a,b){return a.x.size-b.x.size;});
+  el("mixSelect").innerHTML=data.mixes.map(function(x,i){return '<option value="'+i+'">'+esc(x.name)+' ('+(x.price===0?"Gratis":fmt(x.price)+"/ml")+')</option>';}).join("");
+    var caps=data.capacities.map(function(x,i){return {x:x,i:i};}).sort(function(a,b){return a.x.size-b.x.size;});
+  // Tambahkan opsi default "0 ml" di paling atas
   el("capacitySelect").innerHTML = '<option value="-1">0 ml</option>' + caps.map(function(o){return '<option value="'+o.i+'">'+o.x.size+' ml</option>';}).join("");
   var sortedB=data.purchases.map(function(x,i){return {x:x,i:i};}).sort(function(a,b){
     if(a.x.name.toLowerCase()==="refill")return -1;
@@ -1492,28 +1237,41 @@ function moveKnob(clientX){
   currentPct=Math.round(1+ratio*99);refreshKnob();calcCurrentItem();
 }
 
+// Fungsi tombol panah kiri (Kurang 1%)
 el("pctMinusBtn").onclick = function(){
-  if(currentPct > 1){ currentPct--; refreshKnob(); calcCurrentItem(); }
+  if(currentPct > 1){ 
+    currentPct--; 
+    refreshKnob(); 
+    calcCurrentItem(); 
+  }
 };
+
+// Fungsi tombol panah kanan (Tambah 1%)
 el("pctPlusBtn").onclick = function(){
-  if(currentPct < 100){ currentPct++; refreshKnob(); calcCurrentItem(); }
+  if(currentPct < 100){ 
+    currentPct++; 
+    refreshKnob(); 
+    calcCurrentItem(); 
+  }
 };
 knob.addEventListener("pointerdown",function(e){
-  e.preventDefault();
+  e.preventDefault(); // Mencegah layar ikut ter-scroll
   dragging=true;
   if(knob.setPointerCapture) knob.setPointerCapture(e.pointerId);
 });
-wrap.addEventListener("pointermove", function(e){ moveKnob(e.clientX); });
+wrap.addEventListener("pointermove", function(e){
+  moveKnob(e.clientX);
+});
 knob.addEventListener("pointerup",function(){dragging=false;});
 knob.addEventListener("pointercancel",function(){dragging=false;});
-window.addEventListener("pointerup",function(){dragging=false;});
-wrap.addEventListener("click", function(e) { moveKnob(e.clientX); });
-
+window.addEventListener("pointerup",function(){dragging=false;}); // Jaga-jaga kalau jari lepas di luar area
+  wrap.addEventListener("click", function(e) { moveKnob(e.clientX); });
 /* ================== CALC ITEM ================== */
 function calcCurrentItem(){
   var idx=+el("perfumeSelect").value;
   var capIdx=+el("capacitySelect").value;
   
+  // Jika parfum tidak dipilih (-1) ATAU kapasitas masih 0ml (-1), reset harganya
   if(idx<0 || isNaN(idx) || capIdx<0 || isNaN(capIdx) || !data.perfumes[idx] || !data.mixes.length || !data.capacities.length || !data.purchases.length){
     el("itemSubtotal").textContent="Rp0";
     el("itemFormula").textContent="—";
@@ -1639,16 +1397,16 @@ function getLowStockItems(outlet){
   var res=[],cur=stocks[outlet].current;
   data.perfumes.forEach(function(p){
     var q=cur.perfumes[p.name]||0,m=getStokMin(outlet,"perfumes",p.name);
-    if(q<=m)res.push({cat:"Bibit Parfum",name:p.name,displayName:p.displayName||p.name,qty:q,min:m,unit:"ml",catKey:"perfumes"});
+    if(q<=m)res.push({cat:"Bibit Parfum",name:p.name,qty:q,min:m,unit:"ml",catKey:"perfumes"});
   });
   data.mixes.forEach(function(x){
     var q=cur.mixes[x.name]||0,m=getStokMin(outlet,"mixes",x.name);
-    if(q<=m)res.push({cat:"Campuran",name:x.name,displayName:x.displayName||x.name,qty:q,min:m,unit:"ml",catKey:"mixes"});
+    if(q<=m)res.push({cat:"Campuran",name:x.name,qty:q,min:m,unit:"ml",catKey:"mixes"});
   });
   data.purchases.forEach(function(b){
     if(b.price>0){
       var q=cur.purchases[b.name]||0,m=getStokMin(outlet,"purchases",b.name);
-      if(q<=m)res.push({cat:"Botol",name:b.name,displayName:b.displayName||b.name,qty:q,min:m,unit:"pcs",catKey:"purchases"});
+      if(q<=m)res.push({cat:"Botol",name:b.name,qty:q,min:m,unit:"pcs",catKey:"purchases"});
     }
   });
   return res;
@@ -1659,15 +1417,14 @@ function renderLowStock(){
   if(low.length>0){el("orderBadgeCount").textContent=low.length;el("orderBadgeCount").classList.remove("hide");}
   else{el("orderBadgeCount").classList.add("hide");}
   el("lowStockList").innerHTML=low.map(function(it){
-    var lbl=(it.displayName||it.name);
-    return '<div class="item"><div class="row"><div><strong>'+esc(lbl)+'</strong><div class="small">'+it.cat+' · Sisa: '+it.qty.toFixed(1)+' '+it.unit+' (min '+it.min+')</div></div><span class="badge alert">⚠️ WAJIB ORDER</span></div></div>';
+    return '<div class="item"><div class="row"><div><strong>'+esc(it.name)+'</strong><div class="small">'+it.cat+' · Sisa: '+it.qty.toFixed(1)+' '+it.unit+' (min '+it.min+')</div></div><span class="badge alert">⚠️ WAJIB ORDER</span></div></div>';
   }).join("")||'<p class="note" style="color:#16a34a;font-weight:700">✅ Semua stok aman.</p>';
 }
 el("sendOrderWaBtn").onclick=function(){
   if(!session)return;
   var low=getLowStockItems(session.outlet);
   if(!low.length){toast("Semua stok masih aman.","ok");return;}
-  var txt="PERMINTAAN ORDER STOK — "+session.outlet+"\nTanggal: "+todayStr()+"\n\nDaftar Barang Minim:\n"+low.map(function(x,i){return (i+1)+". "+(x.displayName||x.name)+" ("+x.cat+") - Sisa "+x.qty.toFixed(1)+" "+x.unit;}).join("\n");
+  var txt="PERMINTAAN ORDER STOK — "+session.outlet+"\nTanggal: "+todayStr()+"\n\nDaftar Barang Minim:\n"+low.map(function(x,i){return (i+1)+". "+x.name+" ("+x.cat+") - Sisa "+x.qty.toFixed(1)+" "+x.unit;}).join("\n");
   openWaModal(txt,data.shop.pusatWa);
 };
 
@@ -1679,15 +1436,11 @@ function renderStokAwal(){
   el("stokAwalDateInput").value=s.startDate||todayStr();
   el("lblTglStokAwal").textContent=s.startDate||todayStr();
   var q=(el("filterStokAwal").value||"").toLowerCase().trim(),rows=[];
-  data.perfumes.forEach(function(p){rows.push({cat:"Bibit",name:p.name,displayName:p.displayName||p.name,qty:s.initial.perfumes[p.name]||0,unit:"ml"});});
-  data.mixes.forEach(function(m){rows.push({cat:"Campuran",name:m.name,displayName:m.displayName||m.name,qty:s.initial.mixes[m.name]||0,unit:"ml"});});
-  data.purchases.forEach(function(b){if(b.price>0)rows.push({cat:"Botol",name:b.name,displayName:b.displayName||b.name,qty:s.initial.purchases[b.name]||0,unit:"pcs"});});
-  el("stokAwalList").innerHTML=rows.filter(function(r){
-    if(!q)return true;
-    return (r.name+" "+(r.displayName||"")).toLowerCase().indexOf(q)>=0;
-  }).map(function(r){
-    var lbl=(r.displayName||r.name);
-    return '<div class="item"><div class="row"><div><strong>'+esc(lbl)+'</strong><div class="small">'+r.cat+'</div></div><strong>'+r.qty+' '+r.unit+'</strong></div></div>';
+  data.perfumes.forEach(function(p){rows.push({cat:"Bibit",name:p.name,qty:s.initial.perfumes[p.name]||0,unit:"ml"});});
+  data.mixes.forEach(function(m){rows.push({cat:"Campuran",name:m.name,qty:s.initial.mixes[m.name]||0,unit:"ml"});});
+  data.purchases.forEach(function(b){if(b.price>0)rows.push({cat:"Botol",name:b.name,qty:s.initial.purchases[b.name]||0,unit:"pcs"});});
+  el("stokAwalList").innerHTML=rows.filter(function(r){return !q||r.name.toLowerCase().indexOf(q)>=0;}).map(function(r){
+    return '<div class="item"><div class="row"><div><strong>'+esc(r.name)+'</strong><div class="small">'+r.cat+'</div></div><strong>'+r.qty+' '+r.unit+'</strong></div></div>';
   }).join("");
 }
 el("saveStokAwalDateBtn").onclick=function(){
@@ -1696,32 +1449,14 @@ el("saveStokAwalDateBtn").onclick=function(){
   stocks[session.outlet].startDate=el("stokAwalDateInput").value||todayStr();
   saveStocks();renderStokAwal();toast("Tanggal stok awal disimpan.","ok");
 };
-el("downloadStokAwalTemplateBtn").onclick=function(){
-  if(!session)return;
-  var out=session.outlet;
-  var today=todayStr();
-  var rows=[["OUTLET","TANGGAL_AWAL","KATEGORI","KODE","NAMA_ITEM","STOK_AWAL"]];
-  data.perfumes.forEach(function(p){
-    rows.push([out,today,"perfumes",p.code||"",(p.displayName||p.name),""]);
-  });
-  data.mixes.forEach(function(m){
-    rows.push([out,today,"mixes",m.code||"",(m.displayName||m.name),""]);
-  });
-  data.purchases.forEach(function(b){
-    if(b.price>0)rows.push([out,today,"purchases","",(b.displayName||b.name),""]);
-  });
-  var csv="\uFEFF"+rows.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(",");}).join("\r\n");
-  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
-  a.download="Template_StokAwal_"+out.replace(/\s+/g,"_")+"_"+today+".csv";a.click();
-  toast("Template diunduh. Isi kolom STOK_AWAL lalu import.","ok");
-};
+el("exportStokAwalBtn").onclick=function(){
   if(!session)return;
   var out=session.outlet;ensureOutletStock(out);
   var s=stocks[out];
-  var rows=[["OUTLET","TANGGAL_AWAL","KATEGORI","KODE","NAMA_ITEM","STOK_AWAL"]];
-  data.perfumes.forEach(function(p){rows.push([out,s.startDate,"perfumes",p.code||"",p.displayName||p.name,s.initial.perfumes[p.name]||0]);});
-  data.mixes.forEach(function(m){rows.push([out,s.startDate,"mixes",m.code||"",m.displayName||m.name,s.initial.mixes[m.name]||0]);});
-  data.purchases.forEach(function(b){if(b.price>0)rows.push([out,s.startDate,"purchases","",b.displayName||b.name,s.initial.purchases[b.name]||0]);});
+  var rows=[["OUTLET","TANGGAL_AWAL","KATEGORI","NAMA_ITEM","STOK_AWAL"]];
+  data.perfumes.forEach(function(p){rows.push([out,s.startDate,"perfumes",p.name,s.initial.perfumes[p.name]||0]);});
+  data.mixes.forEach(function(m){rows.push([out,s.startDate,"mixes",m.name,s.initial.mixes[m.name]||0]);});
+  data.purchases.forEach(function(b){if(b.price>0)rows.push([out,s.startDate,"purchases",b.name,s.initial.purchases[b.name]||0]);});
   var csv="\uFEFF"+rows.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(",");}).join("\r\n");
   var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
   a.download="StokAwal_"+out.replace(/\s+/g,"_")+"_"+s.startDate+".csv";a.click();
@@ -1734,28 +1469,9 @@ el("importStokAwalInput").onchange=function(e){
     var s=stocks[out],cnt=0;
     ev.target.result.split(/\r?\n/).forEach(function(ln){
       var c=ln.split(",");
-      // Format baru: OUTLET,TANGGAL_AWAL,KATEGORI,KODE,NAMA_ITEM,STOK_AWAL
-      if(c.length>=6&&c[2]!=="KATEGORI"){
-        var cat=c[2].trim().replace(/^"|"$/g,"");
-        var code=c[3].trim().replace(/^"|"$/g,"");
-        var nm=c[4].trim().replace(/^"|"$/g,"");
-        var rawVal=c[5].trim().replace(/^"|"$/g,"");
-if(rawVal==="")return;
-var val=+rawVal;
-if(isNaN(val))return;
-        // Cari key asli di data (name gabungan)
-        var keyName=nm;
-        if(cat==="perfumes"){
-          var found=data.perfumes.find(function(p){return (p.code===code&&p.displayName===nm)||p.name===nm;});
-          if(found)keyName=found.name;
-        }else if(cat==="mixes"){
-          var found2=data.mixes.find(function(m){return (m.code===code&&m.displayName===nm)||m.name===nm;});
-          if(found2)keyName=found2.name;
-        }else{
-          var found3=data.purchases.find(function(b){return b.name===nm||b.displayName===nm;});
-          if(found3)keyName=found3.name;
-        }
-        if(s.initial[cat]&&!isNaN(val)){s.initial[cat][keyName]=val;s.current[cat][keyName]=val;cnt++;}
+      if(c.length>=5&&c[2]!=="KATEGORI"){
+        var cat=c[2].trim().replace(/^"|"$/g,""),nm=c[3].trim().replace(/^"|"$/g,""),val=+c[4].trim().replace(/^"|"$/g,"");
+        if(s.initial[cat]&&!isNaN(val)){s.initial[cat][nm]=val;s.current[cat][nm]=val;cnt++;}
       }
     });
     saveStocks();all();toast("✅ Impor "+cnt+" item Stok Awal!","ok");
@@ -1764,7 +1480,8 @@ if(isNaN(val))return;
 };
 el("filterStokAwal").oninput=renderStokAwal;
   /* ================== DISTRIBUSI STOK MASUK ================== */
-// DIST_KEY sudah dideklarasikan di bagian_10.
+// DIST_KEY sudah dideklarasikan di bagian_10 (var DIST_KEY="auraPos19DistV9").
+// Tidak dideklarasikan ulang di sini untuk menghindari duplikasi.
 var distHistory=[];
 try{distHistory=JSON.parse(localStorage.getItem(DIST_KEY))||[];}catch(e){distHistory=[];}
 function saveDistHistory(){try{localStorage.setItem(DIST_KEY,JSON.stringify(distHistory));}catch(e){toast("⚠️ Penyimpanan penuh!","err");}}
@@ -1772,7 +1489,7 @@ function saveDistHistory(){try{localStorage.setItem(DIST_KEY,JSON.stringify(dist
 function getHargaBeli(cat,name){
   var list=data[cat];if(!list)return 0;
   var item=list.find(function(x){return x.name===name;});
-    return item?(item.price||0):0;
+    return item?(item.buy||0):0;
 }
 function getSusutRate(cat){
   if(cat==="purchases")return 0;
@@ -1782,8 +1499,7 @@ function getSusutRate(cat){
 function renderDistItems(){
   var cat=el("distCatSelect").value;
   el("distItemSelect").innerHTML=data[cat].map(function(x){
-    var lbl=(x.code?x.code+" - ":"")+(x.displayName||x.name);
-    return '<option value="'+esc(x.name)+'">'+esc(lbl)+'</option>';
+    return '<option value="'+esc(x.name)+'">'+esc(x.name)+'</option>';
   }).join("");
   updateDistHargaBeliBox();
 }
@@ -1792,9 +1508,9 @@ function updateDistHargaBeliBox(){
   var buy=getHargaBeli(cat,name);
   el("distHargaBeliBox").classList.remove("hide");
   if(cat==="purchases"){
-    el("distHargaBeliInfo").innerHTML="Harga: <strong>"+(buy?fmt(buy):"Rp0")+"</strong> /pcs";
+    el("distHargaBeliInfo").innerHTML="Harga beli: <strong>"+(buy?fmt(buy):"Rp0")+"</strong> /pcs";
   }else{
-    el("distHargaBeliInfo").innerHTML="Harga: <strong>"+(buy?fmt(buy):"Rp0")+"</strong> /ml · Susut "+(getSusutRate(cat)*100)+"%";
+    el("distHargaBeliInfo").innerHTML="Harga beli: <strong>"+(buy?fmt(buy):"Rp0")+"</strong> /ml · Susut "+(getSusutRate(cat)*100)+"%";
   }
   var qty=+el("distQtyInput").value||0;
   if(qty>0){
@@ -1842,7 +1558,7 @@ function renderDistCart(){
   var totN=0,totNet=0;
   el("distCartList").innerHTML=distCart.map(function(it,i){
     totN+=it.nilaiNormal;totNet+=it.nilaiNetto;
-    var warn=it.hargaBeli===0?'<span class="badge alert">⚠️ Harga 0</span>':"";
+    var warn=it.hargaBeli===0?'<span class="badge alert">⚠️ Harga beli 0</span>':"";
     return '<div class="dist-item"><div><div class="di-name">'+esc(it.name)+' '+warn+'</div><div class="di-sub">'+it.qtyIn+' → '+it.qtyNet+' '+it.unit+' · @'+fmt(it.hargaBeli)+'</div></div><div class="di-qty"><div class="di-val">'+fmt(it.nilaiNetto)+'</div><button type="button" onclick="window._rmDist('+i+')" class="btn danger sm" style="margin-top:4px">Hapus</button></div></div>';
   }).join("");
   el("distTotalNormal").textContent=fmt(totN);
@@ -1856,14 +1572,15 @@ el("distClearBtn").onclick=function(){
     function(){distCart=[];renderDistCart();});
 };
 
-/* Cek harga 0 (hanya parfum, campuran gratis seperti Alkohol dikecualikan) */
+/* Cek harga beli 0 */
 function hasHargaBeliZero(){
-  return data.perfumes.some(function(p){return !p.price||p.price<=0;});
+  return data.perfumes.some(function(p){return !p.buy||p.buy<=0;});
 }
 function getHargaBeliZeroList(){
-  return data.perfumes.filter(function(p){return !p.price||p.price<=0;});
+  return data.perfumes.filter(function(p){return !p.buy||p.buy<=0;});
 }
 function updateDistHargaBeliWarn(){
+  // Cek role: Jika bukan admin, sembunyikan total banner ini
   if(!session || session.role !== "admin"){
     el("distHargaBeliWarn").style.display="none";
     return;
@@ -1871,7 +1588,7 @@ function updateDistHargaBeliWarn(){
   var list=getHargaBeliZeroList();
   if(list.length>0){
     el("distHargaBeliWarn").style.display="flex";
-    el("distHargaBeliWarnTxt").textContent="⚠️ Ada "+list.length+" parfum dengan harga 0. Distribusi diblokir sampai dilengkapi.";
+    el("distHargaBeliWarnTxt").textContent="⚠️ Ada "+list.length+" parfum dengan harga beli 0. Distribusi diblokir sampai dilengkapi.";
       }else{
     el("distHargaBeliWarn").style.display="none";
   }
@@ -1884,7 +1601,7 @@ el("distFixBtn").onclick=async function(){
   if(!distCart.length){toast("Daftar distribusi masih kosong.","err");return;}
   var zero=getHargaBeliZeroList();
   if(zero.length>0){
-    toast("❌ "+zero.length+" parfum harga 0. Lengkapi dulu di Master.","err");
+    toast("❌ "+zero.length+" parfum harga beli 0. Lengkapi dulu di Master.","err");
     return;
   }
   var date=el("distDateInput").value||todayStr();
@@ -1939,7 +1656,8 @@ el("distRetryAllBtn").onclick=function(){
 };
 
 // Catatan: mode "no-cors" dipakai karena Google Apps Script tidak mengirim CORS header.
-// Response opaque → status "terkirim" bersifat optimistis (network OK = dianggap terkirim).
+// Konsekuensi: response bersifat opaque, jadi status "terkirim" bersifat optimistis
+// (dianggap terkirim jika network OK). Kalau butuh verifikasi server, perlu proxy CORS.
 async function trySendDist(id){
   var d=distQueue.find(function(x){return x.id===id;});
   if(!d||d.status==="sent")return;
@@ -1995,6 +1713,7 @@ window._viewDist=function(id){
     html+='<div class="dist-item"><div><div class="di-name">'+esc(it.name)+'</div><div class="di-sub">'+it.qtyIn+' → '+it.qtyNet+' '+it.unit+' @'+fmt(it.hargaBeli)+'</div></div><div class="di-qty"><div class="di-val">'+fmt(it.nilaiNetto)+'</div></div></div>';
   });
   html+='</div><div class="dist-summary"><div class="ds-row"><span>Total Normal</span><strong>'+fmt(d.totalNormal)+'</strong></div><div class="ds-row total"><span>Total Netto</span><strong>'+fmt(d.totalNetto)+'</strong></div></div>';
+  // Simpan handler global modalSave & teks tombol, lalu restore setelah modal ditutup
   var oldSaveHandler = el("modalSave").onclick;
   var oldSaveText = el("modalSave").textContent;
   modal("Detail Distribusi "+d.id,html,null);
@@ -2035,7 +1754,7 @@ el("distExportRekapBtn").onclick=function(){
     return d.outlet===session.outlet&&(!from||d.date>=from)&&(!to||d.date<=to);
   });
   if(!list.length){toast("Tidak ada data.","err");return;}
-  var rows=[["OUTLET","TANGGAL","DOKUMEN","KATEGORI","NAMA_ITEM","QTY_IN","QTY_NET","SATUAN","HARGA","NILAI_NORMAL","NILAI_NETTO"]];
+  var rows=[["OUTLET","TANGGAL","DOKUMEN","KATEGORI","NAMA_ITEM","QTY_IN","QTY_NET","SATUAN","HARGA_BELI","NILAI_NORMAL","NILAI_NETTO"]];
   list.forEach(function(d){
     d.items.forEach(function(it){
       rows.push([d.outlet,d.date,d.doc,it.cat,it.name,it.qtyIn,it.qtyNet,it.unit,it.hargaBeli,it.nilaiNormal,it.nilaiNetto]);
@@ -2070,10 +1789,9 @@ function createAuditDraft(){
   }
   ensureOutletStock(session.outlet);
   var items=[],cur=stocks[session.outlet].current;
-  // Semua parfum, semua campuran (termasuk Alkohol), semua botol berharga > 0
-  data.perfumes.forEach(function(p){items.push({cat:"perfumes",name:p.name,displayName:p.displayName||p.name,unit:"ml",sys:+(cur.perfumes[p.name]||0),act:null});});
-  data.mixes.forEach(function(m){items.push({cat:"mixes",name:m.name,displayName:m.displayName||m.name,unit:"ml",sys:+(cur.mixes[m.name]||0),act:null});});
-  data.purchases.forEach(function(b){if(b.price>0)items.push({cat:"purchases",name:b.name,displayName:b.displayName||b.name,unit:"pcs",sys:+(cur.purchases[b.name]||0),act:null});});
+  data.perfumes.forEach(function(p){items.push({cat:"perfumes",name:p.name,unit:"ml",sys:+(cur.perfumes[p.name]||0),act:null});});
+  data.mixes.forEach(function(m){items.push({cat:"mixes",name:m.name,unit:"ml",sys:+(cur.mixes[m.name]||0),act:null});});
+  data.purchases.forEach(function(b){if(b.price>0)items.push({cat:"purchases",name:b.name,unit:"pcs",sys:+(cur.purchases[b.name]||0),act:null});});
   var now=new Date();
   var draft={
     id:"AUD-"+now.getTime().toString().slice(-6),
@@ -2108,9 +1826,8 @@ function renderAuditSession(){
       else if(diff>0)badge='<span class="ai-badge" style="color:#0284c7">+'+diff+' '+it.unit+'</span>';
       else badge='<span class="ai-badge" style="color:#16a34a">✅</span>';
     }
-    var lbl=(it.displayName||it.name);
     return '<div class="audit-item-row '+(checked?"checked":"")+'">'+
-      '<div><div class="ai-name">'+esc(lbl)+badge+'</div>'+
+      '<div><div class="ai-name">'+esc(it.name)+badge+'</div>'+
       '<div class="ai-sub">System: '+it.sys.toFixed(1)+' '+it.unit+'</div></div>'+
       '<input type="number" step="0.1" min="0" placeholder="Fisik" data-idx="'+idx+'" value="'+(checked?it.act:"")+'" class="audit-input">'+
     '</div>';
@@ -2200,8 +1917,7 @@ function showAuditDetail(id){
     var badge=diff<0?'<span style="color:#dc2626;font-weight:700">LOSE '+diff+' '+it.unit+'</span>'
       :diff>0?'<span style="color:#0284c7;font-weight:700">+'+diff+' '+it.unit+'</span>'
       :'<span style="color:#16a34a;font-weight:700">✅ Sesuai</span>';
-    var lbl=(it.displayName||it.name);
-    return '<div class="item"><div class="row"><div><strong>'+esc(lbl)+'</strong><div class="small">System: '+it.sys+' → Fisik: '+it.act+' '+it.unit+'</div></div>'+badge+'</div></div>';
+    return '<div class="item"><div class="row"><div><strong>'+esc(it.name)+'</strong><div class="small">System: '+it.sys+' → Fisik: '+it.act+' '+it.unit+'</div></div>'+badge+'</div></div>';
   }).join("")||'<p class="note">Tidak ada item.</p>';
 }
 function exportAuditSessionCsv(sessionId){
@@ -2212,7 +1928,7 @@ function exportAuditSessionCsv(sessionId){
   var rows=[["SESI_ID","OUTLET","TANGGAL","NAMA_ITEM","SATUAN","STOK_SYSTEM","STOK_FISIK","SELISIH","STATUS"]];
   list.forEach(function(ss){ss.items.forEach(function(it){
     var diff=+(it.act-it.sys).toFixed(1);
-    rows.push([ss.id,ss.outlet,ss.date,(it.displayName||it.name),it.unit,it.sys,it.act,diff,diff<0?"LOSE":(diff>0?"LEBIH":"SESUAI")]);
+    rows.push([ss.id,ss.outlet,ss.date,it.name,it.unit,it.sys,it.act,diff,diff<0?"LOSE":(diff>0?"LEBIH":"SESUAI")]);
   });});
   var csv="\uFEFF"+rows.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(",");}).join("\r\n");
   var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
@@ -2222,10 +1938,10 @@ function exportAuditTemplate(){
   if(!session)return;
   ensureOutletStock(session.outlet);
   var cur=stocks[session.outlet].current;
-  var rows=[["OUTLET","TANGGAL","KATEGORI","KODE","NAMA_ITEM","SATUAN","STOK_SYSTEM","STOK_FISIK"]];
-  data.perfumes.forEach(function(p){rows.push([session.outlet,todayStr(),"perfumes",p.code||"",(p.displayName||p.name),"ml",+(cur.perfumes[p.name]||0),""]);});
-  data.mixes.forEach(function(m){rows.push([session.outlet,todayStr(),"mixes",m.code||"",(m.displayName||m.name),"ml",+(cur.mixes[m.name]||0),""]);});
-  data.purchases.forEach(function(b){if(b.price>0)rows.push([session.outlet,todayStr(),"purchases","",(b.displayName||b.name),"pcs",+(cur.purchases[b.name]||0),""]);});
+  var rows=[["OUTLET","TANGGAL","KATEGORI","NAMA_ITEM","SATUAN","STOK_SYSTEM","STOK_FISIK"]];
+  data.perfumes.forEach(function(p){rows.push([session.outlet,todayStr(),"perfumes",p.name,"ml",+(cur.perfumes[p.name]||0),""]);});
+  data.mixes.forEach(function(m){rows.push([session.outlet,todayStr(),"mixes",m.name,"ml",+(cur.mixes[m.name]||0),""]);});
+  data.purchases.forEach(function(b){if(b.price>0)rows.push([session.outlet,todayStr(),"purchases",b.name,"pcs",+(cur.purchases[b.name]||0),""]);});
   var csv="\uFEFF"+rows.map(function(r){return r.join(",");}).join("\r\n");
   var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
   a.download="Template_CekStok_"+session.outlet.replace(/\s+/g,"_")+"_"+todayStr()+".csv";a.click();
@@ -2239,23 +1955,10 @@ function importAuditCsv(file){
     lines.forEach(function(ln,idx){
       if(!ln.trim()||idx===0)return;
       var c=ln.split(",").map(function(x){return x.trim().replace(/^"|"$/g,"");});
-      // Format baru: OUTLET,TANGGAL,KATEGORI,KODE,NAMA_ITEM,SATUAN,STOK_SYSTEM,STOK_FISIK
-      if(c.length<8)return;
-      var cat=c[2],code=c[3],nm=c[4],unit=c[5],sys=+c[6],act=c[7]===""?null:+c[7];
-      if(!cat||!nm||act===null||isNaN(act))return;
-      // Cari key asli (name gabungan)
-      var keyName=nm;
-      if(cat==="perfumes"){
-        var f=data.perfumes.find(function(p){return (p.code===code&&p.displayName===nm)||p.name===nm;});
-        if(f)keyName=f.name;
-      }else if(cat==="mixes"){
-        var f2=data.mixes.find(function(m){return (m.code===code&&m.displayName===nm)||m.name===nm;});
-        if(f2)keyName=f2.name;
-      }else{
-        var f3=data.purchases.find(function(b){return b.name===nm||b.displayName===nm;});
-        if(f3)keyName=f3.name;
-      }
-      items.push({cat:cat,name:keyName,displayName:nm,unit:unit,sys:sys,act:act});
+      if(c.length<7)return;
+      var cat=c[2],name=c[3],unit=c[4],sys=+c[5],act=c[6]===""?null:+c[6];
+      if(!cat||!name||act===null||isNaN(act))return;
+      items.push({cat:cat,name:name,unit:unit,sys:sys,act:act});
     });
     if(!items.length){toast("File tidak berisi STOK_FISIK valid.","err");return;}
     var existing=getActiveDraft(session.outlet);
@@ -2292,7 +1995,7 @@ el("waAuditBtn").onclick=function(){
   var txt="*REKAP CEK STOK "+s.id+"*\nOutlet: "+s.outlet+"\nTanggal: "+s.date+"\n\nTotal: "+st.total+"\n✅ Sesuai: "+st.same+"\n❌ Lose: "+st.lose+"\n➕ Lebih: "+st.gain+"\n\n*Detail Lose/Lebih:*\n";
   s.items.forEach(function(it){
     var diff=+(it.act-it.sys).toFixed(1);
-    if(diff!==0)txt+="- "+(it.displayName||it.name)+": "+it.sys+" → "+it.act+" ("+(diff>0?"+":"")+diff+" "+it.unit+")\n";
+    if(diff!==0)txt+="- "+it.name+": "+it.sys+" → "+it.act+" ("+(diff>0?"+":"")+diff+" "+it.unit+")\n";
   });
   openWaModal(txt,data.shop.pusatWa);
   };
@@ -2311,29 +2014,25 @@ function renderMinTable(){
   if(!outlet){el("minTableBody").innerHTML='<tr><td colspan="4" class="note">Pilih outlet.</td></tr>';return;}
   var q=(el("minFilterInput").value||"").toLowerCase().trim();
   var rows=[];
-  // Default = 0 (karena master tidak punya min). Override per outlet.
   data.perfumes.forEach(function(p){
-    var lbl=(p.code?p.code+" - ":"")+(p.displayName||p.name);
-    if(q&&lbl.toLowerCase().indexOf(q)<0)return;
-    rows.push({cat:"perfumes",name:p.name,label:lbl,def:0,override:stokMinOverride[outlet+"|perfumes|"+p.name]});
+    if(q&&p.name.toLowerCase().indexOf(q)<0)return;
+    rows.push({cat:"perfumes",name:p.name,def:p.min||0,override:stokMinOverride[outlet+"|perfumes|"+p.name]});
   });
   data.mixes.forEach(function(m){
-    var lbl=(m.code?m.code+" - ":"")+(m.displayName||m.name);
-    if(q&&lbl.toLowerCase().indexOf(q)<0)return;
-    rows.push({cat:"mixes",name:m.name,label:lbl,def:0,override:stokMinOverride[outlet+"|mixes|"+m.name]});
+    if(q&&m.name.toLowerCase().indexOf(q)<0)return;
+    rows.push({cat:"mixes",name:m.name,def:m.min||0,override:stokMinOverride[outlet+"|mixes|"+m.name]});
   });
   data.purchases.forEach(function(b){
     if(b.price<=0)return;
-    var lbl=(b.displayName||b.name);
-    if(q&&lbl.toLowerCase().indexOf(q)<0)return;
-    rows.push({cat:"purchases",name:b.name,label:lbl,def:0,override:stokMinOverride[outlet+"|purchases|"+b.name]});
+    if(q&&b.name.toLowerCase().indexOf(q)<0)return;
+    rows.push({cat:"purchases",name:b.name,def:b.min||0,override:stokMinOverride[outlet+"|purchases|"+b.name]});
   });
   el("minTableBody").innerHTML=rows.map(function(r){
     var hasOv=r.override!==undefined;
     var val=hasOv?r.override:"";
     var status=hasOv?'<span class="badge wait">Override</span>':'<span class="badge info">Default</span>';
     return '<tr class="'+(hasOv?"overridden":"")+'" data-cat="'+r.cat+'" data-name="'+esc(r.name)+'">'+
-      '<td>'+esc(r.label)+'</td>'+
+      '<td>'+esc(r.name)+'</td>'+
       '<td class="center">'+r.def+'</td>'+
       '<td class="center"><input type="number" min="0" value="'+val+'" placeholder="'+r.def+'" class="min-input" data-cat="'+r.cat+'" data-name="'+esc(r.name)+'"></td>'+
       '<td class="center">'+status+'</td></tr>';
@@ -2356,7 +2055,7 @@ el("minFilterInput").oninput=renderMinTable;
 el("minResetBtn").onclick=function(){
   var o=el("minOutletSelect").value;
   if(!o)return;
-  modal("Reset Stok Minim",'<p class="note">Reset semua override stok minim untuk <strong>'+esc(o)+'</strong> ke default (0)?</p>',
+  modal("Reset Stok Minim",'<p class="note">Reset semua override stok minim untuk <strong>'+esc(o)+'</strong> ke default master?</p>',
     function(){
       Object.keys(stokMinOverride).forEach(function(k){if(k.indexOf(o+"|")===0)delete stokMinOverride[k];});
       saveStokMin();renderMinTable();markDirty();toast("✅ Reset ke default.","ok");
@@ -2365,10 +2064,10 @@ el("minResetBtn").onclick=function(){
 el("minExportBtn").onclick=function(){
   var o=el("minOutletSelect").value;
   if(!o){toast("Pilih outlet dulu.","err");return;}
-  var rows=[["OUTLET","KATEGORI","KODE","NAMA_ITEM","DEFAULT","MIN_OUTLET"]];
-  data.perfumes.forEach(function(p){rows.push([o,"perfumes",p.code||"",(p.displayName||p.name),0,stokMinOverride[o+"|perfumes|"+p.name]!==undefined?stokMinOverride[o+"|perfumes|"+p.name]:""]);});
-  data.mixes.forEach(function(m){rows.push([o,"mixes",m.code||"",(m.displayName||m.name),0,stokMinOverride[o+"|mixes|"+m.name]!==undefined?stokMinOverride[o+"|mixes|"+m.name]:""]);});
-  data.purchases.forEach(function(b){if(b.price>0)rows.push([o,"purchases","",(b.displayName||b.name),0,stokMinOverride[o+"|purchases|"+b.name]!==undefined?stokMinOverride[o+"|purchases|"+b.name]:""]);});
+  var rows=[["OUTLET","KATEGORI","NAMA_ITEM","DEFAULT","MIN_OUTLET"]];
+  data.perfumes.forEach(function(p){rows.push([o,"perfumes",p.name,p.min||0,stokMinOverride[o+"|perfumes|"+p.name]!==undefined?stokMinOverride[o+"|perfumes|"+p.name]:""]);});
+  data.mixes.forEach(function(m){rows.push([o,"mixes",m.name,m.min||0,stokMinOverride[o+"|mixes|"+m.name]!==undefined?stokMinOverride[o+"|mixes|"+m.name]:""]);});
+  data.purchases.forEach(function(b){if(b.price>0)rows.push([o,"purchases",b.name,b.min||0,stokMinOverride[o+"|purchases|"+b.name]!==undefined?stokMinOverride[o+"|purchases|"+b.name]:""]);});
   var csv="\uFEFF"+rows.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(",");}).join("\r\n");
   var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
   a.download="StokMin_"+o.replace(/\s+/g,"_")+"_"+todayStr()+".csv";a.click();
@@ -2384,24 +2083,11 @@ el("minImportInput").onchange=function(e){
     lines.forEach(function(ln,idx){
       if(!ln.trim()||idx===0)return;
       var c=ln.split(",").map(function(x){return x.trim().replace(/^"|"$/g,"");});
-      // Format baru: OUTLET,KATEGORI,KODE,NAMA_ITEM,DEFAULT,MIN_OUTLET
-      if(c.length<6)return;
-      var out=c[0],cat=c[1],code=c[2],nm=c[3],ov=c[5];
+      if(c.length<5)return;
+      var out=c[0],cat=c[1],name=c[2],ov=c[4];
       if(out!==o)return;
-      // Cari key asli (name gabungan)
-      var keyName=nm;
-      if(cat==="perfumes"){
-        var f=data.perfumes.find(function(p){return (p.code===code&&p.displayName===nm)||p.name===nm;});
-        if(f)keyName=f.name;
-      }else if(cat==="mixes"){
-        var f2=data.mixes.find(function(m){return (m.code===code&&m.displayName===nm)||m.name===nm;});
-        if(f2)keyName=f2.name;
-      }else{
-        var f3=data.purchases.find(function(b){return b.name===nm||b.displayName===nm;});
-        if(f3)keyName=f3.name;
-      }
-      if(ov===""){delete stokMinOverride[o+"|"+cat+"|"+keyName];}
-      else{stokMinOverride[o+"|"+cat+"|"+keyName]=+ov;}
+      if(ov===""){delete stokMinOverride[o+"|"+cat+"|"+name];}
+      else{stokMinOverride[o+"|"+cat+"|"+name]=+ov;}
       cnt++;
     });
     saveStokMin();renderMinTable();markDirty();
@@ -2410,12 +2096,11 @@ el("minImportInput").onchange=function(e){
   reader.readAsText(file);this.value="";
 };
   /* ================== PIN TOKO ================== */
- /* ================== SETTING: OUTLET + PIN ================== */
-function renderOutletList(){
-  el("outletList").innerHTML=data.outlets.map(function(o,i){
+ function renderOutletEmails(){
+  el("outletEmailList").innerHTML=data.outlets.map(function(o){
     var pin=data.outletEmails[o]||"";
-    return '<div class="item"><div class="row"><div style="flex:1"><strong>'+esc(o)+'</strong><div style="margin-top:6px"><input type="text" inputmode="numeric" value="'+esc(pin)+'" placeholder="PIN Toko" data-outlet="'+esc(o)+'" class="pin-input" style="max-width:160px"><span class="badge '+(pin?"ok":"alert")+'" style="margin-left:6px">'+(pin?"Aktif":"Belum Diatur")+'</span></div></div><div class="item-actions"><button type="button" onclick="window._edOut('+i+')">Ubah Nama</button></div></div></div>';
-  }).join("")||'<p class="note">Belum ada outlet.</p>';
+    return '<div class="item"><label style="margin:0 0 4px">'+esc(o)+'</label><div class="row"><input type="text" inputmode="numeric" value="'+esc(pin)+'" placeholder="PIN Toko" data-outlet="'+esc(o)+'" class="pin-input"><span class="badge '+(pin?"ok":"alert")+'">'+(pin?"Aktif":"Belum Diatur")+'</span></div></div>';
+  }).join("");
   document.querySelectorAll(".pin-input").forEach(function(inp){
     inp.onchange=function(){
       data.outletEmails[this.getAttribute("data-outlet")]=this.value.trim();
@@ -2423,8 +2108,6 @@ function renderOutletList(){
     };
   });
 }
-// Kompatibilitas: panggilan lama renderOutletEmails → renderOutletList
-function renderOutletEmails(){renderOutletList();}
 
 /* ================== MASTER ================== */
 function collectMasterFromUI(){
@@ -2450,13 +2133,14 @@ async function globalSaveAll(){
     collectMasterFromUI();
     saveMaster();saveStokMin();saveStocks();
     await pushCloudMaster();
-    clearDirty();renderLoginOutlets();renderOutletList();
+    clearDirty();renderLoginOutlets();
     if(session)all();
     toast("✅ Semua perubahan disimpan & dikirim!","ok");
   }catch(e){toast("Gagal menyimpan: "+e.message,"err");}
   finally{if(btn){btn.disabled=false;btn.textContent="💾 Simpan Semua";}}
 }
 el("globalSaveBtn").onclick=globalSaveAll;
+el("saveProfileBtn").onclick=globalSaveAll;
 
 // Catatan: outletEmails sengaja dikosongkan (tidak dikirim ke cloud) untuk keamanan PIN.
 // Konsekuensi: PIN tidak sync antar device. Kalau butuh sync, hapus baris sanitized.outletEmails={}.
@@ -2489,16 +2173,14 @@ async function pullCloudData(){
       if(!data.shop.devWa)data.shop.devWa="";
       if(!data.shop.pusatWa)data.shop.pusatWa="";
       if(!data.stokMin)data.stokMin={};
-      // Migrasi data cloud jika format lama
-      (data.perfumes||[]).forEach(function(p){if(p.code===undefined){var mm=String(p.name||"").match(/^(\d+)\s*-\s*(.+)$/);if(mm){p.code=mm[1];p.displayName=mm[2];}else{p.code="";p.displayName=p.name||"";}}if(!p.displayName)p.displayName=p.name||"";if(p.price===undefined)p.price=(p.buy||0);delete p.min;delete p.buy;});
-      (data.mixes||[]).forEach(function(m){if(m.code===undefined){var mm=String(m.name||"").match(/^(Al|Et|Eta)\s*-\s*(.+)$/i);if(mm){m.code=mm[1];m.displayName=mm[2];}else{m.code="";m.displayName=m.name||"";}}if(!m.displayName)m.displayName=m.name||"";if(m.price===undefined)m.price=(m.buy||0);delete m.min;delete m.buy;});
-      (data.purchases||[]).forEach(function(b){if(b.code===undefined)b.code="";if(!b.displayName)b.displayName=b.name||"";if(b.price===undefined)b.price=(b.buy||0);delete b.min;delete b.buy;});
-      saveMaster();renderLoginOutlets();renderOutletList();if(session)all();
+      saveMaster();renderLoginOutlets();if(session)all();
     }
     if(j&&j.stokMin){stokMinOverride=j.stokMin;saveStokMin();if(session)renderMinTable();}
     if(j&&Array.isArray(j.sales)&&j.sales.length){
       j.sales.forEach(function(cs){
         if(cs.id&&!sales.some(function(ls){return ls.id===cs.id;})){
+          // Perbaikan: pakai vol dari cloud jika ada (jangan hardcode 0),
+          // supaya laporan Top Parfum / volume tetap akurat.
           sales.push({
             outlet:cs.outlet,
             id:cs.id,
@@ -2534,7 +2216,7 @@ el("importMasterInput").onchange=function(e){
   reader.onload=async function(ev){
     try{
       var parsed=JSON.parse(ev.target.result);
-        if(parsed&&parsed.perfumes&&parsed.outlets){
+            if(parsed&&parsed.perfumes&&parsed.outlets){
         var keepHook=data.shop.webhook;
         var keepPass={mgmt:data.shop.mgmtPass,dev:data.shop.devPass};
         data=parsed;
@@ -2544,11 +2226,7 @@ el("importMasterInput").onchange=function(e){
         if(!data.shop.devPass)data.shop.devPass=keepPass.dev||"9999";
         if(!data.outletEmails)data.outletEmails={};
         if(!data.stokMin)data.stokMin={};
-        // Migrasi data import
-        (data.perfumes||[]).forEach(function(p){if(p.code===undefined){var mm=String(p.name||"").match(/^(\d+)\s*-\s*(.+)$/);if(mm){p.code=mm[1];p.displayName=mm[2];}else{p.code="";p.displayName=p.name||"";}}if(!p.displayName)p.displayName=p.name||"";if(p.price===undefined)p.price=(p.buy||0);delete p.min;delete p.buy;});
-        (data.mixes||[]).forEach(function(m){if(m.code===undefined){var mm=String(m.name||"").match(/^(Al|Et|Eta)\s*-\s*(.+)$/i);if(mm){m.code=mm[1];m.displayName=mm[2];}else{m.code="";m.displayName=m.name||"";}}if(!m.displayName)m.displayName=m.name||"";if(m.price===undefined)m.price=(m.buy||0);delete m.min;delete m.buy;});
-        (data.purchases||[]).forEach(function(b){if(b.code===undefined)b.code="";if(!b.displayName)b.displayName=b.name||"";if(b.price===undefined)b.price=(b.buy||0);delete b.min;delete b.buy;});
-        saveMaster();renderLoginOutlets();renderOutletList();all();await pushCloudMaster();
+        saveMaster();renderLoginOutlets();all();await pushCloudMaster();
         toast("✅ Master berhasil di-upload!","ok");
       }else toast("Format Master JSON tidak valid.","err");
     }catch(err){toast("File gagal dibaca.","err");}
@@ -2564,45 +2242,41 @@ el("resetBtn").onclick=function(){
 /* ================== MASTER LIST RENDER ================== */
 function listRender(k,id,filter){
   var q=(filter||"").toLowerCase().trim();
-  el(id).innerHTML=data[k].map(function(x,i){return {x:x,i:i};}).filter(function(o){
-    if(!q)return true;
-    var hay=((o.x.code||"")+" "+(o.x.displayName||o.x.name||"")).toLowerCase();
-    return hay.indexOf(q)>=0;
-  }).map(function(o){
+  el(id).innerHTML=data[k].map(function(x,i){return {x:x,i:i};}).filter(function(o){return !q||o.x.name.toLowerCase().indexOf(q)>=0;}).map(function(o){
     var x=o.x,i=o.i;
-    var lbl=(x.code?x.code+" - ":"")+(x.displayName||x.name);
-    var s=fmt(x.price)+(k==="purchases"?"":"/ml");
-    return '<div class="item"><div class="row"><div><strong>'+esc(lbl)+'</strong><div class="small">'+s+'</div></div><div class="item-actions"><button type="button" onclick="window._ed(\''+k+'\','+i+')">Edit</button><button type="button" onclick="window._dl(\''+k+'\','+i+')" style="background:#fee2e2;color:#b91c1c">Hapus</button></div></div></div>';
+    var s=fmt(x.price)+(k==="purchases"?"":"/ml")+(x.min?" · Min: "+x.min:"");
+    var buyInfo=x.buy?(' · Beli: '+fmt(x.buy)):' <span class="badge alert">⚠️ Beli 0</span>';
+    return '<div class="item"><div class="row"><div><strong>'+esc(x.name)+'</strong><div class="small">'+s+buyInfo+'</div></div><div class="item-actions"><button type="button" onclick="window._ed(\''+k+'\','+i+')">Edit</button><button type="button" onclick="window._dl(\''+k+'\','+i+')" style="background:#fee2e2;color:#b91c1c">Hapus</button></div></div></div>';
   }).join("")||'<p class="note">Belum ada data.</p>';
 }
 window._ed=function(k,i){
   var item=data[k][i];
   var isPurchase=k==="purchases";
-  var hasCode=k!=="purchases";
   modal("Edit Data",
-    (hasCode?'<label>Kode</label><input id="mC" value="'+esc(item.code||"")+'">':'')+
-    '<label>Nama</label><input id="mN" value="'+esc(item.displayName||item.name)+'">'+
-    '<label>Harga '+(isPurchase?'(Rp)':'/ml')+'</label><input id="mP" type="number" value="'+item.price+'">',
+    '<label>Nama</label><input id="mN" value="'+esc(item.name)+'">'+
+    '<label>Harga Jual '+(isPurchase?'(Rp)':'/ml')+'</label><input id="mP" type="number" value="'+item.price+'">'+
+    '<label>Harga Beli '+(isPurchase?'(Rp)':'/ml')+'</label><input id="mB" type="number" value="'+(item.buy||0)+'">'+
+    '<label>Batas Min Default</label><input id="mM" type="number" value="'+(item.min||0)+'">',
     function(){
-      var c=hasCode?el("mC").value.trim():"";
-      var n=el("mN").value.trim(),v=+el("mP").value;
-      if(n&&v>=0){
-        var fullName=(hasCode&&c)?(c+" - "+n):n;
-        data[k][i]={code:c,name:fullName,displayName:n,price:v};
-        saveMaster();all();
-      }
+      var n=el("mN").value.trim(),v=+el("mP").value,b=+el("mB").value||0,m=+el("mM").value||0;
+      if(n&&v>=0){data[k][i]={name:n,price:v,buy:b,min:m};saveMaster();all();}
       else{toast("Nama & harga wajib diisi.","err");return false;}
     });
 };
 window._dl=function(k,i){
-  modal("Hapus Data","<p class='note'>Hapus item <strong>"+esc(data[k][i].displayName||data[k][i].name)+"</strong>?</p>",
+  modal("Hapus Data","<p class='note'>Hapus item <strong>"+esc(data[k][i].name)+"</strong>?</p>",
     function(){data[k].splice(i,1);saveMaster();all();});
 };
+function renderOutlets(){
+  el("outletList").innerHTML=data.outlets.map(function(o,i){
+    return '<div class="item"><div class="row"><strong>'+esc(o)+'</strong><div class="item-actions"><button type="button" onclick="window._edOut('+i+')">Ubah Nama</button></div></div></div>';
+  }).join("");
+}
 window._edOut=function(i){
   modal("Ubah Nama Outlet",'<input id="mOut" value="'+esc(data.outlets[i])+'">',
     function(){
       var v=el("mOut").value.trim();
-      if(v){data.outlets[i]=v;saveMaster();renderOutletList();renderLoginOutlets();renderMinOutletSelect();}
+      if(v){data.outlets[i]=v;saveMaster();renderOutlets();renderLoginOutlets();renderMinOutletSelect();}
       else{toast("Nama tidak boleh kosong.","err");return false;}
     });
 };
@@ -2674,7 +2348,7 @@ window._devDelSale=function(id){
     });
 };
 
-// Catatan: mode "no-cors" untuk kompatibilitas Google Apps Script.
+// Catatan: mode "no-cors" dipakai untuk kompatibilitas Google Apps Script.
 // Response opaque → status "berhasil" bersifat optimistis (network OK = dianggap terkirim).
 el("closingBtn").onclick=async function(){
   if(!session)return;
@@ -2688,7 +2362,7 @@ el("closingBtn").onclick=async function(){
   ensureOutletStock(session.outlet);
   data.perfumes.forEach(function(p){
     var q=stocks[session.outlet].current.perfumes[p.name]||0,m=getStokMin(session.outlet,"perfumes",p.name);
-    snap.push({cat:"Bibit",name:p.name,displayName:p.displayName||p.name,qty:q.toFixed(1)+" ml",min:m,status:q<=m?"WAJIB ORDER":"AMAN"});
+    snap.push({cat:"Bibit",name:p.name,qty:q.toFixed(1)+" ml",min:m,status:q<=m?"WAJIB ORDER":"AMAN"});
   });
   try{
     await fetch(data.shop.webhook,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({outlet:session.outlet,date:d,transactions:list,stockSnapshot:snap})});
@@ -2716,19 +2390,14 @@ el("exportSalesCsvBtn").onclick=function(){
   a.download="Laporan_AuraPOS_"+todayStr()+".csv";a.click();
 };
 
-/* ================== CSV GABUNGAN MASTER ================== */
-el("masterExportCsvBtn").onclick=function(){
-  var rows=[["KATEGORI","KODE","NAMA","HARGA"]];
-  data.perfumes.forEach(function(p){rows.push(["parfum",p.code||"",(p.displayName||p.name),p.price||0]);});
-  data.mixes.forEach(function(m){rows.push(["campuran",m.code||"",(m.displayName||m.name),m.price||0]);});
-  data.purchases.forEach(function(b){rows.push(["botol","",(b.displayName||b.name),b.price||0]);});
-  var csv="\uFEFF"+rows.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(",");}).join("\r\n");
+/* ================== CSV IMPORT PARFUM ================== */
+el("dlSampleCsvBtn").onclick=function(){
+  var rows=[["KODE","NAMA_PARFUM","HARGA_JUAL_ML","HARGA_BELI_ML","BATAS_MIN_ML"],["9110","Baccarot",3200,2600,50],["1407","Cristian Dior - Sauvage",2800,2300,50]];
+  var csv="\uFEFF"+rows.map(function(r){return r.join(",");}).join("\r\n");
   var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
-  a.download="Master_AuraPOS_"+todayStr()+".csv";a.click();
-  toast("✅ CSV gabungan diunduh.","ok");
+  a.download="Template_Import_Parfum_AURA.csv";a.click();
 };
-el("masterImportCsvBtn").onclick=function(){el("masterImportCsvInput").click();};
-el("masterImportCsvInput").onchange=function(e){
+el("csvFileInput").onchange=function(e){
   var file=e.target.files[0];if(!file)return;
   var reader=new FileReader();
   reader.onload=async function(ev){
@@ -2736,34 +2405,21 @@ el("masterImportCsvInput").onchange=function(e){
     lines.forEach(function(ln,idx){
       if(!ln.trim()||idx===0)return;
       var sep=ln.indexOf(";")>=0?";":",";
-      var c=ln.split(sep).map(function(x){return x.trim().replace(/^"|"$/g,"");});
-      // KATEGORI,KODE,NAMA,HARGA
-      if(c.length<4)return;
-      var kat=(c[0]||"").toLowerCase(),code=c[1]||"",nm=c[2]||"",pr=parseInt((c[3]||"0").replace(/\D/g,""),10)||0;
-      if(!nm)return;
-      if(kat==="parfum"){
+      var cols=ln.split(sep).map(function(c){return c.trim().replace(/^"|"$/g,"");});
+      var code=cols[0]||"",nm=cols[1]||"",pr=parseInt((cols[2]||"").replace(/\D/g,""),10),buy=parseInt((cols[3]||"0").replace(/\D/g,""),10)||0,mn=parseInt((cols[4]||"50").replace(/\D/g,""),10)||50;
+      if(nm&&nm.toUpperCase()!=="PERFUME"&&nm.toUpperCase()!=="NAMA_PARFUM"&&pr>0){
         var fullName=code?(code+" - "+nm):nm;
-        var exist=data.perfumes.find(function(p){return (code&&p.code===code)||p.name===fullName;});
-        if(exist){exist.code=code;exist.name=fullName;exist.displayName=nm;exist.price=pr;updated++;}
-        else{data.perfumes.push({code:code,name:fullName,displayName:nm,price:pr});added++;}
-      }else if(kat==="campuran"){
-        var fullName2=code?(code+" - "+nm):nm;
-        var exist2=data.mixes.find(function(m){return (code&&m.code===code)||m.name===fullName2;});
-        if(exist2){exist2.code=code;exist2.name=fullName2;exist2.displayName=nm;exist2.price=pr;updated++;}
-        else{data.mixes.push({code:code,name:fullName2,displayName:nm,price:pr});added++;}
-      }else if(kat==="botol"){
-        var exist3=data.purchases.find(function(b){return b.name===nm||b.displayName===nm;});
-        if(exist3){exist3.displayName=nm;exist3.price=pr;updated++;}
-        else{data.purchases.push({code:"",name:nm,displayName:nm,price:pr});added++;}
+        var exist=data.perfumes.find(function(p){return p.name===fullName;});
+        if(exist){exist.price=pr;exist.buy=buy;exist.min=mn;updated++;}
+        else{data.perfumes.push({name:fullName,price:pr,buy:buy,min:mn});added++;}
       }
     });
     saveMaster();all();await pushCloudMaster();
     toast("✅ "+added+" baru, "+updated+" diperbarui.","ok");
-    this.value="";
   };
-  reader.readAsText(file);
+    reader.readAsText(file);
 };
-  
+
 /* ================== AJUKAN HAPUS & BATAL ================== */
 window._reqDel=function(type,ref){
   if(!session)return;
@@ -2814,7 +2470,7 @@ function renderAdminNotif(){
   var zero=getHargaBeliZeroList();
   zero.forEach(function(p){
     items.push({
-      html:'<div class="notif-item"><div class="ni-head">⚠️ Harga 0: '+esc(p.displayName||p.name)+'</div><div class="ni-sub">Parfum ini belum diisi harga. Distribusi stok masuk diblokir sampai dilengkapi.</div><div class="ni-actions"><button type="button" class="btn-fix" onclick="window._goFixHargaBeli(\''+esc(p.name).replace(/'/g,"\\'")+'\')">🔧 Buka & Isi</button></div></div>'
+      html:'<div class="notif-item"><div class="ni-head">⚠️ Harga Beli 0: '+esc(p.name)+'</div><div class="ni-sub">Parfum ini belum diisi harga beli. Distribusi stok masuk diblokir sampai dilengkapi.</div><div class="ni-actions"><button type="button" class="btn-fix" onclick="window._goFixHargaBeli(\''+esc(p.name).replace(/'/g,"\\'")+'\')">🔧 Buka & Isi</button></div></div>'
     });
   });
   var pend=delReqs.filter(function(r){return r.status==="pending";});
@@ -2836,7 +2492,7 @@ function renderAdminNotif(){
 }
 window._goFixHargaBeli=function(name){
   if(!session || session.role !== "admin"){
-    toast("Akses ditolak! Hanya Admin yang bisa mengubah harga.","err");
+    toast("Akses ditolak! Hanya Admin yang bisa mengubah harga beli.","err");
     return;
   }
   setTab("tAdmin");
@@ -2935,6 +2591,7 @@ function renderMgmtOmzet(d){
   el("rpOmzetDelta").className="kp-sub flat";
   el("rpNotaSub").textContent=nota>0?("Omzet total "+fmt(omzet)):"—";
   el("rpHariSub").textContent=todaySales.length+" nota hari ini";
+  // 30 hari chart
   var days=[];var maxD=1;
   for(var i=29;i>=0;i--){
     var dt=new Date();dt.setDate(dt.getDate()-i);
@@ -2946,6 +2603,7 @@ function renderMgmtOmzet(d){
   el("rpChart30").innerHTML='<div class="mini-chart">'+days.map(function(x){
     return '<div class="mc-bar" style="height:'+Math.max(2,Math.round(x.val/maxD*100))+'%"><span class="mc-lbl">'+x.lbl+'</span><span class="mc-val">'+(x.val>0?fmt(x.val):'')+'</span></div>';
   }).join("")+'</div>';
+  // per outlet
   var outletRows=data.outlets.map(function(o){
     var oSales=d.listSales.filter(function(s){return s.outlet===o;});
     var sum=oSales.reduce(function(a,b){return a+b.total;},0);
@@ -2958,11 +2616,12 @@ function renderMgmtOmzet(d){
     var border = x.omzet>0 ? "#16a34a" : "#cbd5e1";
     html+='<div class="item" style="cursor:pointer; border-left:4px solid '+border+'; padding:12px; background:#fff;" onclick="window._openMgmtDetail(\''+esc(x.name)+'\')">'+
       '<div class="row"><strong>🏪 '+esc(x.name)+'</strong><span style="font-weight:900; color:#0d6efd">'+fmt(x.omzet)+'</span></div>'+
-        '<div class="small" style="margin-top:4px">Nota: '+x.nota+' · Rata-rata: '+fmt(x.avg)+'</div>'+
+            '<div class="small" style="margin-top:4px">Nota: '+x.nota+' · Rata-rata: '+fmt(x.avg)+'</div>'+
     '</div>';
   });
   
   el("rpOutletList").innerHTML=html;
+  // payment
   var payMap={};
   d.listSales.forEach(function(s){payMap[s.method]=(payMap[s.method]||0)+s.total;});
   var total=omzet||1;
@@ -2978,14 +2637,16 @@ function renderMgmtProduk(d){
   el("rpTop10").innerHTML=top.map(function(x){
     return '<div class="bar-row"><div class="row"><small>'+esc(x.name)+'</small><strong>'+x.vol.toFixed(1)+' ml</strong></div><div class="bar-bg"><div class="bar-fill" style="width:'+Math.round(x.vol/maxV*100)+'%"></div></div></div>';
   }).join("")||'<p class="note">Belum ada data.</p>';
+  // dead products
   var last30=new Date();last30.setDate(last30.getDate()-30);
   var cut=last30.getFullYear()+"-"+String(last30.getMonth()+1).padStart(2,"0")+"-"+String(last30.getDate()).padStart(2,"0");
   var soldSet={};
   sales.filter(function(s){return s.date>=cut;}).forEach(function(s){s.items.forEach(function(i){if(i.parfum)soldSet[i.parfum]=true;});});
   var dead=data.perfumes.filter(function(p){return !soldSet[p.name];});
   el("rpDeadProducts").innerHTML=dead.slice(0,20).map(function(p){
-    return '<div class="item"><div class="row"><strong>'+esc(p.displayName||p.name)+'</strong><span class="badge alert">0 terjual</span></div></div>';
+    return '<div class="item"><div class="row"><strong>'+esc(p.name)+'</strong><span class="badge alert">0 terjual</span></div></div>';
   }).join("")||'<p class="note">✅ Semua parfum bergerak.</p>';
+  // avg per ml
   var totalVol=0,totalRp=0;
   d.listSales.forEach(function(s){s.items.forEach(function(i){if(i.vol>0){totalVol+=i.vol;totalRp+=i.subtotal;}});});
   el("rpTotalVol").textContent=totalVol.toFixed(1)+" ml";
@@ -2995,11 +2656,11 @@ function renderMgmtBelanja(d){
   var totalN=0,totalNet=0;
   d.listDist.forEach(function(x){totalN+=x.totalNormal;totalNet+=x.totalNetto;});
   var omzet=0;d.listSales.forEach(function(s){omzet+=s.total;});
-  el("rpBelanjaNormal").textContent=fmt(totalN);
+    el("rpBelanjaNormal").textContent=fmt(totalN);
   el("rpBelanjaNetto").textContent=fmt(totalNet);
   el("rpHppRatio").textContent=omzet>0?Math.round(totalNet/omzet*100)+"%":"0%";
-  // Balance = Omzet − Belanja Netto (ganti laba kotor)
-  el("rpBalance").textContent=fmt(omzet-totalNet);
+  // Baris laba kotor dihapus
+  // chart daily
   var days={};
   d.listSales.forEach(function(s){days[s.date]=days[s.date]||{omzet:0,belanja:0};days[s.date].omzet+=s.total;});
   d.listDist.forEach(function(x){days[x.date]=days[x.date]||{omzet:0,belanja:0};days[x.date].belanja+=x.totalNetto;});
@@ -3009,6 +2670,7 @@ function renderMgmtBelanja(d){
     var o=days[k].omzet,b=days[k].belanja;
     return '<div class="bar-row"><div class="row"><small>'+k.slice(5)+'</small><strong>O: '+fmt(o)+' · B: '+fmt(b)+'</strong></div><div class="bar-bg" style="height:14px"><div class="bar-fill" style="width:'+Math.round(o/maxV*100)+'%;background:#0d6efd;height:6px"></div><div class="bar-fill" style="width:'+Math.round(b/maxV*100)+'%;background:#d97706;height:6px;margin-top:2px"></div></div></div>';
   }).join("")||'<p class="note">Belum ada data.</p>';
+  // bulanan
   var byMonth={};
   d.listSales.forEach(function(s){
     var m=s.date.slice(0,7);
@@ -3021,7 +2683,7 @@ function renderMgmtBelanja(d){
     byMonth[m].belanja+=x.totalNetto;
   });
    var mkeys=Object.keys(byMonth).sort();
-  var mhtml='<tr><th>Bulan</th><th class="right">Omzet</th><th class="right">Belanja</th><th class="right">Rasio %</th></tr>';
+  var mhtml='<tr><th>Bulan</th><th class="right">Omzet</th><th class="right">Belanja</th><th class="right">HPP %</th></tr>';
   mkeys.forEach(function(m){
     var x=byMonth[m];
     var hpp=x.omzet>0?Math.round(x.belanja/x.omzet*100):0;
@@ -3031,6 +2693,7 @@ function renderMgmtBelanja(d){
   el("rpBulananTable").innerHTML=mhtml;
 }
 function renderMgmtStok(d){
+  // nilai stok per outlet
   var rows='<tr><th>Outlet</th><th class="right">Nilai Parfum</th><th class="right">Nilai Campuran</th><th class="right">Total</th></tr>';
   var grandTotal=0;
   data.outlets.forEach(function(o){
@@ -3039,25 +2702,27 @@ function renderMgmtStok(d){
     var cur=stocks[o].current;
     var valP=0,valM=0;
     data.perfumes.forEach(function(p){
-      var q=cur.perfumes[p.name]||0;valP+=q*(p.price||0);
+      var q=cur.perfumes[p.name]||0;valP+=q*(p.buy||0);
     });
     data.mixes.forEach(function(m){
-      var q=cur.mixes[m.name]||0;valM+=q*(m.price||0);
+      var q=cur.mixes[m.name]||0;valM+=q*(m.buy||0);
     });
     var tot=valP+valM;grandTotal+=tot;
     rows+='<tr><td>'+esc(o)+'</td><td class="right">'+fmt(valP)+'</td><td class="right">'+fmt(valM)+'</td><td class="right">'+fmt(tot)+'</td></tr>';
   });
   rows+='<tr class="total-row"><td>TOTAL</td><td colspan="2"></td><td class="right">'+fmt(grandTotal)+'</td></tr>';
   el("rpNilaiStokTable").innerHTML=rows;
+  // low stock per outlet
   var lowHtml="";
   var outletsToCheck=(d.scope==="all")?data.outlets:[session.outlet];
     outletsToCheck.forEach(function(o){
     var low=getLowStockItems(o);
     if(low.length>0){
-      lowHtml+='<div class="item"><strong>'+esc(o)+'</strong> <span class="badge alert">'+low.length+' item</span><div class="small">'+low.slice(0,5).map(function(x){return (x.displayName||x.name);}).join(", ")+(low.length>5?'...':'')+'</div></div>';
+      lowHtml+='<div class="item"><strong>'+esc(o)+'</strong> <span class="badge alert">'+low.length+' item</span><div class="small">'+low.slice(0,5).map(function(x){return x.name;}).join(", ")+(low.length>5?'...':'')+'</div></div>';
     }
   });
   el("rpLowStockList").innerHTML=lowHtml||'<p class="note" style="color:#16a34a">✅ Semua stok aman.</p>';
+  // dead stock
   var last60=new Date();last60.setDate(last60.getDate()-60);
   var cut=last60.getFullYear()+"-"+String(last60.getMonth()+1).padStart(2,"0")+"-"+String(last60.getDate()).padStart(2,"0");
   var moved={};
@@ -3068,12 +2733,12 @@ function renderMgmtStok(d){
     ensureOutletStock(o);
     data.perfumes.forEach(function(p){
       if(!moved[p.name]&&(stocks[o].current.perfumes[p.name]||0)>0){
-        deadList.push({outlet:o,name:p.name,displayName:p.displayName||p.name,qty:stocks[o].current.perfumes[p.name]});
+        deadList.push({outlet:o,name:p.name,qty:stocks[o].current.perfumes[p.name]});
       }
     });
   });
   el("rpDeadStockList").innerHTML=deadList.slice(0,30).map(function(x){
-    return '<div class="item"><div class="row"><strong>'+esc(x.displayName||x.name)+'</strong><span class="small">'+esc(x.outlet)+' · '+x.qty.toFixed(1)+' ml</span></div></div>';
+    return '<div class="item"><div class="row"><strong>'+esc(x.name)+'</strong><span class="small">'+esc(x.outlet)+' · '+x.qty.toFixed(1)+' ml</span></div></div>';
   }).join("")||'<p class="note" style="color:#16a34a">✅ Tidak ada dead stock.</p>';
 }
 function renderMgmtKasir(d){
@@ -3082,6 +2747,7 @@ function renderMgmtKasir(d){
   el("rpMetodePorsi").innerHTML=Object.keys(payMap).map(function(k){
     return '<div class="bar-row"><div class="row"><small>'+k+'</small><strong>'+payMap[k]+' nota ('+Math.round(payMap[k]/total*100)+'%)</strong></div><div class="bar-bg"><div class="bar-fill" style="width:'+Math.round(payMap[k]/total*100)+'%"></div></div></div>';
   }).join("")||'<p class="note">Belum ada data.</p>';
+  // peak hour
   var hourMap={};
   d.listSales.forEach(function(s){
     if(!s.time)return;
@@ -3114,6 +2780,7 @@ window._openMgmtDetail = function(outletName){
 el("mgmtBackBtn").onclick = function(){
   el("mgmtDetailView").classList.add("hide");
   el("mgmtListView").classList.remove("hide");
+  // window.scrollTo(0,0); dihapus agar layar tidak lompat ke atas
 };
 
 function renderMgmtDetail(outletName){
@@ -3129,6 +2796,7 @@ function renderMgmtDetail(outletName){
     return (!filterOutlet || d.outlet===filterOutlet) && d.date>=from && d.date<=to;
   });
 
+  // 1. KPI Dasar
   var omzet=0, nota=listSales.length;
   listSales.forEach(function(s){omzet+=s.total;});
   var belanja=0;
@@ -3139,6 +2807,7 @@ function renderMgmtDetail(outletName){
   el("dtAvg").textContent=nota>0?fmt(omzet/nota):"Rp0";
   el("dtBelanja").textContent=fmt(belanja);
 
+  // 2. Top 5 Parfum
   var pMap={};
   listSales.forEach(function(s){s.items.forEach(function(i){if(i.parfum&&i.vol>0)pMap[i.parfum]=(pMap[i.parfum]||0)+i.vol;});});
   var topP=Object.keys(pMap).map(function(k){return {name:k,vol:pMap[k]};}).sort(function(a,b){return b.vol-a.vol;}).slice(0,5);
@@ -3147,6 +2816,7 @@ function renderMgmtDetail(outletName){
     return '<div class="bar-row"><div class="row"><small>'+esc(x.name)+'</small><strong>'+x.vol.toFixed(1)+' ml</strong></div><div class="bar-bg"><div class="bar-fill" style="width:'+Math.round(x.vol/maxP*100)+'%"></div></div></div>';
   }).join("")||'<p class="note">Belum ada penjualan.</p>';
   
+  // 3. Metode Bayar
   var payMap={};
   listSales.forEach(function(s){payMap[s.method]=(payMap[s.method]||0)+s.total;});
   var totalP=omzet||1;
@@ -3154,6 +2824,7 @@ function renderMgmtDetail(outletName){
     return '<div class="bar-row"><div class="row"><small>'+k+'</small><strong>'+fmt(payMap[k])+' ('+Math.round(payMap[k]/totalP*100)+'%)</strong></div><div class="bar-bg"><div class="bar-fill" style="width:'+Math.round(payMap[k]/totalP*100)+'%"></div></div></div>';
   }).join("")||'<p class="note">Belum ada data.</p>';
 
+  // 4. Peak Hour
   var hourMap={};
   listSales.forEach(function(s){
     if(!s.time)return;
@@ -3188,18 +2859,6 @@ document.querySelectorAll(".report-tab").forEach(function(t){
   };
 });
 
-/* ================== SUB-TAB MASTER ================== */
-document.querySelectorAll(".master-tab").forEach(function(t){
-  t.onclick=function(){
-    document.querySelectorAll(".master-tab").forEach(function(x){x.classList.remove("active");});
-    this.classList.add("active");
-    var tab=this.getAttribute("data-mtab");
-    document.querySelectorAll(".master-section").forEach(function(s){
-      s.classList.toggle("active",s.getAttribute("data-msec")===tab);
-    });
-  };
-});
-
 /* ================== GRAFIK OUTLET ================== */
 function renderGrafik(){
   if(!session)return;
@@ -3211,10 +2870,9 @@ function renderGrafik(){
   var mOmzet=0,mVol=0,mCost=0;
   listSales.forEach(function(s){mOmzet+=s.total;s.items.forEach(function(i){mVol+=(i.vol||0);});});
   listDist.forEach(function(x){mCost+=(x.totalNetto||0);});
-  el("gMonthOmzet").textContent=fmt(mOmzet);
+    el("gMonthOmzet").textContent=fmt(mOmzet);
   el("gMonthCost").textContent=fmt(mCost);
-  // Rasio Belanja / Omzet (ganti laba kotor)
-  el("gMonthRatio").textContent=mOmzet>0?Math.round(mCost/mOmzet*100)+"%":"0%";
+  // el("gMonthProfit").textContent=fmt(mOmzet-mCost); // dihapus
   el("gMonthVol").textContent=mVol+" ml";
   var days=[],maxD=1;
   for(var i=6;i>=0;i--){
@@ -3257,7 +2915,8 @@ function all(){
   if(el("devPassInput"))el("devPassInput").value=data.shop.devPass||"9999";
   if(el("shopSub"))el("shopSub").textContent=data.shop.name||"AURA International Perfume";
     renderSelects();
-  renderOutletList();
+  renderOutlets();
+  renderOutletEmails();
   listRender("perfumes","perfumeList",el("filterMasterParfum")?el("filterMasterParfum").value:"");
   listRender("mixes","mixList");
   listRender("purchases","purchaseList");
@@ -3272,14 +2931,10 @@ function all(){
 }
 
 /* ================== TAB NAV ================== */
-var TAB_MAP={
-  tKasir:"secKasir", tLaporan:"secLaporan", tOrder:"secOrder", tGrafik:"secGrafik",
-  tStokAwal:"secStokAwal", tStokMasuk:"secStokMasuk", tAudit:"secAudit", tStokMin:"secStokMin",
-  tAdmin:"secMaster", tSetting:"secSetting", tMgmt:"secMgmt", tNotif:"secNotif"
-};
+var TAB_MAP={tKasir:"secKasir",tLaporan:"secLaporan",tOrder:"secOrder",tGrafik:"secGrafik",tStokAwal:"secStokAwal",tStokMasuk:"secStokMasuk",tAudit:"secAudit",tStokMin:"secStokMin",tAkses:"secAkses",tAdmin:"secAdmin",tMgmt:"secMgmt",tNotif:"secNotif"};
 function setTab(id){
   // PENGAMAN: Cegah akses tab admin/master oleh role selain admin
-  var adminTabs = ["tStokAwal","tAudit","tStokMin","tAdmin","tSetting","tNotif"];
+  var adminTabs = ["tStokAwal","tAudit","tStokMin","tAkses","tAdmin","tNotif"];
   if (adminTabs.indexOf(id) >= 0 && (!session || session.role !== "admin")) {
     toast("Akses ditolak! Halaman ini khusus Admin.","err");
     return;
@@ -3299,7 +2954,6 @@ function setTab(id){
   if(id==="tAudit"){renderAuditSession();renderAuditHistoryNew();}
   if(id==="tStokMin")renderMinOutletSelect();
   if(id==="tAdmin"){updateDistHargaBeliWarn();}
-  if(id==="tSetting"){renderOutletList();}
   if(id==="tMgmt")renderMgmt();
   if(id==="tNotif"){renderAdminNotif();renderDevRequests();}
 }
@@ -3318,34 +2972,30 @@ el("addOutletBtn").onclick=function(){
   if(n){data.outlets.push(n);el("newOutletName").value="";saveMaster();all();toast("Outlet ditambahkan.","ok");}
 };
 el("addPerfume").onclick=function(){
-  var c=el("newPerfumeCode").value.trim(),n=el("newPerfumeName").value.trim(),v=+el("newPerfumePrice").value;
-  var st=+el("newPerfumeStock").value||0;
+  var n=el("newPerfumeName").value.trim(),v=+el("newPerfumePrice").value,b=+el("newPerfumeBuyPrice").value||0;
+  var st=+el("newPerfumeStock").value||0,mn=+el("newPerfumeMin").value||50;
   if(!n){toast("Nama parfum wajib diisi.","err");return;}
-  var fullName=c?(c+" - "+n):n;
-  data.perfumes.unshift({code:c,name:fullName,displayName:n,price:v});
+  data.perfumes.unshift({name:n,price:v,buy:b,min:mn});
   if(session){
     ensureOutletStock(session.outlet);
-    stocks[session.outlet].initial.perfumes[fullName]=st;
-    stocks[session.outlet].current.perfumes[fullName]=st;
+    stocks[session.outlet].initial.perfumes[n]=st;
+    stocks[session.outlet].current.perfumes[n]=st;
     saveStocks();
   }
-  el("newPerfumeCode").value="";el("newPerfumeName").value="";el("newPerfumePrice").value="";saveMaster();all();
+  el("newPerfumeName").value="";el("newPerfumePrice").value="";el("newPerfumeBuyPrice").value="0";saveMaster();all();
   toast("Parfum ditambahkan.","ok");
 };
 el("addMix").onclick=function(){
-  var c=el("newMixCode").value.trim(),n=el("newMixName").value.trim(),v=+el("newMixPrice").value;
+  var n=el("newMixName").value.trim(),v=+el("newMixPrice").value,b=+el("newMixBuyPrice").value||0,mn=+el("newMixMin").value||200;
   if(!n){toast("Nama campuran wajib diisi.","err");return;}
-  var fullName=c?(c+" - "+n):n;
-  data.mixes.push({code:c,name:fullName,displayName:n,price:v});
-  el("newMixCode").value="";el("newMixName").value="";el("newMixPrice").value="";saveMaster();all();
-  toast("Campuran ditambahkan.","ok");
+  data.mixes.push({name:n,price:v,buy:b,min:mn});
+  el("newMixName").value="";el("newMixPrice").value="";el("newMixBuyPrice").value="0";saveMaster();all();
 };
 el("addPurchase").onclick=function(){
-  var n=el("newPurchaseName").value.trim(),v=+el("newPurchasePrice").value;
+  var n=el("newPurchaseName").value.trim(),v=+el("newPurchasePrice").value,b=+el("newPurchaseBuyPrice").value||0,mn=+el("newPurchaseMin").value||10;
   if(!n){toast("Nama botol wajib diisi.","err");return;}
-  data.purchases.push({code:"",name:n,displayName:n,price:v});
-  el("newPurchaseName").value="";el("newPurchasePrice").value="";saveMaster();all();
-  toast("Botol ditambahkan.","ok");
+  data.purchases.push({name:n,price:v,buy:b,min:mn});
+  el("newPurchaseName").value="";el("newPurchasePrice").value="";el("newPurchaseBuyPrice").value="0";saveMaster();all();
 };
 
 /* ================== INIT ================== */
