@@ -508,7 +508,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
     <label>Kapasitas (ml)</label>
     <div class="cap-wrap" id="capWrap">
       <div class="cap-input-display empty" id="capDisplay">
-        <span id="capDisplayText">Pilih / ketik ml</span>
+        <span id="capDisplayText">Masukan ml</span>
         <span style="font-size:11px;color:var(--blue)">▼</span>
       </div>
       <input type="hidden" id="capacityInput" value="">
@@ -1504,7 +1504,7 @@ function renderPerfumeOptions(filter){
 }
 function renderSelects(){
   renderPerfumeOptions(el("searchParfum").value);
-  el("mixSelect").innerHTML=data.mixes.map(function(x,i){
+  el("mixSelect").innerHTML='<option value="-1">-- Pilih Campuran --</option>'+data.mixes.map(function(x,i){
     var lbl=(x.code?x.code+" - ":"")+(x.displayName||x.name);
     return '<option value="'+i+'">'+esc(lbl)+' ('+(x.price===0?"Gratis":fmt(x.price)+"/ml")+')</option>';
   }).join("");
@@ -1537,7 +1537,7 @@ function renderSelects(){
     if(b.x.name.toLowerCase()==="refill")return 1;
     return 0;
   });
-  el("purchaseSelect").innerHTML=sortedB.map(function(o){return '<option value="'+o.i+'">'+esc(o.x.name)+(o.x.price>0?" — "+fmt(o.x.price):" (Gratis)")+'</option>';}).join("");
+  el("purchaseSelect").innerHTML='<option value="-1">-- Pilih Botol / Kemasan --</option>'+sortedB.map(function(o){return '<option value="'+o.i+'">'+esc(o.x.name)+(o.x.price>0?" — "+fmt(o.x.price):" (Gratis)")+'</option>';}).join("");
 }
 
 function setCapacityValue(val){
@@ -1546,7 +1546,7 @@ function setCapacityValue(val){
     el("capDisplayText").textContent=val+" ml";
     el("capDisplay").classList.remove("empty");
   }else{
-    el("capDisplayText").textContent="Pilih / ketik ml";
+    el("capDisplayText").textContent="Masukan ml";
     el("capDisplay").classList.add("empty");
   }
   calcCurrentItem();
@@ -1583,8 +1583,10 @@ wrap.addEventListener("click", function(e) { moveKnob(e.clientX); });
 /* ================== CALC ITEM ================== */
 function calcCurrentItem(){
   var idx=+el("perfumeSelect").value;
+  var mixIdx=+el("mixSelect").value;
+  var botIdx=+el("purchaseSelect").value;
   var vol=parseFloat(el("capacityInput").value)||0;
-  if(idx<0 || isNaN(idx) || vol<=0 || !data.perfumes[idx] || !data.mixes.length || !data.purchases.length){
+  if(idx<0 || isNaN(idx) || mixIdx<0 || isNaN(mixIdx) || botIdx<0 || isNaN(botIdx) || vol<=0 || !data.perfumes[idx] || !data.mixes[mixIdx] || !data.purchases[botIdx]){
     el("itemSubtotal").textContent="Rp0";
     el("itemFormula").textContent="—";
     if(el("ksItemVal"))el("ksItemVal").textContent="Rp0";
@@ -1592,8 +1594,8 @@ function calcCurrentItem(){
     return null;
   }
   var p=data.perfumes[idx];
-  var m=data.mixes[+el("mixSelect").value||0];
-  var b=data.purchases[+el("purchaseSelect").value||0];
+  var m=data.mixes[mixIdx];
+  var b=data.purchases[botIdx];
   var pct=currentPct;
   var oil=vol*pct/100,sol=vol-oil;
   var raw=(oil*p.price)+(sol*m.price)+b.price;
@@ -1637,8 +1639,13 @@ function getCartTotal(){return cart.reduce(function(s,x){return s+x.subtotal;},0
 var selectedPayMethod="Tunai",calcInputStr="0";
 el("addToCartBtn").onclick=function(){
   var it=calcCurrentItem();
-  if(!it){toast("Pilih parfum & kapasitas yang valid.","err");return;}
-  cart.push(it);renderCart();toast("✅ Masuk keranjang ("+cart.length+" item)","ok");
+  if(!it){toast("Lengkapi pilihan parfum, kapasitas, campuran & botol.","err");return;}
+  cart.push(it);
+  renderCart();
+  el("mixSelect").value="-1";
+  el("purchaseSelect").value="-1";
+  setCapacityValue("");
+  toast("✅ Masuk keranjang ("+cart.length+" item)","ok");
 };
 el("clearCartBtn").onclick=function(){cart=[];renderCart();};
 
