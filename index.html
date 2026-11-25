@@ -1502,6 +1502,7 @@ function renderPerfumeOptions(filter){
   }
   calcCurrentItem();
 }
+
 function renderSelects(){
   renderPerfumeOptions(el("searchParfum").value);
   el("mixSelect").innerHTML='<option value="-1">-- Pilih Campuran --</option>'+data.mixes.map(function(x,i){
@@ -1580,6 +1581,7 @@ knob.addEventListener("pointerup",function(){dragging=false;});
 knob.addEventListener("pointercancel",function(){dragging=false;});
 window.addEventListener("pointerup",function(){dragging=false;});
 wrap.addEventListener("click", function(e) { moveKnob(e.clientX); });
+
 /* ================== CALC ITEM ================== */
 function calcCurrentItem(){
   var idx=+el("perfumeSelect").value;
