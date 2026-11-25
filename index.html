@@ -681,40 +681,78 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 </div></div>
 
 <!-- MODAL PEMBAYARAN BARU -->
-<div id="payModal" class="modal-bg hide">
-  <div class="modal-box" style="max-width:400px;">
-    <div class="adminhead" style="text-align:center; font-size:18px; margin-bottom:12px;">Pembayaran</div>
+<!-- MODAL 1: PILIHAN METODE -->
+<div id="payMethodModal" class="modal-bg hide">
+  <div class="modal-box" style="max-width:350px;">
+    <div class="adminhead" style="text-align:center; font-size:18px; margin-bottom:16px;">Pilih Pembayaran</div>
     
-    <div id="payMethodSelection">
-      <div class="grid3" style="margin-bottom:16px;">
-        <button type="button" class="btn secondary pay-method-btn active" data-method="Cash" style="margin:0; display:flex; flex-direction:column; align-items:center; gap:8px; padding:15px 10px; border:2px solid #0d6efd;">
-          <span style="font-size:24px;">💵</span> Cash
-        </button>
-        <button type="button" class="btn secondary pay-method-btn" data-method="QRIS" style="margin:0; display:flex; flex-direction:column; align-items:center; gap:8px; padding:15px 10px;">
-          <span style="font-size:24px;">📱</span> QRIS
-        </button>
-        <button type="button" class="btn secondary pay-method-btn" data-method="EDC" style="margin:0; display:flex; flex-direction:column; align-items:center; gap:8px; padding:15px 10px;">
-          <span style="font-size:24px;">💳</span> EDC
-        </button>
-      </div>
+    <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;">
+      <button type="button" class="btn secondary pay-method-btn" data-method="Cash" style="margin:0; display:flex; flex-direction:column; align-items:center; gap:8px; padding:20px 10px; border:2px solid #bfdbfe;">
+        <span style="font-size:32px;">💵</span> <span style="font-size:16px; font-weight:800;">Cash</span>
+      </button>
+      <button type="button" class="btn secondary pay-method-btn" data-method="QRIS" style="margin:0; display:flex; flex-direction:column; align-items:center; gap:8px; padding:20px 10px; border:2px solid #bfdbfe;">
+        <span style="font-size:32px;">📱</span> <span style="font-size:16px; font-weight:800;">QRIS</span>
+      </button>
+      <button type="button" class="btn secondary pay-method-btn" data-method="EDC" style="margin:0; display:flex; flex-direction:column; align-items:center; gap:8px; padding:20px 10px; border:2px solid #bfdbfe;">
+        <span style="font-size:32px;">💳</span> <span style="font-size:16px; font-weight:800;">EDC</span>
+      </button>
+    </div>
+    
+    <button type="button" class="btn secondary" id="payMethodCancelBtn" style="margin:0; border:1px solid #dc2626; color:#dc2626;">Batal</button>
+  </div>
+</div>
 
-      <!-- Kalkulator Cash -->
-      <div id="cashCalculator">
-        <div style="background:#f8fafc; border-radius:12px; padding:12px; margin-bottom:12px; text-align:center;">
-          <div class="small">Total Tagihan</div>
-          <div style="font-size:24px; font-weight:900; color:#0f172a;" id="payModalTotal">Rp0</div>
-        </div>
-        
-        <div class="grid" style="margin-bottom:12px;">
-          <div>
-            <div class="small">Diterima</div>
-            <div style="font-size:18px; font-weight:800; color:#0d6efd;" id="payModalPaid">Rp0</div>
-          </div>
-          <div style="background:#eff6ff; border-radius:8px; padding:6px; border:1px solid #bfdbfe;">
-            <div class="small">Kembali</div>
-            <div style="font-size:18px; font-weight:800; color:#16a34a;" id="payModalChange">Rp0</div>
-          </div>
-        </div>
+<!-- MODAL 2: KALKULATOR CASH (HANYA MUNCUL JIKA CASH) -->
+<div id="cashModal" class="modal-bg hide">
+  <div class="modal-box" style="max-width:380px;">
+    <div class="adminhead" style="text-align:center; font-size:18px; margin-bottom:12px;">Pembayaran Cash</div>
+    
+    <div style="background:#f8fafc; border-radius:12px; padding:12px; margin-bottom:12px; text-align:center;">
+      <div class="small">Total Tagihan</div>
+      <div style="font-size:24px; font-weight:900; color:#0f172a;" id="payModalTotal">Rp0</div>
+    </div>
+    
+    <div class="grid" style="margin-bottom:12px;">
+      <div>
+        <div class="small">Diterima</div>
+        <div style="font-size:18px; font-weight:800; color:#0d6efd;" id="payModalPaid">Rp0</div>
+      </div>
+      <div style="background:#eff6ff; border-radius:8px; padding:6px; border:1px solid #bfdbfe;">
+        <div class="small">Kembali</div>
+        <div style="font-size:18px; font-weight:800; color:#16a34a;" id="payModalChange">Rp0</div>
+      </div>
+    </div>
+
+    <div class="grid" style="margin-bottom:12px;">
+      <button type="button" class="btn secondary quick-cash" data-val="pas" style="margin:0;">Uang Pas</button>
+      <button type="button" class="btn secondary quick-cash" data-val="15000" style="margin:0;">Rp 15.000</button>
+      <button type="button" class="btn secondary quick-cash" data-val="20000" style="margin:0;">Rp 20.000</button>
+      <button type="button" class="btn secondary quick-cash" data-val="50000" style="margin:0;">Rp 50.000</button>
+    </div>
+
+    <div class="grid3" style="gap:6px; margin-bottom:12px;">
+      <button type="button" class="btn secondary numpad" data-num="1" style="font-size:18px; padding:12px 0; margin:0;">1</button>
+      <button type="button" class="btn secondary numpad" data-num="2" style="font-size:18px; padding:12px 0; margin:0;">2</button>
+      <button type="button" class="btn secondary numpad" data-num="3" style="font-size:18px; padding:12px 0; margin:0;">3</button>
+      <button type="button" class="btn secondary numpad" data-num="4" style="font-size:18px; padding:12px 0; margin:0;">4</button>
+      <button type="button" class="btn secondary numpad" data-num="5" style="font-size:18px; padding:12px 0; margin:0;">5</button>
+      <button type="button" class="btn secondary numpad" data-num="6" style="font-size:18px; padding:12px 0; margin:0;">6</button>
+      <button type="button" class="btn secondary numpad" data-num="7" style="font-size:18px; padding:12px 0; margin:0;">7</button>
+      <button type="button" class="btn secondary numpad" data-num="8" style="font-size:18px; padding:12px 0; margin:0;">8</button>
+      <button type="button" class="btn secondary numpad" data-num="9" style="font-size:18px; padding:12px 0; margin:0;">9</button>
+      <button type="button" class="btn secondary numpad" data-num="0" style="font-size:18px; padding:12px 0; margin:0;">0</button>
+      <button type="button" class="btn secondary numpad" data-num="00" style="font-size:18px; padding:12px 0; margin:0;">00</button>
+      <button type="button" class="btn secondary numpad" data-num="000" style="font-size:18px; padding:12px 0; margin:0;">000</button>
+      <button type="button" class="btn danger" id="numpadBack" style="margin:0; padding:12px 0; grid-column:span 2;">⌫ Hapus</button>
+      <button type="button" class="btn secondary" id="numpadReset" style="margin:0; padding:12px 0;">Reset</button>
+    </div>
+
+    <div class="grid" style="margin-top:16px;">
+      <button type="button" class="btn secondary" id="cashCancelBtn" style="margin:0; border:1px solid #dc2626; color:#dc2626;">Batal</button>
+      <button type="button" class="btn" id="payProcessBtn" style="margin:0; background:linear-gradient(135deg,#0d6efd,#0a58ca);">Bayar</button>
+    </div>
+  </div>
+</div>
 
         <div class="grid" style="margin-bottom:12px;">
           <button type="button" class="btn secondary quick-cash" data-val="pas" style="margin:0;">Uang Pas</button>
@@ -764,7 +802,37 @@ outletEmails:{},
 perfumes:[
 {code:"101",name:"101 - Adidas",displayName:"Adidas",price:2500},
 {code:"4302",name:"4302 - Al Rehab - lovely",displayName:"Al Rehab - lovely",price:2700},
-{code:"9110",name:"9110 - Baccarot",displayName:"Baccarot",price:3200}
+{code:"7402",name:"7402 - Al Rehab - Soft",displayName:"Al Rehab - Soft",price:2700},
+{code:"202",name:"202 - Ana Sui - Secret Wish",displayName:"Ana Sui - Secret Wish",price:3500},
+{code:"207",name:"207 - Ana Sui - Flight Of Fancy",displayName:"Ana Sui - Flight Of Fancy",price:3700},
+{code:"9110",name:"9110 - Baccarot",displayName:"Baccarot",price:3200},
+{code:"9111",name:"9111 - Baccarot Oud",displayName:"Baccarot Oud",price:3200},
+{code:"503",name:"503 - Body Shop - White Musk A",displayName:"Body Shop - White Musk A",price:3700},
+{code:"502",name:"502 - Body Shop - Vanila",displayName:"Body Shop - Vanila",price:2700},
+{code:"801",name:"801 - Bvlgari - Aqua For Man A",displayName:"Bvlgari - Aqua For Man A",price:4700},
+{code:"804",name:"804 - Bvlgari - BLV Man A",displayName:"Bvlgari - BLV Man A",price:3600},
+{code:"808",name:"808 - Bvlgari - Extreme A",displayName:"Bvlgari - Extreme A",price:3700},
+{code:"811",name:"811 - Bvlgari - Omnia Crystal",displayName:"Bvlgari - Omnia Crystal",price:2700},
+{code:"1001",name:"1001 - Carolina Herrera - 212 Man",displayName:"Carolina Herrera - 212 Man",price:3800},
+{code:"1011",name:"1011 - Carolina Herrera - 212 VIP Rose",displayName:"Carolina Herrera - 212 VIP Rose",price:2500},
+{code:"1306",name:"1306 - Chanel - Allur Sport",displayName:"Chanel - Allur Sport",price:3600},
+{code:"1308",name:"1308 - Chanel - Blue Chance",displayName:"Chanel - Blue Chance",price:3100},
+{code:"1407",name:"1407 - Cristian Dior - Sauvage",displayName:"Cristian Dior - Sauvage",price:2800},
+{code:"1405",name:"1405 - Christian Dior - Jadore",displayName:"Christian Dior - Jadore",price:2300},
+{code:"1103",name:"1103 - Creed-Creed Adventus",displayName:"Creed-Creed Adventus",price:2800},
+{code:"2102",name:"2102 - Dunhill - Desire Blue",displayName:"Dunhill - Desire Blue",price:3100},
+{code:"2207",name:"2207 - E. Aigner - In Lather Man",displayName:"E. Aigner - In Lather Man",price:4000},
+{code:"3407",name:"3407 - Hugo Boss - Bottled",displayName:"Hugo Boss - Bottled",price:4000},
+{code:"3602",name:"3602 - Jaguar - Blue",displayName:"Jaguar - Blue",price:3500},
+{code:"9204",name:"9204 - JO Malone-engles spear",displayName:"JO Malone-engles spear",price:2700},
+{code:"4708",name:"4708 - Paco Rabane - One Million",displayName:"Paco Rabane - One Million",price:2600},
+{code:"5704",name:"5704 - Victoria Secret - Bombshell",displayName:"Victoria Secret - Bombshell",price:3500},
+{code:"5705",name:"5705 - Victoria Secret - Romantic Wish",displayName:"Victoria Secret - Romantic Wish",price:2900},
+{code:"5708",name:"5708 - Victoria Secret - Scandalos",displayName:"Victoria Secret - Scandalos",price:3600},
+{code:"5803",name:"5803 - YSL -Black Opium",displayName:"YSL -Black Opium",price:2700},
+{code:"5806",name:"5806 - YSL -Libre",displayName:"YSL -Libre",price:2700},
+{code:"304",name:"304 - Afnan-Nine PM",displayName:"Afnan-Nine PM",price:2800},
+{code:"6208",name:"6208 - Marfa-Sotb Saff And Co",displayName:"Marfa-Sotb Saff And Co",price:3200}
 ],
 mixes:[
 {code:"Et",name:"Et - Etanol",displayName:"Etanol",price:200},
@@ -774,7 +842,27 @@ mixes:[
 capacities:defaultCaps,
 purchases:[
 {name:"Refill",displayName:"Refill",price:0},
-{name:"P25 - SP 25",displayName:"P25 - SP 25",price:3000}
+{name:"P25 - SP 25",displayName:"P25 - SP 25",price:3000},
+{name:"P40 - SP 40",displayName:"P40 - SP 40",price:3000},
+{name:"P60 - SP 60",displayName:"P60 - SP 60",price:3000},
+{name:"R10 - Roll On Es 10",displayName:"R10 - Roll On Es 10",price:3000},
+{name:"K15 - SK 15",displayName:"K15 - SK 15",price:5000},
+{name:"K35 - SK 35",displayName:"K35 - SK 35",price:8000},
+{name:"K60 - SK 60",displayName:"K60 - SK 60",price:8000},
+{name:"H43 - H 443",displayName:"H43 - H 443",price:10000},
+{name:"GT30 - Gradasi Tabung 30",displayName:"GT30 - Gradasi Tabung 30",price:10000},
+{name:"GT50 - Gradasi Tabung 50",displayName:"GT50 - Gradasi Tabung 50",price:10000},
+{name:"V35 - Oval 35",displayName:"V35 - Oval 35",price:10000},
+{name:"C35 - Clasic 35",displayName:"C35 - Clasic 35",price:10000},
+{name:"CJ50 - Cristian Dior Joy",displayName:"CJ50 - Cristian Dior Joy",price:10000},
+{name:"mc35 - Marcedes",displayName:"mc35 - Marcedes",price:10000},
+{name:"HG50 - Hugo 50",displayName:"HG50 - Hugo 50",price:10000},
+{name:"HG30 - Hugo 30",displayName:"HG30 - Hugo 30",price:10000},
+{name:"GK50 - Gradasi Kotak 50",displayName:"GK50 - Gradasi Kotak 50",price:10000},
+{name:"GE35 - Gradasi Elips 35",displayName:"GE35 - Gradasi Elips 35",price:10000},
+{name:"HM30 - Gradasi Hermes 30",displayName:"HM30 - Gradasi Hermes 30",price:10000},
+{name:"STP50 - Stik 50 Polos",displayName:"STP50 - Stik 50 Polos",price:10000},
+{name:"GK100 - Gradasi Kotak 100",displayName:"GK100 - Gradasi Kotak 100",price:13000}
 ],
 rounding:1000,
 stokMin:{}
@@ -1056,37 +1144,48 @@ function renderCart(){
 window._rmCart=function(i){cart.splice(i,1);renderCart();};
 function getCartTotal(){return cart.reduce(function(s,x){return s+x.subtotal;},0);}
 
-/* ================== PEMBAYARAN BARU ================== */
+/* ================== PEMBAYARAN BARU (2 TAHAP) ================== */
 var selectedMethod="Cash",inputAmount=0;
+
+// 1. Buka Popup Pilihan Metode
 function openPayModal(){
   if(!cart.length){toast("Keranjang kosong.","err");return;}
-  el("payModalTotal").textContent=fmt(getCartTotal());
-  inputAmount=0;updatePayUI();el("payModal").classList.remove("hide");
-  document.querySelectorAll(".pay-method-btn").forEach(function(b){b.classList.remove("active");b.style.border="1px solid #bfdbfe";});
-  document.querySelector('.pay-method-btn[data-method="Cash"]').classList.add("active");
-  document.querySelector('.pay-method-btn[data-method="Cash"]').style.border="2px solid #0d6efd";
-  selectedMethod="Cash";el("cashCalculator").style.display="block";
+  el("payMethodModal").classList.remove("hide");
 }
+
+// 2. Pilih Metode
+document.querySelectorAll(".pay-method-btn").forEach(function(btn){
+  btn.onclick=function(){
+    selectedMethod=this.getAttribute("data-method");
+    el("payMethodModal").classList.add("hide"); // Tutup popup 1
+    
+    if(selectedMethod==="Cash"){
+      // Buka Popup Kalkulator Cash
+      inputAmount=0;
+      el("payModalTotal").textContent=fmt(getCartTotal());
+      updatePayUI();
+      el("cashModal").classList.remove("hide");
+    } else {
+      // QRIS / EDC Langsung Bayar
+      processPayment(selectedMethod, getCartTotal());
+    }
+  };
+});
+
+// 3. Batal Popup 1
+el("payMethodCancelBtn").onclick=function(){el("payMethodModal").classList.add("hide");};
+
+// 4. Logika Kalkulator Cash
 function updatePayUI(){
-  var total=getCartTotal(), paid=(selectedMethod==="Cash")?inputAmount:total, change=paid-total;
+  var total=getCartTotal(), paid=inputAmount, change=paid-total;
   el("payModalPaid").textContent=fmt(paid);
   var chgEl=el("payModalChange");
   chgEl.textContent=change>=0?fmt(change):"Kurang "+fmt(Math.abs(change));
   chgEl.style.color=change>=0?"#16a34a":"#dc2626";
   var btn=el("payProcessBtn");
-  if(selectedMethod==="Cash"&&paid<total){btn.disabled=true;btn.style.opacity=0.5;}
+  if(paid<total){btn.disabled=true;btn.style.opacity=0.5;}
   else{btn.disabled=false;btn.style.opacity=1;}
 }
-document.querySelectorAll(".pay-method-btn").forEach(function(btn){
-  btn.onclick=function(){
-    document.querySelectorAll(".pay-method-btn").forEach(function(b){b.classList.remove("active");b.style.border="1px solid #bfdbfe";});
-    this.classList.add("active");this.style.border="2px solid #0d6efd";
-    selectedMethod=this.getAttribute("data-method");
-    if(selectedMethod==="Cash"){el("cashCalculator").style.display="block";}
-    else{el("cashCalculator").style.display="none";inputAmount=getCartTotal();}
-    updatePayUI();
-  };
-});
 document.querySelectorAll(".numpad").forEach(function(btn){
   btn.onclick=function(){
     var num=this.getAttribute("data-num");
@@ -1105,11 +1204,21 @@ document.querySelectorAll(".quick-cash").forEach(function(btn){
     updatePayUI();
   };
 });
-el("payCancelBtn").onclick=function(){el("payModal").classList.add("hide");};
+el("cashCancelBtn").onclick=function(){el("cashModal").classList.add("hide");};
+
+// 5. Proses Pembayaran (Cash / QRIS / EDC)
 el("payProcessBtn").onclick=function(){
+  var total=getCartTotal(), paid=inputAmount;
+  if(paid<total){toast("Uang kurang.","err");return;}
+  processPayment(selectedMethod, paid);
+  el("cashModal").classList.add("hide");
+};
+
+function processPayment(method, paidAmount){
   if(!session)return;
-  var total=getCartTotal(),paid=(selectedMethod==="Cash")?inputAmount:total;
-  if(selectedMethod==="Cash"&&paid<total){toast("Uang kurang.","err");return;}
+  var total=getCartTotal();
+  
+  // Update Stok
   var out=session.outlet;ensureOutletStock(out);
   var cur=stocks[out].current;
   cart.forEach(function(it){
@@ -1119,13 +1228,25 @@ el("payProcessBtn").onclick=function(){
     if(bObj&&bObj.price>0)cur.purchases[it.botol]=Math.max(0,(cur.purchases[it.botol]||0)-1);
   });
   saveStocks();
+
+  // Buat Transaksi
   var now=new Date();
-  var trx={id:"INV-"+now.getTime().toString().slice(-6),outlet:out,date:todayStr(),time:nowTime(),items:clone(cart),total:total,method:selectedMethod,paid:paid,change:Math.max(0,paid-total),synced:false};
+  var trx={
+    id:"INV-"+now.getTime().toString().slice(-6),
+    outlet:out, date:todayStr(), time:nowTime(),
+    items:clone(cart), total:total, method:method, paid:paidAmount,
+    change:Math.max(0,paidAmount-total), synced:false
+  };
   sales.unshift(trx);saveSales();
-  cart=[];renderCart();all();el("payModal").classList.add("hide");
+
+  // Reset
+  cart=[];renderCart();all();
+  
+  // Preview Struk
   showReceiptPreview(buildReceipt58(trx));
-  toast("✅ Pembayaran Berhasil.","ok");
-};
+  toast("✅ Pembayaran "+method+" Berhasil.","ok");
+}
+
 el("checkoutBtn").onclick=openPayModal;
 el("addToCartBtn").onclick=function(){var it=calcCurrentItem();if(it){cart.push(it);renderCart();}};
 /* ================== RECEIPT ================== */
@@ -1570,9 +1691,12 @@ function collectMasterFromUI(){
   saveMaster();
 }
 async function globalSaveAll(){
-  var btn=el("globalSaveBtn");if(btn){btn.disabled=true;btn.textContent="⏳ Menyimpan...";}
-  try{collectMasterFromUI();saveMaster();saveStokMin();saveStocks();await pushCloudMaster();clearDirty();renderLoginOutlets();renderOutletList();if(session)all();toast("✅ Semua perubahan disimpan!","ok");}
-  catch(e){toast("Gagal menyimpan: "+e.message,"err");}
+  var btn=el("globalSaveBtn");
+  if(btn){btn.disabled=true;btn.textContent="⏳ Menyimpan...";}
+  try{
+    collectMasterFromUI();saveMaster();saveStokMin();saveStocks();await pushCloudMaster();clearDirty();renderLoginOutlets();renderOutletList();if(session)all();
+    toast("✅ Semua perubahan disimpan!","ok");
+  }catch(e){toast("Gagal menyimpan: "+e.message,"err");}
   finally{if(btn){btn.disabled=false;btn.textContent="💾 Simpan";}}
 }
 el("globalSaveBtn").onclick=globalSaveAll;
