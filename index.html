@@ -1127,7 +1127,7 @@ el("payProcessBtn").onclick=function(){
   toast("✅ Pembayaran Berhasil.","ok");
 };
 el("checkoutBtn").onclick=openPayModal;
-
+el("addToCartBtn").onclick=function(){var it=calcCurrentItem();if(it){cart.push(it);renderCart();}};
 /* ================== RECEIPT ================== */
 function buildReceipt58(trx){
   var out="================================\n  "+(data.shop.name||"AURA POS").toUpperCase()+"\n";
