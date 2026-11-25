@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>AURA POS — System</title>
 <style>
-:root{
+.hide{display:none!important}
+  :root{
   --bg:#f4f8fd;--card:#fff;--text:#0f172a;--muted:#64748b;
   --blue:#0d6efd;--blue-dark:#0a58ca;--green:#16a34a;--red:#dc2626;
   --amber:#d97706;--line:#dbeafe;--soft:#eff6ff;--purple:#7c3aed;
@@ -1847,7 +1848,32 @@ el("masterImportCsvInput").onchange=function(e){
     saveMaster();all();await pushCloudMaster();toast("✅ "+added+" baru, "+updated+" diupdate.","ok");this.value="";
   };reader.readAsText(file);
 };
+/* ================== DROPDOWN & GLOBAL SAVE ================== */
+function dropdownHTML(uid,items){
+  var btns=items.map(function(it){
+    return '<button type="button" class="'+(it.danger?"danger":"")+'" onclick="'+it.onclick+'">'+it.label+'</button>';
+  }).join("");
+  return '<div class="menu-wrap"><button type="button" class="btn-dots" onclick="window._toggleMenu(\''+uid+'\',event)">⋮</button><div class="dropdown" id="dd_'+uid+'">'+btns+'</div></div>';
+}
+window._toggleMenu=function(uid,e){
+  e.stopPropagation();
+  var dd=el("dd_"+uid);if(!dd)return;
+  var isOpen=dd.classList.contains("open");
+  document.querySelectorAll(".dropdown.open").forEach(function(d){d.classList.remove("open");});
+  if(!isOpen)dd.classList.add("open");
+};
+document.addEventListener("click",function(e){if(!e.target.closest(".menu-wrap")){document.querySelectorAll(".dropdown.open").forEach(function(d){d.classList.remove("open");});}});
 
+async function globalSaveAll(){
+  var btn=el("globalSaveBtn");
+  if(btn){btn.disabled=true;btn.textContent="⏳ Menyimpan...";}
+  try{
+    collectMasterFromUI();saveMaster();saveStokMin();saveStocks();await pushCloudMaster();clearDirty();renderLoginOutlets();renderOutletList();if(session)all();
+    toast("✅ Semua perubahan disimpan!","ok");
+  }catch(e){toast("Gagal menyimpan: "+e.message,"err");}
+  finally{if(btn){btn.disabled=false;btn.textContent="💾 Simpan";}}
+}
+el("globalSaveBtn").onclick=globalSaveAll;
 /* ================== HAPUS / NOTIF ================== */
 window._reqDel=function(type,ref){
   if(!session)return;var desc="",targetId="",tgl=todayStr();
