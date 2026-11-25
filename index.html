@@ -167,7 +167,29 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 .kasir-sticky .ks-item{font-size:11.5px;opacity:.9;margin-top:2px}
 .kasir-sticky .ks-cart{text-align:right}
 .kasir-sticky .ks-cart .ks-val{color:#fef08a}
-/* ==== TOMBOL TAMBAH KERANJANG BESAR + BADGE NOTIF ==== */
+/* ==== DROPDOWN KAPASITAS KUSTOM ==== */
+.cap-wrap{position:relative}
+.cap-input-display{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 12px;border:1px solid #bfdbfe;border-radius:var(--radius-sm);
+  background:#fff;color:var(--text);font-size:14px;cursor:pointer;min-height:42px;
+}
+.cap-input-display.empty{color:var(--muted)}
+.cap-menu{
+  position:absolute;left:0;right:0;top:46px;z-index:60;
+  background:#fff;border:1px solid #93c5fd;border-radius:12px;
+  box-shadow:var(--shadow-lg);max-height:240px;overflow-y:auto;padding:4px;
+}
+.cap-opt{
+  padding:10px 12px;border-radius:8px;font-size:14px;font-weight:600;
+  cursor:pointer;display:flex;justify-content:space-between;align-items:center;
+}
+.cap-opt:hover,.cap-opt:active{background:#eff6ff;color:var(--blue)}
+.cap-opt.manual{
+  background:#f0fdf4;color:#15803d;font-weight:800;
+  border-top:1px solid #dcfce7;margin-top:4px;
+}
+  /* ==== TOMBOL TAMBAH KERANJANG BESAR + BADGE NOTIF ==== */
 .btn-add-cart-lg{
   display:flex;align-items:center;justify-content:center;gap:12px;
   padding:15px 18px;font-size:16px;font-weight:800;border-radius:14px;
@@ -483,9 +505,15 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 <label>Pilih Parfum</label><select id="perfumeSelect"></select>
 <div class="grid">
   <div>
-       <label>Kapasitas (ml)</label>
-    <input id="capacityInput" type="number" min="1" step="1" list="capacityOptions" placeholder="Pilih / ketik ml">
-    <datalist id="capacityOptions"></datalist>
+    <label>Kapasitas (ml)</label>
+    <div class="cap-wrap" id="capWrap">
+      <div class="cap-input-display empty" id="capDisplay">
+        <span id="capDisplayText">Pilih / ketik ml</span>
+        <span style="font-size:11px;color:var(--blue)">▼</span>
+      </div>
+      <input type="hidden" id="capacityInput" value="">
+      <div class="cap-menu hide" id="capMenu"></div>
+    </div>
   </div>
   <div><label>Campuran</label><select id="mixSelect"></select></div>
 </div>
@@ -1481,7 +1509,29 @@ function renderSelects(){
     return '<option value="'+i+'">'+esc(lbl)+' ('+(x.price===0?"Gratis":fmt(x.price)+"/ml")+')</option>';
   }).join("");
   var caps=data.capacities.slice().sort(function(a,b){return a.size-b.size;});
-  el("capacityOptions").innerHTML=caps.map(function(x){return '<option value="'+x.size+'">'+x.size+' ml</option>';}).join("");
+  var capHtml=caps.map(function(x){
+    return '<div class="cap-opt" data-val="'+x.size+'"><span>'+x.size+' ml</span><span class="small">Pilih</span></div>';
+  }).join("");
+  capHtml+='<div class="cap-opt manual" data-val="MANUAL"><span>⌨️ Ketik Manual (Bebas ml)</span><span>→</span></div>';
+  el("capMenu").innerHTML=capHtml;
+  document.querySelectorAll("#capMenu .cap-opt").forEach(function(opt){
+    opt.onclick=function(e){
+      e.stopPropagation();
+      var v=this.getAttribute("data-val");
+      el("capMenu").classList.add("hide");
+      if(v==="MANUAL"){
+        modal("Input Kapasitas Manual",
+          '<label>Masukkan Ukuran (ml)</label><input id="mManualCap" type="number" min="1" step="1" placeholder="Contoh: 150">',
+          function(){
+            var num=parseFloat(el("mManualCap").value)||0;
+            if(num<=0){toast("Masukkan angka lebih dari 0.","err");return false;}
+            setCapacityValue(num);
+          });
+      }else{
+        setCapacityValue(+v);
+      }
+    };
+  });
   var sortedB=data.purchases.map(function(x,i){return {x:x,i:i};}).sort(function(a,b){
     if(a.x.name.toLowerCase()==="refill")return -1;
     if(b.x.name.toLowerCase()==="refill")return 1;
@@ -1489,6 +1539,25 @@ function renderSelects(){
   });
   el("purchaseSelect").innerHTML=sortedB.map(function(o){return '<option value="'+o.i+'">'+esc(o.x.name)+(o.x.price>0?" — "+fmt(o.x.price):" (Gratis)")+'</option>';}).join("");
 }
+
+function setCapacityValue(val){
+  el("capacityInput").value=val||"";
+  if(val>0){
+    el("capDisplayText").textContent=val+" ml";
+    el("capDisplay").classList.remove("empty");
+  }else{
+    el("capDisplayText").textContent="Pilih / ketik ml";
+    el("capDisplay").classList.add("empty");
+  }
+  calcCurrentItem();
+}
+el("capDisplay").onclick=function(e){
+  e.stopPropagation();
+  el("capMenu").classList.toggle("hide");
+};
+document.addEventListener("click",function(e){
+  if(!e.target.closest("#capWrap")&&el("capMenu"))el("capMenu").classList.add("hide");
+});
 
 /* ================== KNOB ================== */
 var knob=el("scKnob"),wrap=el("scWrap"),fill=el("scFill"),dragging=false;
@@ -3286,8 +3355,6 @@ Object.keys(TAB_MAP).forEach(function(id){if(el(id))el(id).onclick=function(){se
 el("searchParfum").oninput=function(){renderPerfumeOptions(this.value);};
 el("filterMasterParfum").oninput=function(){listRender("perfumes","perfumeList",this.value);};
 ["perfumeSelect","mixSelect","purchaseSelect"].forEach(function(id){el(id).onchange=calcCurrentItem;});
-el("capacityInput").oninput=calcCurrentItem;
-el("capacityInput").onchange=calcCurrentItem;
 el("reportDate").value=todayStr();
 el("reportDate").onchange=renderReport;
 initMgmtDates();
