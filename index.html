@@ -1493,7 +1493,8 @@ function renderPerfumeOptions(filter){
   if(!list.length){
     el("perfumeSelect").innerHTML='<option value="-1">Tidak ditemukan</option>';
   }else{
-    el("perfumeSelect").innerHTML=list.map(function(o, idx){
+    var placeholder = !q ? '<option value="-1">-- Pilih Parfum --</option>' : '';
+    el("perfumeSelect").innerHTML=placeholder+list.map(function(o, idx){
       var bgColor = (idx % 2 === 0) ? "#ffffff" : "#eff6ff";
       var style = 'style="background-color:'+bgColor+'; color:#0f172a; padding:10px; font-weight:600;"';
       var lbl = (o.x.code?o.x.code+" - ":"")+(o.x.displayName||o.x.name);
@@ -1644,6 +1645,8 @@ el("addToCartBtn").onclick=function(){
   if(!it){toast("Lengkapi pilihan parfum, kapasitas, campuran & botol.","err");return;}
   cart.push(it);
   renderCart();
+  el("searchParfum").value="";
+  renderPerfumeOptions("");
   el("mixSelect").value="-1";
   el("purchaseSelect").value="-1";
   setCapacityValue("");
