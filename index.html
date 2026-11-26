@@ -3970,10 +3970,10 @@ el("addAdditional").onclick=function(){
 };
 
 var DEFAULT_DIST_QTYS={
-  perfumes:,
-  mixes:,
-  purchases:,
-  additionals:
+  perfumes:new Array(100,250,500,1000),
+  mixes:new Array(500,1000,2500,5000),
+  purchases:new Array(10,24,50,100),
+  additionals:new Array(1,5,10,20)
 };
 function getCatUnit(cat){
   return (cat==="purchases"||cat==="additionals")?"pcs":"ml";
