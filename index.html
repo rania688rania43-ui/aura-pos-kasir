@@ -875,13 +875,12 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
     <button type="button" class="btn secondary" id="masterImportCsvBtn" style="margin:0">📥 Import Excel (.xls)</button>
   </div>
   <input type="file" id="masterImportCsvInput" accept=".xls,.csv,application/vnd.ms-excel,text/csv" style="display:none">
-    <div class="master-tabs">
+      <div class="master-tabs">
     <button type="button" class="master-tab active" data-mtab="parfum">🧴 Parfum</button>
     <button type="button" class="master-tab" data-mtab="campuran">💧 Campuran</button>
     <button type="button" class="master-tab" data-mtab="botol">🍶 Botol</button>
     <button type="button" class="master-tab" data-mtab="additional">📦 Additional</button>
-    <button type="button" class="master-tab" data-mtab="kapasitas">📏 Kapasitas</button>
-    <button type="button" class="master-tab" data-mtab="distqty">🚚 Jml Distribusi</button>
+    <button type="button" class="master-tab" data-mtab="popupset">⚙️ Pop-up & Harga</button>
   </div>
 
   <!-- PARFUM -->
@@ -932,20 +931,31 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
     <div id="additionalList" style="margin-top:8px"></div>
   </div>
 
-  <!-- JUMLAH DISTRIBUSI -->
-  <div class="master-section" data-msec="distqty">
-    <div class="adminhead">Master Pilihan Jumlah Masuk Distribusi</div>
-    <p class="note">Daftar angka cepat yang muncul saat memilih jumlah masuk barang di halaman Distribusi.</p>
+  <!-- PENGATURAN POP-UP & PEMBULATAN HARGA (SATU HALAMAN SIMPEL) -->
+  <div class="master-section" data-msec="popupset">
+    <div class="adminhead">📏 Pilihan Pop-up Kapasitas Kasir (ml)</div>
+    <p class="note">Angka yang muncul saat kasir menekan kolom kapasitas ml.</p>
     <div class="grid">
-      <div><label>Angka Jumlah Masuk</label><input id="newDistQtySize" type="number" min="1" placeholder="Contoh: 250"></div>
-      <div style="display:flex;align-items:flex-end"><button type="button" class="btn" id="addDistQtyBtn" style="margin:0">+ Tambah Angka</button></div>
+      <div><input id="newCapSize" type="number" min="1" placeholder="Tambah ml (misal: 120)"></div>
+      <div><button type="button" class="btn" id="addCapBtn" style="margin:0">+ Tambah ml</button></div>
     </div>
-    <div id="distQtyMasterList" style="margin-top:8px"></div>
-  </div>
+    <div id="capacityList" style="margin-top:8px"></div>
 
-  <div class="admin-section">
-    <div class="adminhead">Pembulatan Harga (Rp)</div>
-    <input id="rounding" type="number" step="500" value="1000">
+    <div class="admin-section">
+      <div class="adminhead">🚚 Pilihan Pop-up Jumlah Distribusi</div>
+      <p class="note">Angka cepat yang muncul saat memilih jumlah masuk di halaman Distribusi.</p>
+      <div class="grid">
+        <div><input id="newDistQtySize" type="number" min="1" placeholder="Tambah angka (misal: 250)"></div>
+        <div><button type="button" class="btn" id="addDistQtyBtn" style="margin:0">+ Tambah Angka</button></div>
+      </div>
+      <div id="distQtyMasterList" style="margin-top:8px"></div>
+    </div>
+
+    <div class="admin-section">
+      <div class="adminhead">💰 Pembulatan Harga Nota (Rp)</div>
+      <p class="note">Kelipatan pembulatan otomatis harga akhir di Kasir (contoh: 1000).</p>
+      <input id="rounding" type="number" step="500" value="1000">
+    </div>
   </div>
 </div>
 </section>
@@ -3776,7 +3786,6 @@ function all(){
   listRender("purchases","purchaseList");
   listRender("additionals","additionalList");
   renderCapacityList();
-    renderCapacityList();
   renderDistQtyMasterList();
   if(el("rounding"))el("rounding").value=data.rounding;
   refreshKnob();calcCurrentItem();renderCart();
@@ -3958,7 +3967,14 @@ if(el("addDistQtyBtn"))el("addDistQtyBtn").onclick=function(){
   saveMaster();renderDistQtyMasterList();markDirty();
   toast("✅ Angka "+fmtN(num)+" ditambahkan.","ok");
 };
-window._delCap=function(sz){
+function renderCapacityList(){
+  if(!el("capacityList"))return;
+  var caps=(data.capacities||[]).slice().sort(function(a,b){return a.size-b.size;});
+  el("capacityList").innerHTML=caps.map(function(c){
+    return '<div class="item"><div class="row"><strong>'+c.size+' ml</strong><div class="item-actions"><button type="button" onclick="window._delCap('+c.size+')" style="background:#fee2e2;color:#b91c1c">Hapus</button></div></div></div>';
+  }).join("")||'<p class="note">Belum ada ukuran kapasitas.</p>';
+}
+  window._delCap=function(sz){
   data.capacities=(data.capacities||[]).filter(function(c){return c.size!==sz;});
   saveMaster();renderSelects();renderCapacityList();markDirty();
   toast("Ukuran "+sz+" ml dihapus.","warn");
