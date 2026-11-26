@@ -875,12 +875,11 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
     <button type="button" class="btn secondary" id="masterImportCsvBtn" style="margin:0">📥 Import Excel (.xls)</button>
   </div>
   <input type="file" id="masterImportCsvInput" accept=".xls,.csv,application/vnd.ms-excel,text/csv" style="display:none">
-      <div class="master-tabs">
+  <div class="master-tabs">
     <button type="button" class="master-tab active" data-mtab="parfum">🧴 Parfum</button>
     <button type="button" class="master-tab" data-mtab="campuran">💧 Campuran</button>
     <button type="button" class="master-tab" data-mtab="botol">🍶 Botol</button>
     <button type="button" class="master-tab" data-mtab="additional">📦 Additional</button>
-    <button type="button" class="master-tab" data-mtab="popupset">⚙️ Pop-up & Harga</button>
   </div>
 
   <!-- PARFUM -->
@@ -931,34 +930,9 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
     <div id="additionalList" style="margin-top:8px"></div>
   </div>
 
-  <!-- PENGATURAN POP-UP & PEMBULATAN HARGA (SATU HALAMAN SIMPEL) -->
-  <div class="master-section" data-msec="popupset">
-    <div class="adminhead">📏 Pilihan Pop-up Kapasitas Kasir (ml)</div>
-    <p class="note">Angka yang muncul saat kasir menekan kolom kapasitas ml.</p>
-    <div class="grid">
-      <div><input id="newCapSize" type="number" min="1" placeholder="Tambah ml (misal: 120)"></div>
-      <div><button type="button" class="btn" id="addCapBtn" style="margin:0">+ Tambah ml</button></div>
-    </div>
-    <div id="capacityList" style="margin-top:8px"></div>
-
-    <div class="admin-section">
-      <div class="adminhead">🚚 Pilihan Pop-up Jumlah Distribusi</div>
-      <p class="note">Angka cepat yang muncul saat memilih jumlah masuk di halaman Distribusi.</p>
-      <div class="grid">
-        <div><input id="newDistQtySize" type="number" min="1" placeholder="Tambah angka (misal: 250)"></div>
-        <div><button type="button" class="btn" id="addDistQtyBtn" style="margin:0">+ Tambah Angka</button></div>
-      </div>
-      <div id="distQtyMasterList" style="margin-top:8px"></div>
-    </div>
-
-    <div class="admin-section">
-      <div class="adminhead">💰 Pembulatan Harga Nota (Rp)</div>
-      <p class="note">Kelipatan pembulatan otomatis harga akhir di Kasir (contoh: 1000).</p>
-      <input id="rounding" type="number" step="500" value="1000">
-    </div>
   </div>
-</div>
 </section>
+
 
 <!-- ============ SETTING ============ -->
 <section id="secSetting" class="hide">
@@ -981,10 +955,33 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 </div>
 
 <div class="card">
-  <div class="adminhead">🔑 Password Akses</div>
+  <div class="adminhead">🎛️ Pengaturan Pop-up & Pembulatan Harga</div>
+
+  <label>📏 Pilihan Pop-up Kapasitas Kasir (ml)</label>
   <div class="grid">
-    <div><label>Pass Management</label><input id="mgmtPassInput" type="text"></div>
-    <div><label>Pass Admin</label><input id="devPassInput" type="text"></div>
+    <div><input id="newCapSize" type="number" min="1" placeholder="Tambah ml (misal: 120)"></div>
+    <div><button type="button" class="btn" id="addCapBtn" style="margin:0">+ Tambah ml</button></div>
+  </div>
+  <div id="capacityList" style="margin-top:8px"></div>
+
+  <div class="admin-section">
+    <label>🚚 Pilihan Pop-up Jumlah Distribusi (Per Kategori)</label>
+    <select id="distQtyCatSelect" style="margin-bottom:8px">
+      <option value="perfumes">🧴 Parfum (ml)</option>
+      <option value="mixes">💧 Campuran (ml)</option>
+      <option value="purchases">🍶 Botol (pcs)</option>
+      <option value="additionals">📦 Additional (pcs)</option>
+    </select>
+    <div class="grid">
+      <div><input id="newDistQtySize" type="number" min="1" placeholder="Angka (misal: 100)"></div>
+      <div><button type="button" class="btn" id="addDistQtyBtn" style="margin:0">+ Tambah Angka</button></div>
+    </div>
+    <div id="distQtyMasterList" style="margin-top:8px"></div>
+  </div>
+
+  <div class="admin-section">
+    <label>💰 Pembulatan Harga Nota Kasir (Rp)</label>
+    <input id="rounding" type="number" step="500" value="1000">
   </div>
 </div>
 
@@ -3967,7 +3964,91 @@ if(el("addDistQtyBtn"))el("addDistQtyBtn").onclick=function(){
   saveMaster();renderDistQtyMasterList();markDirty();
   toast("✅ Angka "+fmtN(num)+" ditambahkan.","ok");
 };
-function renderCapacityList(){
+var DEFAULT_DIST_QTYS={
+  perfumes:[100,200,300,500,1000],
+  mixes:[500,1000,2000,5000],
+  purchases:[10,20,50,100],
+  additionals:[1,5,10,20]
+};
+function ensureDistQtyMap(){
+  if(!data.distQtyMap || typeof data.distQtyMap!=="object"){
+    var legacy=Array.isArray(data.distQtys)&&data.distQtys.length?data.distQtys.slice():null;
+    data.distQtyMap={
+      perfumes:legacy||DEFAULT_DIST_QTYS.perfumes.slice(),
+      mixes:DEFAULT_DIST_QTYS.mixes.slice(),
+      purchases:DEFAULT_DIST_QTYS.purchases.slice(),
+      additionals:DEFAULT_DIST_QTYS.additionals.slice()
+    };
+  }
+  ["perfumes","mixes","purchases","additionals"].forEach(function(k){
+    if(!Array.isArray(data.distQtyMap[k]))data.distQtyMap[k]=DEFAULT_DIST_QTYS[k].slice();
+  });
+}
+function getDistQtyOptions(cat){
+  ensureDistQtyMap();
+  var key=cat||(el("distCatSelect")?el("distCatSelect").value:"perfumes");
+  return (data.distQtyMap[key]||[]).slice().sort(function(a,b){return a-b;});
+}
+function renderDistQtyMenu(){
+  var menu=el("distQtyMenu");
+  if(!menu)return;
+  var activeCat=el("distCatSelect")?el("distCatSelect").value:"perfumes";
+  var unit=(activeCat==="purchases"||activeCat==="additionals")?"pcs":"ml";
+  var opts=getDistQtyOptions(activeCat);
+  var html=opts.map(function(n){
+    return '<div class="cap-opt" data-val="'+n+'"><span>'+fmtN(n)+' '+unit+'</span><span class="small">Pilih</span></div>';
+  }).join("");
+  html+='<div class="cap-opt manual" data-val="MANUAL"><span>⌨️ Ketik Manual (Bebas)</span><span>→</span></div>';
+  menu.innerHTML=html;
+  menu.querySelectorAll(".cap-opt").forEach(function(opt){
+    opt.onclick=function(e){
+      e.stopPropagation();
+      var v=this.getAttribute("data-val");
+      menu.classList.add("hide");
+      if(v==="MANUAL"){
+        modal("Input Jumlah Masuk Manual",
+          '<label>Masukkan Jumlah ('+unit+')</label><input id="mManualDistQty" type="number" min="1" step="1" placeholder="Contoh: 250">',
+          function(){
+            var num=parseFloat(el("mManualDistQty").value)||0;
+            if(num<=0){toast("Masukkan angka lebih dari 0.","err");return false;}
+            setDistQtyValue(num);
+          });
+      }else{
+        setDistQtyValue(+v);
+      }
+    };
+  });
+}
+function renderDistQtyMasterList(){
+  renderDistQtyMenu();
+  if(!el("distQtyMasterList")||!el("distQtyCatSelect"))return;
+  var selCat=el("distQtyCatSelect").value;
+  var unit=(selCat==="purchases"||selCat==="additionals")?"pcs":"ml";
+  var opts=getDistQtyOptions(selCat);
+  el("distQtyMasterList").innerHTML=opts.map(function(n){
+    return '<div class="item"><div class="row"><strong>'+fmtN(n)+' '+unit+'</strong><div class="item-actions"><button type="button" onclick="window._delDistQty(\''+selCat+'\','+n+')" style="background:#fee2e2;color:#b91c1c">Hapus</button></div></div></div>';
+  }).join("")||'<p class="note">Belum ada angka cepat untuk kategori ini.</p>';
+}
+if(el("distQtyCatSelect"))el("distQtyCatSelect").onchange=renderDistQtyMasterList;
+window._delDistQty=function(cat,n){
+  ensureDistQtyMap();
+  data.distQtyMap[cat]=data.distQtyMap[cat].filter(function(x){return x!==n;});
+  saveMaster();renderDistQtyMasterList();markDirty();
+  toast("Angka "+fmtN(n)+" dihapus.","warn");
+};
+if(el("addDistQtyBtn"))el("addDistQtyBtn").onclick=function(){
+  ensureDistQtyMap();
+  var selCat=el("distQtyCatSelect")?el("distQtyCatSelect").value:"perfumes";
+  var num=parseInt(el("newDistQtySize").value,10)||0;
+  if(num<=0){toast("Masukkan angka lebih dari 0.","err");return;}
+  if(data.distQtyMap[selCat].indexOf(num)>=0){toast("Angka "+fmtN(num)+" sudah ada.","warn");return;}
+  data.distQtyMap[selCat].push(num);
+  data.distQtyMap[selCat].sort(function(a,b){return a-b;});
+  el("newDistQtySize").value="";
+  saveMaster();renderDistQtyMasterList();markDirty();
+  toast("✅ Angka "+fmtN(num)+" ditambahkan.","ok");
+};
+  function renderCapacityList(){
   if(!el("capacityList"))return;
   var caps=(data.capacities||[]).slice().sort(function(a,b){return a.size-b.size;});
   el("capacityList").innerHTML=caps.map(function(c){
