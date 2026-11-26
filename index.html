@@ -955,6 +955,14 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 </div>
 
 <div class="card">
+  <div class="adminhead">🔑 Password Akses</div>
+  <div class="grid">
+    <div><label>Pass Management</label><input id="mgmtPassInput" type="text"></div>
+    <div><label>Pass Admin</label><input id="devPassInput" type="text"></div>
+  </div>
+</div>
+
+<div class="card">
   <div class="adminhead">🎛️ Pengaturan Pop-up & Pembulatan Harga</div>
 
   <label>📏 Pilihan Pop-up Kapasitas Kasir (ml)</label>
@@ -965,15 +973,16 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
   <div id="capacityList" style="margin-top:8px"></div>
 
   <div class="admin-section">
-    <label>🚚 Pilihan Pop-up Jumlah Distribusi (Per Kategori)</label>
-    <select id="distQtyCatSelect" style="margin-bottom:8px">
-      <option value="perfumes">🧴 Parfum (ml)</option>
-      <option value="mixes">💧 Campuran (ml)</option>
-      <option value="purchases">🍶 Botol (pcs)</option>
-      <option value="additionals">📦 Additional (pcs)</option>
-    </select>
+    <label>🚚 Pilihan Pop-up Jumlah Distribusi (Pilih Kategori):</label>
+    <input type="hidden" id="distQtyCatSelect" value="perfumes">
+    <div class="cat-pill-grid" id="setDistCatPills" style="margin-bottom:10px">
+      <button type="button" class="cat-pill-btn active" data-cat="perfumes">🧴 Parfum (ml)</button>
+      <button type="button" class="cat-pill-btn" data-cat="mixes">💧 Campuran (ml)</button>
+      <button type="button" class="cat-pill-btn" data-cat="purchases">🍶 Botol (pcs)</button>
+      <button type="button" class="cat-pill-btn" data-cat="additionals">📦 Additional (pcs)</button>
+    </div>
     <div class="grid">
-      <div><input id="newDistQtySize" type="number" min="1" placeholder="Angka (misal: 100)"></div>
+      <div><input id="newDistQtySize" type="number" min="1" placeholder="Angka dalam ml (misal: 250)"></div>
       <div><button type="button" class="btn" id="addDistQtyBtn" style="margin:0">+ Tambah Angka</button></div>
     </div>
     <div id="distQtyMasterList" style="margin-top:8px"></div>
