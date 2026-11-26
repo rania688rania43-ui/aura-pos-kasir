@@ -479,8 +479,8 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
     <span id="activeSessionLabel" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Outlet 01 · Karyawan</span>
   </div>
   <div class="topbar-right">
-    <button type="button" class="btn-save-mini hide" id="globalSaveBtn">💾 Simpan</button>
     <button type="button" id="logoutBtn">Keluar</button>
+    <button type="button" class="btn-save-mini hide" id="globalSaveBtn">💾 Simpan</button>
   </div>
 </div>
 
@@ -637,7 +637,24 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
   </div>
 
   <div class="grid">
-    <div><label>Jumlah Masuk</label><input id="distQtyInput" type="number" min="1" placeholder="100"></div>
+    <div>
+      <label>Jumlah Masuk</label>
+      <div class="cap-wrap" id="distQtyWrap">
+        <div class="cap-input-display empty" id="distQtyDisplay">
+          <span id="distQtyDisplayText">Masukan jumlah</span>
+          <span style="font-size:11px;color:var(--blue)">▼</span>
+        </div>
+        <input type="hidden" id="distQtyInput" value="">
+        <div class="cap-menu hide" id="distQtyMenu">
+          <div class="cap-opt" data-val="100"><span>100</span><span class="small">Pilih</span></div>
+          <div class="cap-opt" data-val="200"><span>200</span><span class="small">Pilih</span></div>
+          <div class="cap-opt" data-val="300"><span>300</span><span class="small">Pilih</span></div>
+          <div class="cap-opt" data-val="500"><span>500</span><span class="small">Pilih</span></div>
+          <div class="cap-opt" data-val="1000"><span>1.000</span><span class="small">Pilih</span></div>
+          <div class="cap-opt manual" data-val="MANUAL"><span>⌨️ Ketik Manual (Bebas)</span><span>→</span></div>
+        </div>
+      </div>
+    </div>
     <div><label>Keterangan</label><input id="distNoteInput" placeholder="Kiriman Pusat"></div>
   </div>
 
@@ -853,12 +870,17 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 <section id="secMaster" class="hide">
 <div class="card">
   <div class="adminhead">⚙️ Master Data Global (Semua Toko)</div>
-  <p class="note">Perubahan di Master otomatis berlaku untuk seluruh 19 outlet setelah menekan <strong>💾 Simpan</strong> di pojok kanan atas.</p>
+  <div class="grid" style="margin-bottom:8px">
+    <button type="button" class="btn secondary" id="masterExportCsvBtn" style="margin:0">📤 Export Excel (.xls)</button>
+    <button type="button" class="btn secondary" id="masterImportCsvBtn" style="margin:0">📥 Import Excel (.xls)</button>
+  </div>
+  <input type="file" id="masterImportCsvInput" accept=".xls,.csv,application/vnd.ms-excel,text/csv" style="display:none">
   <div class="master-tabs">
     <button type="button" class="master-tab active" data-mtab="parfum">🧴 Parfum</button>
     <button type="button" class="master-tab" data-mtab="campuran">💧 Campuran</button>
     <button type="button" class="master-tab" data-mtab="botol">🍶 Botol</button>
     <button type="button" class="master-tab" data-mtab="additional">📦 Additional</button>
+    <button type="button" class="master-tab" data-mtab="kapasitas">📏 Kapasitas</button>
   </div>
 
   <!-- PARFUM -->
@@ -898,10 +920,9 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
     <div id="purchaseList" style="margin-top:8px"></div>
   </div>
 
-  <!-- ADDITIONAL (BARANG OPERASIONAL NILAI RP 0) -->
+  <!-- ADDITIONAL -->
   <div class="master-section" data-msec="additional">
-    <div class="adminhead">Master Additional (Barang Operasional · Nilai Rp0)</div>
-    <p class="note">Item operasional gudang seperti Tisu, Plastik, Kertas Struk. Tidak dijual di Kasir dan nilainya Rp0 pada distribusi.</p>
+    <div class="adminhead">Master Additional (Operasional · Rp0)</div>
     <div class="grid">
       <div><label>Kode</label><input id="newAddCode" placeholder="TS"></div>
       <div><label>Nama Barang</label><input id="newAddName" placeholder="Tisu"></div>
@@ -910,24 +931,35 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
     <div id="additionalList" style="margin-top:8px"></div>
   </div>
 
+  <!-- KAPASITAS (ML) -->
+  <div class="master-section" data-msec="kapasitas">
+    <div class="adminhead">Master Pilihan Kapasitas (ml)</div>
+    <p class="note">Daftar ukuran ml yang muncul sebagai pilihan cepat saat kasir memilih kapasitas.</p>
+    <div class="grid">
+      <div><label>Ukuran Kapasitas (ml)</label><input id="newCapSize" type="number" min="1" placeholder="Contoh: 120"></div>
+      <div style="display:flex;align-items:flex-end"><button type="button" class="btn" id="addCapBtn" style="margin:0">+ Tambah Ukuran</button></div>
+    </div>
+    <div id="capacityList" style="margin-top:8px"></div>
+  </div>
+
   <div class="admin-section">
     <div class="adminhead">Pembulatan Harga (Rp)</div>
     <input id="rounding" type="number" step="500" value="1000">
   </div>
-
-  <div class="admin-section">
-    <div class="adminhead">📤 Export / Import Excel Gabungan</div>
-    <p class="note">Format kolom: <code>KATEGORI | KODE | NAMA | HARGA</code>. KATEGORI = parfum / campuran / botol / additional.</p>
-    <div class="grid">
-      <button type="button" class="btn secondary" id="masterExportCsvBtn" style="margin:0">📤 Export Excel (.xls)</button>
-      <button type="button" class="btn secondary" id="masterImportCsvBtn" style="margin:0">📥 Import Excel (.xls)</button>
-    </div>
-    <input type="file" id="masterImportCsvInput" accept=".xls,.csv,application/vnd.ms-excel,text/csv" style="display:none">
-  </div>
 </div>
 </section>
+
 <!-- ============ SETTING ============ -->
 <section id="secSetting" class="hide">
+<div class="card">
+  <div class="adminhead">💾 Backup & Restore Master (Excel .xls)</div>
+  <div class="grid">
+    <button type="button" class="btn secondary" id="exportMasterBtn" style="margin:0">📤 Backup (.xls)</button>
+    <button type="button" class="btn secondary" id="importMasterBtn" style="margin:0">📥 Restore (.xls)</button>
+  </div>
+  <input type="file" id="importMasterInput" accept=".xls,.csv,application/vnd.ms-excel,text/csv" style="display:none">
+</div>
+
 <div class="card">
   <div class="adminhead">🏪 Profil Toko</div>
   <label>Nama Brand / Toko</label><input id="shopName">
@@ -953,13 +985,6 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
     <div><button type="button" class="btn" id="addOutletBtn" style="margin:0">+ Tambah Outlet</button></div>
   </div>
   <div id="outletList" style="margin-top:8px"></div>
-</div>
-
-<div class="card">
-  <div class="adminhead">💾 Backup & Restore Master (Excel .xls)</div>
-  <button type="button" class="btn secondary" id="exportMasterBtn">📤 Download Backup Master (.xls)</button>
-  <label style="margin-top:8px">📥 Upload Restore Master (.xls)</label>
-  <input type="file" id="importMasterInput" accept=".xls,.csv,application/vnd.ms-excel,text/csv">
 </div>
 
 <div class="card">
@@ -1367,6 +1392,7 @@ function todayStr(){var d=new Date();return d.getFullYear()+"-"+String(d.getMont
 function nowTime(){return new Date().toLocaleString("id-ID",{dateStyle:"short",timeStyle:"short"});}
 
 function downloadXls(filename, rows){
+  var cleanName=filename.endsWith(".xls")?filename:(filename+".xls");
   var html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://w3.org"><head><meta charset="UTF-8"></head><body><table border="1">';
   rows.forEach(function(r,idx){
     html+='<tr>';
@@ -1377,11 +1403,31 @@ function downloadXls(filename, rows){
     html+='</tr>';
   });
   html+='</table></body></html>';
-  var blob=new Blob(["\uFEFF"+html],{type:"application/vnd.ms-excel;charset=utf-8"});
-  var a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download=filename.endsWith(".xls")?filename:(filename+".xls");
-  a.click();
+  var bomContent="\uFEFF"+html;
+  var blob=new Blob([bomContent],{type:"application/vnd.ms-excel;charset=utf-8;"});
+  try{
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement("a");
+    a.style.display="none";
+    a.href=url;
+    a.setAttribute("download",cleanName);
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    },2500);
+  }catch(e){}
+  if(navigator.canShare && navigator.share){
+    try{
+      var fileObj=new File([bomContent],cleanName,{type:"application/vnd.ms-excel"});
+      if(navigator.canShare({files:[fileObj]})){
+        setTimeout(function(){
+          navigator.share({files:[fileObj],title:cleanName}).catch(function(){});
+        },350);
+      }
+    }catch(e){}
+  }
 }
 
 function parseSpreadsheetRows(text){
@@ -2739,7 +2785,42 @@ document.querySelectorAll("#distCatPills .cat-pill-btn").forEach(function(btn){
 });
 if(el("distSearchInput"))el("distSearchInput").oninput=renderDistItems;
 el("distItemSelect").onchange=updateDistHargaBeliBox;
-el("distQtyInput").oninput=updateDistHargaBeliBox;
+function setDistQtyValue(val){
+  el("distQtyInput").value=val||"";
+  if(val>0){
+    el("distQtyDisplayText").textContent=val;
+    el("distQtyDisplay").classList.remove("empty");
+  }else{
+    el("distQtyDisplayText").textContent="Masukan jumlah";
+    el("distQtyDisplay").classList.add("empty");
+  }
+  updateDistHargaBeliBox();
+}
+el("distQtyDisplay").onclick=function(e){
+  e.stopPropagation();
+  el("distQtyMenu").classList.toggle("hide");
+};
+document.querySelectorAll("#distQtyMenu .cap-opt").forEach(function(opt){
+  opt.onclick=function(e){
+    e.stopPropagation();
+    var v=this.getAttribute("data-val");
+    el("distQtyMenu").classList.add("hide");
+    if(v==="MANUAL"){
+      modal("Input Jumlah Masuk Manual",
+        '<label>Masukkan Jumlah</label><input id="mManualDistQty" type="number" min="1" step="1" placeholder="Contoh: 250">',
+        function(){
+          var num=parseFloat(el("mManualDistQty").value)||0;
+          if(num<=0){toast("Masukkan angka lebih dari 0.","err");return false;}
+          setDistQtyValue(num);
+        });
+    }else{
+      setDistQtyValue(+v);
+    }
+  };
+});
+document.addEventListener("click",function(e){
+  if(!e.target.closest("#distQtyWrap")&&el("distQtyMenu"))el("distQtyMenu").classList.add("hide");
+});
 
 el("distAddBtn").onclick=function(){
   if(!session)return;
@@ -2758,11 +2839,11 @@ el("distAddBtn").onclick=function(){
     hargaBeli:buy,susut:susut,
     nilaiNormal:totalNormal,nilaiNetto:totalNetto,note:note
   });
-  el("distQtyInput").value="";el("distNoteInput").value="";
-  updateDistHargaBeliBox();
+  setDistQtyValue("");el("distNoteInput").value="";
   renderDistCart();
   toast("✅ Item ditambahkan ke distribusi.","ok");
 };
+
 function renderDistCart(){
   el("distCartCount").textContent=distCart.length;
   if(!distCart.length){
@@ -3692,6 +3773,7 @@ function all(){
   listRender("mixes","mixList");
   listRender("purchases","purchaseList");
   listRender("additionals","additionalList");
+  renderCapacityList();
   if(el("rounding"))el("rounding").value=data.rounding;
   refreshKnob();calcCurrentItem();renderCart();
   renderLowStock();renderReport();renderStokAwal();renderStokSystem();
@@ -3809,14 +3891,32 @@ el("addPurchase").onclick=function(){
   el("newPurchaseName").value="";el("newPurchasePrice").value="";saveMaster();all();
   toast("Botol ditambahkan.","ok");
 };
-el("addAdditional").onclick=function(){
-  var c=el("newAddCode").value.trim(),n=el("newAddName").value.trim();
-  if(!n){toast("Nama additional wajib diisi.","err");return;}
-  var fullName=c?(c+" - "+n):n;
-  if(!data.additionals)data.additionals=[];
-  data.additionals.push({code:c,name:fullName,displayName:n,price:0});
-  el("newAddCode").value="";el("newAddName").value="";saveMaster();all();
-  toast("Additional ditambahkan (Rp0).","ok");
+if(el("importStokAwalBtn"))el("importStokAwalBtn").onclick=function(){el("importStokAwalInput").click();};
+if(el("importAuditCsvBtn"))el("importAuditCsvBtn").onclick=function(){el("importAuditCsvInput").click();};
+if(el("importMasterBtn"))el("importMasterBtn").onclick=function(){el("importMasterInput").click();};
+
+function renderCapacityList(){
+  if(!el("capacityList"))return;
+  var caps=(data.capacities||[]).slice().sort(function(a,b){return a.size-b.size;});
+  el("capacityList").innerHTML=caps.map(function(c){
+    return '<div class="item"><div class="row"><strong>'+c.size+' ml</strong><div class="item-actions"><button type="button" onclick="window._delCap('+c.size+')" style="background:#fee2e2;color:#b91c1c">Hapus</button></div></div></div>';
+  }).join("")||'<p class="note">Belum ada ukuran kapasitas.</p>';
+}
+window._delCap=function(sz){
+  data.capacities=(data.capacities||[]).filter(function(c){return c.size!==sz;});
+  saveMaster();renderSelects();renderCapacityList();markDirty();
+  toast("Ukuran "+sz+" ml dihapus.","warn");
+};
+if(el("addCapBtn"))el("addCapBtn").onclick=function(){
+  var sz=parseInt(el("newCapSize").value,10)||0;
+  if(sz<=0){toast("Masukkan ukuran ml lebih dari 0.","err");return;}
+  if(!data.capacities)data.capacities=[];
+  if(data.capacities.some(function(c){return c.size===sz;})){toast("Ukuran "+sz+" ml sudah ada.","warn");return;}
+  data.capacities.push({size:sz});
+  data.capacities.sort(function(a,b){return a.size-b.size;});
+  el("newCapSize").value="";
+  saveMaster();renderSelects();renderCapacityList();markDirty();
+  toast("✅ Ukuran "+sz+" ml ditambahkan.","ok");
 };
 
 pruneOldData();
