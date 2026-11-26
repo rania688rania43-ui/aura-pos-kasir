@@ -979,9 +979,30 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
     <div id="distQtyMasterList" style="margin-top:8px"></div>
   </div>
 
-  <div class="admin-section">
-    <label>💰 Pembulatan Harga Nota Kasir (Rp)</label>
-    <input id="rounding" type="number" step="500" value="1000">
+<div class="card">
+  <div class="adminhead">🤖 Pengaturan Data Otomatis Sistem</div>
+  <p class="note">Atur nilai perhitungan dan sinkronisasi otomatis yang berjalan di aplikasi.</p>
+  <div class="grid">
+    <div>
+      <label>Susut Distribusi Cairan (%)</label>
+      <input id="autoSusutDistInput" type="number" step="0.1" min="0" max="50" value="2.5">
+    </div>
+    <div>
+      <label>Susut Racik Kasir (%)</label>
+      <input id="autoSusutKasirInput" type="number" step="0.1" min="0" max="50" value="2.5">
+    </div>
+    <div>
+      <label>Batas Min. Recommended (%)</label>
+      <input id="autoMinPctInput" type="number" step="1" min="1" max="99" value="30">
+    </div>
+    <div>
+      <label>Auto-Sync Cloud (Detik)</label>
+      <input id="autoSyncSecInput" type="number" step="10" min="30" max="3600" value="120">
+    </div>
+    <div class="full">
+      <label>Masa Simpan Riwayat Lokal (Tahun)</label>
+      <input id="autoRetainYearsInput" type="number" step="1" min="1" max="20" value="10">
+    </div>
   </div>
 </div>
 
@@ -1395,6 +1416,10 @@ function saveStockIns(){try{localStorage.setItem(IN_KEY,JSON.stringify(stockIns)
 function saveReqs(){try{localStorage.setItem(REQ_KEY,JSON.stringify(delReqs));}catch(e){toast("⚠️ Penyimpanan penuh!","err");}}
 function saveDistQueue(){try{localStorage.setItem(DISTQ_KEY,JSON.stringify(distQueue));}catch(e){toast("⚠️ Penyimpanan penuh!","err");}}
 function saveStokMin(){try{localStorage.setItem(STOKMIN_KEY,JSON.stringify(stokMinOverride));}catch(e){toast("⚠️ Penyimpanan penuh!","err");}}
+function getAutoCfg(){
+  if(!data.autoCfg)data.autoCfg={susutDist:2.5,susutKasir:2.5,minRecPct:30,syncSec:120,retainYears:10};
+  return data.autoCfg;
+}
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
 function todayStr(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 function nowTime(){return new Date().toLocaleString("id-ID",{dateStyle:"short",timeStyle:"short"});}
@@ -1455,15 +1480,15 @@ function parseSpreadsheetRows(text){
   });
 }
 
-/* ================== RETENSI 10 TAHUN ================== */
+/* ================== RETENSI DATA OTOMATIS ================== */
 function pruneOldData(){
-  var cutoff=new Date();cutoff.setFullYear(cutoff.getFullYear()-10);
+  var yrs=Math.max(1,parseInt(getAutoCfg().retainYears,10)||10);
+  var cutoff=new Date();cutoff.setFullYear(cutoff.getFullYear()-yrs);
   var cutStr=cutoff.getFullYear()+"-"+String(cutoff.getMonth()+1).padStart(2,"0")+"-"+String(cutoff.getDate()).padStart(2,"0");
   sales=sales.filter(function(s){return s.date>=cutStr;});
   stockIns=stockIns.filter(function(s){return s.date>=cutStr;});
   saveSales();saveStockIns();
 }
-
 /* ================== TOAST ================== */
 function toast(msg,type){
   var w=el("toastWrap");var t=document.createElement("div");
@@ -1766,8 +1791,9 @@ document.addEventListener("click",function(e){
 /* ================== KNOB ================== */
 var knob=el("scKnob"),wrap=el("scWrap"),fill=el("scFill"),dragging=false;
 function refreshKnob(){
+  var lim=getAutoCfg().minRecPct||30;
   var pos=((currentPct-1)/99)*100;
-  var col=currentPct<=30?"#dc2626":"#16a34a";
+  var col=currentPct<=lim?"#dc2626":"#16a34a";
   knob.style.left=pos+"%";knob.style.borderColor=col;
   fill.style.width=pos+"%";fill.style.background=col;
 }
@@ -1802,13 +1828,14 @@ function calcCurrentItem(){
   var m=data.mixes[mixIdx];
   var b=data.purchases[botIdx];
   var pct=currentPct;
+  var lim=getAutoCfg().minRecPct||30;
   var oil=vol*pct/100,sol=vol-oil;
   var raw=(oil*p.price)+(sol*m.price)+b.price;
   var step=Math.max(1,+data.rounding||1000);
   var sub=Math.ceil(raw/step)*step;
   el("pctLabel").textContent=pct+"%";
-  el("status").textContent=pct<=30?"NOT RECOMMENDED":"☑️ RECOMMENDED ☑️";
-  el("status").className="status "+(pct<=30?"bad":"good");
+  el("status").textContent=pct<=lim?"NOT RECOMMENDED":"☑️ RECOMMENDED ☑️";
+  el("status").className="status "+(pct<=lim?"bad":"good");
   var desc=oil.toFixed(1)+"ml bibit + "+sol.toFixed(1)+"ml "+m.name+" + "+b.name;
   el("itemFormula").textContent=desc;
   el("itemSubtotal").textContent=fmt(sub);
@@ -2036,8 +2063,9 @@ el("calcPayPrintBtn").onclick=function(){
   var out=session.outlet;
   ensureOutletStock(out);
   var cur=stocks[out].current;
+  var faktorSusut=1+((parseFloat(getAutoCfg().susutKasir)||0)/100);
   cart.forEach(function(it){
-    cur.perfumes[it.parfum]=Math.max(0,(cur.perfumes[it.parfum]||0)-(it.oil*1.025));
+    cur.perfumes[it.parfum]=Math.max(0,(cur.perfumes[it.parfum]||0)-(it.oil*faktorSusut));
     cur.mixes[it.campuran]=Math.max(0,(cur.mixes[it.campuran]||0)-it.sol);
     var bObj=data.purchases.find(function(x){return x.name===it.botol;});
     if(bObj&&bObj.price>0)cur.purchases[it.botol]=Math.max(0,(cur.purchases[it.botol]||0)-1);
@@ -2127,6 +2155,15 @@ function collectMasterFromUI(){
     devPass:el("devPassInput").value.trim()||"9999"
   };
   data.rounding=Math.max(1,+el("rounding").value||1000);
+  if(el("autoSusutDistInput")){
+    data.autoCfg={
+      susutDist:Math.max(0,parseFloat(el("autoSusutDistInput").value)||0),
+      susutKasir:Math.max(0,parseFloat(el("autoSusutKasirInput").value)||0),
+      minRecPct:Math.min(99,Math.max(1,parseInt(el("autoMinPctInput").value,10)||30)),
+      syncSec:Math.max(30,parseInt(el("autoSyncSecInput").value,10)||120),
+      retainYears:Math.max(1,parseInt(el("autoRetainYearsInput").value,10)||10)
+    };
+  }
   document.querySelectorAll(".pin-input").forEach(function(inp){
     data.outletEmails[inp.getAttribute("data-outlet")]=inp.value.trim();
   });
@@ -2382,8 +2419,9 @@ window._devDelSale=function(id){
     function(){
       ensureOutletStock(trx.outlet);
       var cur=stocks[trx.outlet].current;
+      var faktorSusut=1+((parseFloat(getAutoCfg().susutKasir)||0)/100);
       trx.items.forEach(function(it){
-        cur.perfumes[it.parfum]=(cur.perfumes[it.parfum]||0)+(it.oil*1.025);
+        cur.perfumes[it.parfum]=(cur.perfumes[it.parfum]||0)+(it.oil*faktorSusut);
         cur.mixes[it.campuran]=(cur.mixes[it.campuran]||0)+it.sol;
         var bObj=data.purchases.find(function(x){return x.name===it.botol;});
         if(bObj&&bObj.price>0)cur.purchases[it.botol]=(cur.purchases[it.botol]||0)+1;
@@ -2578,8 +2616,9 @@ window._acceptReq=async function(reqId){
     if(idx>=0){
       var trx=sales[idx];ensureOutletStock(trx.outlet);
       var cur=stocks[trx.outlet].current;
+      var faktorSusut=1+((parseFloat(getAutoCfg().susutKasir)||0)/100);
       trx.items.forEach(function(it){
-        cur.perfumes[it.parfum]=(cur.perfumes[it.parfum]||0)+(it.oil*1.025);
+        cur.perfumes[it.parfum]=(cur.perfumes[it.parfum]||0)+(it.oil*faktorSusut);
         cur.mixes[it.campuran]=(cur.mixes[it.campuran]||0)+it.sol;
         var bObj=data.purchases.find(function(x){return x.name===it.botol;});
         if(bObj&&bObj.price>0)cur.purchases[it.botol]=(cur.purchases[it.botol]||0)+1;
@@ -2733,9 +2772,16 @@ function getHargaBeli(cat,name){
   var item=list.find(function(x){return x.name===name;});
   return item?(item.price||0):0;
 }
-function getSusutRate(cat){
-  if(cat==="purchases"||cat==="additionals")return 0;
-  return 0.025;
+function setDistQtyValue(val){
+  el("distQtyInput").value=val||"";
+  if(val>0){
+    el("distQtyDisplayText").textContent=val;
+    el("distQtyDisplay").classList.remove("empty");
+  }else{
+    el("distQtyDisplayText").textContent="Masukan jumlah";
+    el("distQtyDisplay").classList.add("empty");
+  }
+  updateDistHargaBeliBox();
 }
 function renderDistItems(){
   var cat=el("distCatSelect").value;
@@ -2798,8 +2844,9 @@ if(el("distSearchInput"))el("distSearchInput").oninput=renderDistItems;
 el("distItemSelect").onchange=updateDistHargaBeliBox;
 function setDistQtyValue(val){
   el("distQtyInput").value=val||"";
+  var activeCat=el("distCatSelect")?el("distCatSelect").value:"perfumes";
   if(val>0){
-    el("distQtyDisplayText").textContent=val;
+    el("distQtyDisplayText").textContent=val+" "+getCatUnit(activeCat);
     el("distQtyDisplay").classList.remove("empty");
   }else{
     el("distQtyDisplayText").textContent="Masukan jumlah";
@@ -3769,6 +3816,24 @@ function renderGrafik(){
 }
 el("chartScopeSelect").onchange=renderGrafik;
 
+/* ================== OVERRIDE SUSUT & QTY DISPLAY OTOMATIS ================== */
+function getSusutRate(cat){
+  if(cat==="purchases"||cat==="additionals")return 0;
+  return (parseFloat(getAutoCfg().susutDist)||0)/100;
+}
+function setDistQtyValue(val){
+  el("distQtyInput").value=val||"";
+  var activeCat=el("distCatSelect")?el("distCatSelect").value:"perfumes";
+  if(val>0){
+    el("distQtyDisplayText").textContent=val+" "+getCatUnit(activeCat);
+    el("distQtyDisplay").classList.remove("empty");
+  }else{
+    el("distQtyDisplayText").textContent="Masukan jumlah";
+    el("distQtyDisplay").classList.add("empty");
+  }
+  updateDistHargaBeliBox();
+}
+
 /* ================== ALL REFRESH & TAB NAV + PANAH KEMBALI ================== */
 function all(){
   if(el("shopName"))el("shopName").value=data.shop.name||"";
@@ -3779,6 +3844,12 @@ function all(){
   if(el("mgmtPassInput"))el("mgmtPassInput").value=data.shop.mgmtPass||"2222";
   if(el("devPassInput"))el("devPassInput").value=data.shop.devPass||"9999";
   if(el("shopSub"))el("shopSub").textContent=data.shop.name||"AURA International Perfume";
+  var ac=getAutoCfg();
+  if(el("autoSusutDistInput"))el("autoSusutDistInput").value=ac.susutDist;
+  if(el("autoSusutKasirInput"))el("autoSusutKasirInput").value=ac.susutKasir;
+  if(el("autoMinPctInput"))el("autoMinPctInput").value=ac.minRecPct;
+  if(el("autoSyncSecInput"))el("autoSyncSecInput").value=ac.syncSec;
+  if(el("autoRetainYearsInput"))el("autoRetainYearsInput").value=ac.retainYears;
   renderSelects();renderOutletList();
   listRender("perfumes","perfumeList",el("filterMasterParfum")?el("filterMasterParfum").value:"");
   listRender("mixes","mixList");
@@ -3795,6 +3866,7 @@ function all(){
   renderGrafik();renderDevRequests();renderAdminNotif();
   if(session&&session.role!=="staff")renderMgmt();
 }
+
 var currentTabId="tKasir";
 var TAB_MAP={
   tKasir:"secKasir", tLaporan:"secLaporan", tOrder:"secOrder", tGrafik:"secGrafik",
@@ -3854,13 +3926,12 @@ function setTab(id){
   if(id==="tStokMasuk"){renderDistItems();renderDistCart();renderDistQueue();renderDistHistory();renderDistRekap();updateDistHargaBeliWarn();}
   if(id==="tKelolaStok"){closeKsSub();}
   if(id==="tAdmin"){updateDistHargaBeliWarn();}
-  if(id==="tSetting"){renderOutletList();}
+  if(id==="tSetting"){renderOutletList();renderCapacityList();renderDistQtyMasterList();}
   if(id==="tMgmt")renderMgmt();
   if(id==="tNotif"){renderAdminNotif();renderDevRequests();}
   updateTopBackBtn();
 }
 Object.keys(TAB_MAP).forEach(function(id){if(el(id))el(id).onclick=function(){setTab(id);};});
-
 /* ================== INPUT BINDING & INIT ================== */
 el("searchParfum").oninput=function(){renderPerfumeOptions(this.value);};
 el("filterMasterParfum").oninput=function(){listRender("perfumes","perfumeList",this.value);};
@@ -3918,107 +3989,27 @@ el("addAdditional").onclick=function(){
 };
 
 var DEFAULT_DIST_QTYS={
-  perfumes:[100,250,500,1000],
-  mixes:[500,1000,2500,5000],
-  purchases:[10,24,50,100],
-  additionals:[1,5,10,20]
-};
-function ensureDistQtyMap(){
-  if(!data.distQtyMap || typeof data.distQtyMap!=="object"){
-    var legacy=Array.isArray(data.distQtys)&&data.distQtys.length?data.distQtys.slice():null;
-    data.distQtyMap={
-      perfumes:legacy||DEFAULT_DIST_QTYS.perfumes.slice(),
-      mixes:DEFAULT_DIST_QTYS.mixes.slice(),
-      purchases:DEFAULT_DIST_QTYS.purchases.slice(),
-      additionals:DEFAULT_DIST_QTYS.additionals.slice()
-    };
-  }
-  ["perfumes","mixes","purchases","additionals"].forEach(function(k){
-    if(!Array.isArray(data.distQtyMap[k]))data.distQtyMap[k]=DEFAULT_DIST_QTYS[k].slice();
-  });
-}
-function getDistQtyOptions(cat){
-  ensureDistQtyMap();
-  var key=cat||(el("distCatSelect")?el("distCatSelect").value:"perfumes");
-  return (data.distQtyMap[key]||[]).slice().sort(function(a,b){return a-b;});
-}
-function renderDistQtyMenu(){
-  var menu=el("distQtyMenu");
-  if(!menu)return;
-  var activeCat=el("distCatSelect")?el("distCatSelect").value:"perfumes";
-  var unit=(activeCat==="purchases"||activeCat==="additionals")?"pcs":"ml";
-  var opts=getDistQtyOptions(activeCat);
-  var html=opts.map(function(n){
-    return '<div class="cap-opt" data-val="'+n+'"><span>'+fmtN(n)+' '+unit+'</span><span class="small">Pilih</span></div>';
-  }).join("");
-  html+='<div class="cap-opt manual" data-val="MANUAL"><span>⌨️ Ketik Manual (Bebas)</span><span>→</span></div>';
-  menu.innerHTML=html;
-  menu.querySelectorAll(".cap-opt").forEach(function(opt){
-    opt.onclick=function(e){
-      e.stopPropagation();
-      var v=this.getAttribute("data-val");
-      menu.classList.add("hide");
-      if(v==="MANUAL"){
-        modal("Input Jumlah Masuk Manual",
-          '<label>Masukkan Jumlah ('+unit+')</label><input id="mManualDistQty" type="number" min="1" step="1" placeholder="Contoh: 250">',
-          function(){
-            var num=parseFloat(el("mManualDistQty").value)||0;
-            if(num<=0){toast("Masukkan angka lebih dari 0.","err");return false;}
-            setDistQtyValue(num);
-          });
-      }else{
-        setDistQtyValue(+v);
-      }
-    };
-  });
-}
-function renderDistQtyMasterList(){
-  renderDistQtyMenu();
-  if(!el("distQtyMasterList")||!el("distQtyCatSelect"))return;
-  var selCat=el("distQtyCatSelect").value;
-  var unit=(selCat==="purchases"||selCat==="additionals")?"pcs":"ml";
-  var opts=getDistQtyOptions(selCat);
-  el("distQtyMasterList").innerHTML=opts.map(function(n){
-    return '<div class="item"><div class="row"><strong>'+fmtN(n)+' '+unit+'</strong><div class="item-actions"><button type="button" onclick="window._delDistQty(\''+selCat+'\','+n+')" style="background:#fee2e2;color:#b91c1c">Hapus</button></div></div></div>';
-  }).join("")||'<p class="note">Belum ada angka cepat untuk kategori ini.</p>';
-}
-if(el("distQtyCatSelect"))el("distQtyCatSelect").onchange=renderDistQtyMasterList;
-window._delDistQty=function(cat,n){
-  ensureDistQtyMap();
-  data.distQtyMap[cat]=data.distQtyMap[cat].filter(function(x){return x!==n;});
-  saveMaster();renderDistQtyMasterList();markDirty();
-  toast("Angka "+fmtN(n)+" dihapus.","warn");
-};
-if(el("addDistQtyBtn"))el("addDistQtyBtn").onclick=function(){
-  ensureDistQtyMap();
-  var selCat=el("distQtyCatSelect")?el("distQtyCatSelect").value:"perfumes";
-  var num=parseInt(el("newDistQtySize").value,10)||0;
-  if(num<=0){toast("Masukkan angka lebih dari 0.","err");return;}
-  if(data.distQtyMap[selCat].indexOf(num)>=0){toast("Angka "+fmtN(num)+" sudah ada.","warn");return;}
-  data.distQtyMap[selCat].push(num);
-  data.distQtyMap[selCat].sort(function(a,b){return a-b;});
-  el("newDistQtySize").value="";
-  saveMaster();renderDistQtyMasterList();markDirty();
-  toast("✅ Angka "+fmtN(num)+" ditambahkan.","ok");
-};
-var DEFAULT_DIST_QTYS={
   perfumes:[100,200,300,500,1000],
   mixes:[500,1000,2000,5000],
   purchases:[10,20,50,100],
   additionals:[1,5,10,20]
 };
+function getCatUnit(cat){
+  return (cat==="purchases"||cat==="additionals")?"pcs":"ml";
+}
 function ensureDistQtyMap(){
   if(!data.distQtyMap || typeof data.distQtyMap!=="object"){
-    var legacy=Array.isArray(data.distQtys)&&data.distQtys.length?data.distQtys.slice():null;
     data.distQtyMap={
-      perfumes:legacy||DEFAULT_DIST_QTYS.perfumes.slice(),
+      perfumes:DEFAULT_DIST_QTYS.perfumes.slice(),
       mixes:DEFAULT_DIST_QTYS.mixes.slice(),
       purchases:DEFAULT_DIST_QTYS.purchases.slice(),
       additionals:DEFAULT_DIST_QTYS.additionals.slice()
     };
   }
   ["perfumes","mixes","purchases","additionals"].forEach(function(k){
-    if(!Array.isArray(data.distQtyMap[k]))data.distQtyMap[k]=DEFAULT_DIST_QTYS[k].slice();
+    if(!Array.isArray(data.distQtyMap[k])||!data.distQtyMap[k].length){
+      data.distQtyMap[k]=DEFAULT_DIST_QTYS[k].slice();
+    }
   });
 }
 function getDistQtyOptions(cat){
@@ -4030,12 +4021,12 @@ function renderDistQtyMenu(){
   var menu=el("distQtyMenu");
   if(!menu)return;
   var activeCat=el("distCatSelect")?el("distCatSelect").value:"perfumes";
-  var unit=(activeCat==="purchases"||activeCat==="additionals")?"pcs":"ml";
+  var unit=getCatUnit(activeCat);
   var opts=getDistQtyOptions(activeCat);
   var html=opts.map(function(n){
-    return '<div class="cap-opt" data-val="'+n+'"><span>'+fmtN(n)+' '+unit+'</span><span class="small">Pilih</span></div>';
+    return '<div class="cap-opt" data-val="'+n+'"><span>'+fmtN(n)+' '+unit+'</span><span class="small">Pilih ('+unit+')</span></div>';
   }).join("");
-  html+='<div class="cap-opt manual" data-val="MANUAL"><span>⌨️ Ketik Manual (Bebas)</span><span>→</span></div>';
+  html+='<div class="cap-opt manual" data-val="MANUAL"><span>⌨️ Ketik Manual (Bebas '+unit+')</span><span>→</span></div>';
   menu.innerHTML=html;
   menu.querySelectorAll(".cap-opt").forEach(function(opt){
     opt.onclick=function(e){
@@ -4043,8 +4034,8 @@ function renderDistQtyMenu(){
       var v=this.getAttribute("data-val");
       menu.classList.add("hide");
       if(v==="MANUAL"){
-        modal("Input Jumlah Masuk Manual",
-          '<label>Masukkan Jumlah ('+unit+')</label><input id="mManualDistQty" type="number" min="1" step="1" placeholder="Contoh: 250">',
+        modal("Input Jumlah Masuk Manual ("+unit+")",
+          '<label>Masukkan Jumlah ('+unit+')</label><input id="mManualDistQty" type="number" min="1" step="1" placeholder="Contoh: '+(unit==="ml"?"250":"15")+'">',
           function(){
             var num=parseFloat(el("mManualDistQty").value)||0;
             if(num<=0){toast("Masukkan angka lebih dari 0.","err");return false;}
@@ -4060,10 +4051,12 @@ function renderDistQtyMasterList(){
   renderDistQtyMenu();
   if(!el("distQtyMasterList")||!el("distQtyCatSelect"))return;
   var selCat=el("distQtyCatSelect").value;
-  var unit=(selCat==="purchases"||selCat==="additionals")?"pcs":"ml";
+  var unit=getCatUnit(selCat);
+  var inp=el("newDistQtySize");
+  if(inp)inp.placeholder="Angka dalam "+unit+" (misal: "+(unit==="ml"?"250":"20")+")";
   var opts=getDistQtyOptions(selCat);
   el("distQtyMasterList").innerHTML=opts.map(function(n){
-    return '<div class="item"><div class="row"><strong>'+fmtN(n)+' '+unit+'</strong><div class="item-actions"><button type="button" onclick="window._delDistQty(\''+selCat+'\','+n+')" style="background:#fee2e2;color:#b91c1c">Hapus</button></div></div></div>';
+    return '<div class="item"><div class="row"><strong>'+fmtN(n)+' <span class="badge info">'+unit+'</span></strong><div class="item-actions"><button type="button" onclick="window._delDistQty(\''+selCat+'\','+n+')" style="background:#fee2e2;color:#b91c1c">Hapus</button></div></div></div>';
   }).join("")||'<p class="note">Belum ada angka cepat untuk kategori ini.</p>';
 }
 if(el("distQtyCatSelect"))el("distQtyCatSelect").onchange=renderDistQtyMasterList;
@@ -4071,28 +4064,30 @@ window._delDistQty=function(cat,n){
   ensureDistQtyMap();
   data.distQtyMap[cat]=data.distQtyMap[cat].filter(function(x){return x!==n;});
   saveMaster();renderDistQtyMasterList();markDirty();
-  toast("Angka "+fmtN(n)+" dihapus.","warn");
+  toast("Angka "+fmtN(n)+" "+getCatUnit(cat)+" dihapus.","warn");
 };
 if(el("addDistQtyBtn"))el("addDistQtyBtn").onclick=function(){
   ensureDistQtyMap();
   var selCat=el("distQtyCatSelect")?el("distQtyCatSelect").value:"perfumes";
+  var unit=getCatUnit(selCat);
   var num=parseInt(el("newDistQtySize").value,10)||0;
   if(num<=0){toast("Masukkan angka lebih dari 0.","err");return;}
-  if(data.distQtyMap[selCat].indexOf(num)>=0){toast("Angka "+fmtN(num)+" sudah ada.","warn");return;}
+  if(data.distQtyMap[selCat].indexOf(num)>=0){toast("Angka "+fmtN(num)+" "+unit+" sudah ada.","warn");return;}
   data.distQtyMap[selCat].push(num);
   data.distQtyMap[selCat].sort(function(a,b){return a-b;});
   el("newDistQtySize").value="";
   saveMaster();renderDistQtyMasterList();markDirty();
-  toast("✅ Angka "+fmtN(num)+" ditambahkan.","ok");
+  toast("✅ Angka "+fmtN(num)+" "+unit+" ditambahkan.","ok");
 };
-  function renderCapacityList(){
+
+function renderCapacityList(){
   if(!el("capacityList"))return;
   var caps=(data.capacities||[]).slice().sort(function(a,b){return a.size-b.size;});
   el("capacityList").innerHTML=caps.map(function(c){
     return '<div class="item"><div class="row"><strong>'+c.size+' ml</strong><div class="item-actions"><button type="button" onclick="window._delCap('+c.size+')" style="background:#fee2e2;color:#b91c1c">Hapus</button></div></div></div>';
   }).join("")||'<p class="note">Belum ada ukuran kapasitas.</p>';
 }
-  window._delCap=function(sz){
+window._delCap=function(sz){
   data.capacities=(data.capacities||[]).filter(function(c){return c.size!==sz;});
   saveMaster();renderSelects();renderCapacityList();markDirty();
   toast("Ukuran "+sz+" ml dihapus.","warn");
@@ -4113,12 +4108,13 @@ pruneOldData();
 renderLoginOutlets();
 renderMinOutletSelect();
 pullCloudData();
+var syncMs=Math.max(30,parseInt(getAutoCfg().syncSec,10)||120)*1000;
 setInterval(function(){
   if(navigator.onLine){
     pullCloudData();
     distQueue.filter(function(d){return d.status!=="sent";}).forEach(function(d){trySendDist(d.id);});
   }
-},120000);
+},syncMs);
 })();
 </script>
 </body>
