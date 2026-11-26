@@ -875,12 +875,13 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
     <button type="button" class="btn secondary" id="masterImportCsvBtn" style="margin:0">📥 Import Excel (.xls)</button>
   </div>
   <input type="file" id="masterImportCsvInput" accept=".xls,.csv,application/vnd.ms-excel,text/csv" style="display:none">
-  <div class="master-tabs">
+    <div class="master-tabs">
     <button type="button" class="master-tab active" data-mtab="parfum">🧴 Parfum</button>
     <button type="button" class="master-tab" data-mtab="campuran">💧 Campuran</button>
     <button type="button" class="master-tab" data-mtab="botol">🍶 Botol</button>
     <button type="button" class="master-tab" data-mtab="additional">📦 Additional</button>
     <button type="button" class="master-tab" data-mtab="kapasitas">📏 Kapasitas</button>
+    <button type="button" class="master-tab" data-mtab="distqty">🚚 Jml Distribusi</button>
   </div>
 
   <!-- PARFUM -->
@@ -931,15 +932,15 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
     <div id="additionalList" style="margin-top:8px"></div>
   </div>
 
-  <!-- KAPASITAS (ML) -->
-  <div class="master-section" data-msec="kapasitas">
-    <div class="adminhead">Master Pilihan Kapasitas (ml)</div>
-    <p class="note">Daftar ukuran ml yang muncul sebagai pilihan cepat saat kasir memilih kapasitas.</p>
+  <!-- JUMLAH DISTRIBUSI -->
+  <div class="master-section" data-msec="distqty">
+    <div class="adminhead">Master Pilihan Jumlah Masuk Distribusi</div>
+    <p class="note">Daftar angka cepat yang muncul saat memilih jumlah masuk barang di halaman Distribusi.</p>
     <div class="grid">
-      <div><label>Ukuran Kapasitas (ml)</label><input id="newCapSize" type="number" min="1" placeholder="Contoh: 120"></div>
-      <div style="display:flex;align-items:flex-end"><button type="button" class="btn" id="addCapBtn" style="margin:0">+ Tambah Ukuran</button></div>
+      <div><label>Angka Jumlah Masuk</label><input id="newDistQtySize" type="number" min="1" placeholder="Contoh: 250"></div>
+      <div style="display:flex;align-items:flex-end"><button type="button" class="btn" id="addDistQtyBtn" style="margin:0">+ Tambah Angka</button></div>
     </div>
-    <div id="capacityList" style="margin-top:8px"></div>
+    <div id="distQtyMasterList" style="margin-top:8px"></div>
   </div>
 
   <div class="admin-section">
@@ -1404,27 +1405,28 @@ function downloadXls(filename, rows){
   });
   html+='</table></body></html>';
   var bomContent="\uFEFF"+html;
-  var blob=new Blob([bomContent],{type:"application/vnd.ms-excel;charset=utf-8;"});
+  var dataUri="data:application/vnd.ms-excel;charset=utf-8,"+encodeURIComponent(bomContent);
+
   try{
-    var url=URL.createObjectURL(blob);
     var a=document.createElement("a");
+    a.href=dataUri;
+    a.download=cleanName;
+    a.target="_blank";
     a.style.display="none";
-    a.href=url;
-    a.setAttribute("download",cleanName);
     document.body.appendChild(a);
     a.click();
     setTimeout(function(){
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    },2500);
+      if(a.parentNode)document.body.removeChild(a);
+    },3000);
   }catch(e){}
+
   if(navigator.canShare && navigator.share){
     try{
       var fileObj=new File([bomContent],cleanName,{type:"application/vnd.ms-excel"});
       if(navigator.canShare({files:[fileObj]})){
         setTimeout(function(){
           navigator.share({files:[fileObj],title:cleanName}).catch(function(){});
-        },350);
+        },300);
       }
     }catch(e){}
   }
@@ -3774,6 +3776,8 @@ function all(){
   listRender("purchases","purchaseList");
   listRender("additionals","additionalList");
   renderCapacityList();
+    renderCapacityList();
+  renderDistQtyMasterList();
   if(el("rounding"))el("rounding").value=data.rounding;
   refreshKnob();calcCurrentItem();renderCart();
   renderLowStock();renderReport();renderStokAwal();renderStokSystem();
@@ -3895,13 +3899,65 @@ if(el("importStokAwalBtn"))el("importStokAwalBtn").onclick=function(){el("import
 if(el("importAuditCsvBtn"))el("importAuditCsvBtn").onclick=function(){el("importAuditCsvInput").click();};
 if(el("importMasterBtn"))el("importMasterBtn").onclick=function(){el("importMasterInput").click();};
 
-function renderCapacityList(){
-  if(!el("capacityList"))return;
-  var caps=(data.capacities||[]).slice().sort(function(a,b){return a.size-b.size;});
-  el("capacityList").innerHTML=caps.map(function(c){
-    return '<div class="item"><div class="row"><strong>'+c.size+' ml</strong><div class="item-actions"><button type="button" onclick="window._delCap('+c.size+')" style="background:#fee2e2;color:#b91c1c">Hapus</button></div></div></div>';
-  }).join("")||'<p class="note">Belum ada ukuran kapasitas.</p>';
+function getDistQtyOptions(){
+  if(!Array.isArray(data.distQtys)||!data.distQtys.length){
+    data.distQtys=[100,200,300,500,1000];
+  }
+  return data.distQtys.slice().sort(function(a,b){return a-b;});
 }
+function renderDistQtyMenu(){
+  var menu=el("distQtyMenu");
+  if(!menu)return;
+  var opts=getDistQtyOptions();
+  var html=opts.map(function(n){
+    return '<div class="cap-opt" data-val="'+n+'"><span>'+fmtN(n)+'</span><span class="small">Pilih</span></div>';
+  }).join("");
+  html+='<div class="cap-opt manual" data-val="MANUAL"><span>⌨️ Ketik Manual (Bebas)</span><span>→</span></div>';
+  menu.innerHTML=html;
+  menu.querySelectorAll(".cap-opt").forEach(function(opt){
+    opt.onclick=function(e){
+      e.stopPropagation();
+      var v=this.getAttribute("data-val");
+      menu.classList.add("hide");
+      if(v==="MANUAL"){
+        modal("Input Jumlah Masuk Manual",
+          '<label>Masukkan Jumlah</label><input id="mManualDistQty" type="number" min="1" step="1" placeholder="Contoh: 250">',
+          function(){
+            var num=parseFloat(el("mManualDistQty").value)||0;
+            if(num<=0){toast("Masukkan angka lebih dari 0.","err");return false;}
+            setDistQtyValue(num);
+          });
+      }else{
+        setDistQtyValue(+v);
+      }
+    };
+  });
+}
+function renderDistQtyMasterList(){
+  renderDistQtyMenu();
+  if(!el("distQtyMasterList"))return;
+  var opts=getDistQtyOptions();
+  el("distQtyMasterList").innerHTML=opts.map(function(n){
+    return '<div class="item"><div class="row"><strong>'+fmtN(n)+'</strong><div class="item-actions"><button type="button" onclick="window._delDistQty('+n+')" style="background:#fee2e2;color:#b91c1c">Hapus</button></div></div></div>';
+  }).join("")||'<p class="note">Belum ada angka cepat.</p>';
+}
+window._delDistQty=function(n){
+  data.distQtys=getDistQtyOptions().filter(function(x){return x!==n;});
+  saveMaster();renderDistQtyMasterList();markDirty();
+  toast("Angka "+fmtN(n)+" dihapus.","warn");
+};
+if(el("addDistQtyBtn"))el("addDistQtyBtn").onclick=function(){
+  var num=parseInt(el("newDistQtySize").value,10)||0;
+  if(num<=0){toast("Masukkan angka lebih dari 0.","err");return;}
+  var opts=getDistQtyOptions();
+  if(opts.indexOf(num)>=0){toast("Angka "+fmtN(num)+" sudah ada.","warn");return;}
+  opts.push(num);
+  opts.sort(function(a,b){return a-b;});
+  data.distQtys=opts;
+  el("newDistQtySize").value="";
+  saveMaster();renderDistQtyMasterList();markDirty();
+  toast("✅ Angka "+fmtN(num)+" ditambahkan.","ok");
+};
 window._delCap=function(sz){
   data.capacities=(data.capacities||[]).filter(function(c){return c.size!==sz;});
   saveMaster();renderSelects();renderCapacityList();markDirty();
