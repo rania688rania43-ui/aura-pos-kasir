@@ -979,6 +979,12 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
     <div id="distQtyMasterList" style="margin-top:8px"></div>
   </div>
 
+  <div class="admin-section">
+    <label>💰 Pembulatan Harga Nota Kasir (Rp)</label>
+    <input id="rounding" type="number" step="500" value="1000">
+  </div>
+</div>
+
 <div class="card">
   <div class="adminhead">🤖 Pengaturan Data Otomatis Sistem</div>
   <p class="note">Atur nilai perhitungan dan sinkronisasi otomatis yang berjalan di aplikasi.</p>
@@ -2772,16 +2778,9 @@ function getHargaBeli(cat,name){
   var item=list.find(function(x){return x.name===name;});
   return item?(item.price||0):0;
 }
-function setDistQtyValue(val){
-  el("distQtyInput").value=val||"";
-  if(val>0){
-    el("distQtyDisplayText").textContent=val;
-    el("distQtyDisplay").classList.remove("empty");
-  }else{
-    el("distQtyDisplayText").textContent="Masukan jumlah";
-    el("distQtyDisplay").classList.add("empty");
-  }
-  updateDistHargaBeliBox();
+function getSusutRate(cat){
+  if(cat==="purchases"||cat==="additionals")return 0;
+  return (parseFloat(getAutoCfg().susutDist)||0)/100;
 }
 function renderDistItems(){
   var cat=el("distCatSelect").value;
@@ -3815,24 +3814,6 @@ function renderGrafik(){
   }else{el("chartOutlets").innerHTML='<p class="note">Khusus Management/Admin untuk melihat semua outlet.</p>';}
 }
 el("chartScopeSelect").onchange=renderGrafik;
-
-/* ================== OVERRIDE SUSUT & QTY DISPLAY OTOMATIS ================== */
-function getSusutRate(cat){
-  if(cat==="purchases"||cat==="additionals")return 0;
-  return (parseFloat(getAutoCfg().susutDist)||0)/100;
-}
-function setDistQtyValue(val){
-  el("distQtyInput").value=val||"";
-  var activeCat=el("distCatSelect")?el("distCatSelect").value:"perfumes";
-  if(val>0){
-    el("distQtyDisplayText").textContent=val+" "+getCatUnit(activeCat);
-    el("distQtyDisplay").classList.remove("empty");
-  }else{
-    el("distQtyDisplayText").textContent="Masukan jumlah";
-    el("distQtyDisplay").classList.add("empty");
-  }
-  updateDistHargaBeliBox();
-}
 
 /* ================== ALL REFRESH & TAB NAV + PANAH KEMBALI ================== */
 function all(){
