@@ -3970,10 +3970,10 @@ el("addAdditional").onclick=function(){
 };
 
 var DEFAULT_DIST_QTYS={
-  perfumes:[100,250,500,1000],
-  mixes:[500,1000,2500,5000],
-  purchases:[10,24,50,100],
-  additionals:[1,5,10,20]
+  perfumes:,
+  mixes:,
+  purchases:,
+  additionals:
 };
 function getCatUnit(cat){
   return (cat==="purchases"||cat==="additionals")?"pcs":"ml";
@@ -4040,7 +4040,14 @@ function renderDistQtyMasterList(){
     return '<div class="item"><div class="row"><strong>'+fmtN(n)+' <span class="badge info">'+unit+'</span></strong><div class="item-actions"><button type="button" onclick="window._delDistQty(\''+selCat+'\','+n+')" style="background:#fee2e2;color:#b91c1c">Hapus</button></div></div></div>';
   }).join("")||'<p class="note">Belum ada angka cepat untuk kategori ini.</p>';
 }
-if(el("distQtyCatSelect"))el("distQtyCatSelect").onchange=renderDistQtyMasterList;
+document.querySelectorAll("#setDistCatPills .cat-pill-btn").forEach(function(btn){
+  btn.onclick=function(){
+    document.querySelectorAll("#setDistCatPills .cat-pill-btn").forEach(function(b){b.classList.remove("active");});
+    this.classList.add("active");
+    el("distQtyCatSelect").value=this.getAttribute("data-cat");
+    renderDistQtyMasterList();
+  };
+});
 window._delDistQty=function(cat,n){
   ensureDistQtyMap();
   data.distQtyMap[cat]=data.distQtyMap[cat].filter(function(x){return x!==n;});
