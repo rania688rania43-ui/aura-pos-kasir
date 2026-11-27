@@ -2734,13 +2734,21 @@ if(el("noExpenseTodayBtn"))el("noExpenseTodayBtn").onclick=function(){
   var d=el("reportDate").value||todayStr();
   var list=getDailyExpenses(session.outlet,d);
   if(list.length>0){
-    toast("Sudah ada catatan pengeluaran pada tanggal ini.","warn");
+    toast("Sudah ada catatan pengeluaran. Hapus item dulu jika ingin menandai nihil.","warn");
     return;
   }
-  noExpenseFlags[session.outlet+"|"+d]=true;
-  saveNoExpenseFlags();
-  renderReport();
-  toast("✅ Ditandai: Tidak ada pengeluaran pada "+d,"ok");
+  var key=session.outlet+"|"+d;
+  if(noExpenseFlags[key]){
+    delete noExpenseFlags[key];
+    saveNoExpenseFlags();
+    renderReport();
+    toast("🔄 Status nihil dibatalkan. Silakan input pengeluaran.","ok");
+  }else{
+    noExpenseFlags[key]=true;
+    saveNoExpenseFlags();
+    renderReport();
+    toast("✅ Ditandai: Tidak ada pengeluaran pada "+d,"ok");
+  }
 };
 if(el("addExpenseBtn"))el("addExpenseBtn").onclick=function(){
   if(!session)return;
@@ -2812,6 +2820,28 @@ function renderReport(){
     }else{
       el("closingExpStatusBadge").className="badge alert";
       el("closingExpStatusBadge").textContent="Wajib Diisi";
+    }
+  }
+  var noExpBtn=el("noExpenseTodayBtn");
+  var expFormEls=["expCategorySelect","expKasbonEmpSelect","expNoteInput","expAmountInput","addExpenseBtn"];
+  if(noExpBtn){
+    if(dayExps.length>0){
+      noExpBtn.classList.add("hide");
+      expFormEls.forEach(function(fid){if(el(fid))el(fid).disabled=false;});
+    }else if(isNoExp){
+      noExpBtn.classList.remove("hide");
+      noExpBtn.textContent="🔄 Batalkan \"Tidak Ada Pengeluaran\" (Buka Input)";
+      noExpBtn.style.background="#fef3c7";
+      noExpBtn.style.borderColor="#fcd34d";
+      noExpBtn.style.color="#92400e";
+      expFormEls.forEach(function(fid){if(el(fid))el(fid).disabled=true;});
+    }else{
+      noExpBtn.classList.remove("hide");
+      noExpBtn.textContent="✅ Tidak Ada Pengeluaran Hari Ini";
+      noExpBtn.style.background="#f0fdf4";
+      noExpBtn.style.borderColor="#86efac";
+      noExpBtn.style.color="#15803d";
+      expFormEls.forEach(function(fid){if(el(fid))el(fid).disabled=false;});
     }
   }
   if(el("expListTotalBadge"))el("expListTotalBadge").textContent=fmt(expTot);
