@@ -601,7 +601,10 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
       <div class="stat-box"><div class="small">Total Pengeluaran</div><div class="stat-val" id="statExpenseTot" style="color:var(--red)">Rp0</div></div>
       <div class="stat-box"><div class="small">Setoran Tunai Bersih</div><div class="stat-val" id="statNetCash" style="color:var(--purple)">Rp0</div></div>
     </div>
-    <button type="button" class="btn" id="closingBtn">🔒 Closing Penjualan Hari Ini (Kirim Online)</button>
+    <button type="button" class="btn" id="closingBtn" style="padding:14px 16px;line-height:1.25">
+      <div style="font-size:17px;font-weight:900;letter-spacing:.4px">🔒 CLOSING</div>
+      <div style="font-size:11.5px;font-weight:600;opacity:.92;margin-top:2px">Kirim Online Penjualan Hari Ini</div>
+    </button>
     <div class="grid"><button type="button" class="btn secondary" id="waReportBtn">Kirim Rekap WA</button><button type="button" class="btn secondary" id="exportSalesCsvBtn">Export Excel (.xls)</button></div>
     <p class="note" id="syncStatusNote" style="margin-top:8px;text-align:center">Tersimpan di database HP.</p>
   </div>
@@ -2935,7 +2938,7 @@ el("closingBtn").onclick=async function(){
   var dayExps=getDailyExpenses(session.outlet,d);
   if(!list.length&&!dayExps.length){toast("Belum ada transaksi tanggal "+d,"err");return;}
   if(!data.shop.webhook){toast("Link Google Sheets belum diisi.","err");return;}
-  var oldText=this.textContent;this.disabled=true;this.textContent="⏳ Mengirim...";
+   var oldHtml=this.innerHTML;this.disabled=true;this.innerHTML='<div style="font-size:16px;font-weight:900">⏳ MENGIRIM...</div><div style="font-size:11px;opacity:.9">Mohon tunggu sebentar</div>';
   var snap=[];
   ensureOutletStock(session.outlet);
   data.perfumes.forEach(function(p){
@@ -2947,7 +2950,7 @@ el("closingBtn").onclick=async function(){
     list.forEach(function(s){s.synced=true;});
     saveSales();renderReport();toast("✅ Closing berhasil!","ok");
   }catch(e){toast("Gagal terhubung.","err");}
-  finally{this.disabled=false;this.textContent=oldText;}
+  finally{this.disabled=false;this.innerHTML=oldHtml;}
 };
 el("waReportBtn").onclick=function(){
   if(!session)return;
