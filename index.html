@@ -40,7 +40,7 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,
   background:#e0f2fe;border:1px solid #bae6fd;border-radius:11px;
   padding:7px 10px;margin-bottom:8px;font-size:12.5px;font-weight:700;color:#0369a1;
 }
-.topbar-left{display:flex;align-items:center;gap:8px;min-width:0}
+.topbar-left{display:flex;align-items:center;gap:6px;min-width:0;flex:1}
 .topbar-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .btn-back-top{
   border:1px solid #7dd3fc;background:#fff;color:#0369a1;border-radius:8px;
@@ -48,6 +48,10 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,
   display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
 }
 .btn-back-top:active{transform:scale(.94)}
+.btn-shift-mini{
+  border:1px solid #93c5fd;background:#fff;color:#0d6efd;border-radius:7px;
+  padding:3px 7px;font-size:10.5px;font-weight:800;cursor:pointer;flex-shrink:0;
+}
 .btn-save-mini{
   border:0;background:#7c3aed;color:#fff;border-radius:8px;
   padding:5px 9px;font-size:11.5px;font-weight:800;cursor:pointer;
@@ -314,6 +318,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
   box-shadow:0 4px 14px rgba(13,110,253,.25);transition:.15s;
 }
 .calc-submit-btn:disabled{background:#cbd5e1;color:#fff;box-shadow:none;cursor:not-allowed}
+
 /* ==== CEK STOK SESI ==== */
 .audit-session-box{
   background:linear-gradient(135deg,#eff6ff,#f0fdf4);
@@ -374,15 +379,21 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 .min-table tr.overridden td{background:#fef3c7}
 .min-table-wrap{max-height:60vh;overflow:auto;border:1px solid var(--line);border-radius:8px}
 
-/* ==== LAPORAN MANAGEMENT ==== */
-.report-tabs{display:flex;gap:6px;overflow-x:auto;padding:4px 0;margin:8px 0;scrollbar-width:none}
+/* ==== TOMBOL SUB-TAB BESAR EFEK MENDEM (LAPORAN & PENGELUARAN) ==== */
+.report-tabs{display:flex;gap:8px;overflow-x:auto;padding:6px 2px 10px;margin:8px 0;scrollbar-width:none}
 .report-tabs::-webkit-scrollbar{display:none}
 .report-tab{
-  flex:0 0 auto;border:1px solid var(--line);border-radius:9px;
-  padding:7px 12px;background:#fff;font-weight:700;font-size:12px;
-  color:var(--text);cursor:pointer;white-space:nowrap;
+  flex:0 0 auto;border:1.5px solid #bfdbfe;border-radius:12px;
+  padding:11px 16px;background:#fff;font-weight:800;font-size:13.5px;
+  color:#1e3a8a;cursor:pointer;white-space:nowrap;
+  box-shadow:0 3px 0 #bfdbfe;transition:all .14s ease;
 }
-.report-tab.active{background:linear-gradient(135deg,#eff6ff,#f0fdf4);border-color:#7dd3fc;color:var(--blue)}
+.report-tab.active{
+  background:linear-gradient(135deg,#0d6efd,#0284c7);
+  border-color:#0a58ca;color:#fff;
+  transform:translateY(2px);
+  box-shadow:inset 0 3px 7px rgba(15,23,42,.32);
+}
 .report-section{display:none}
 .report-section.active{display:block}
 .kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
@@ -405,7 +416,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 .data-table td.center{text-align:center}
 .data-table .total-row{background:#eff6ff;font-weight:800}
 .laporan-filter{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
-.laporan-filter input,.laporan-filter select{padding:7px 10px;font-size:12.5px;width:auto}
+.laporan-filter input,.laporan-filter select{padding:8px 11px;font-size:13px;width:auto}
 .warning-banner{
   background:#fef3c7;border:1px solid #fcd34d;border-radius:10px;
   padding:10px 12px;margin:8px 0;font-size:12.5px;color:#92400e;
@@ -417,7 +428,6 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
   padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;
 }
 .warning-banner.danger button{background:#b91c1c}
-/* ==== NOTIF HARGA BELI 0 ==== */
 .notif-item{border:1px solid #fca5a5;background:#fef2f2;border-radius:11px;padding:11px;margin:7px 0}
 .notif-item .ni-head{font-weight:800;color:#b91c1c;font-size:13px}
 .notif-item .ni-sub{font-size:12px;color:#7f1d1d;margin-top:3px}
@@ -426,7 +436,6 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 .notif-item .ni-actions .btn-fix{background:#b91c1c;color:#fff}
 .notif-item .ni-actions .btn-ignore{background:#fee2e2;color:#b91c1c}
 
-/* ==== MASTER SUB-TAB ==== */
 .master-tabs{display:flex;gap:6px;overflow-x:auto;padding:4px 0;margin:8px 0;scrollbar-width:none}
 .master-tabs::-webkit-scrollbar{display:none}
 .master-tab{
@@ -464,7 +473,20 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 <option value="management">2. Management</option>
 <option value="admin">3. Admin</option>
 </select>
-<div id="emailLoginWrap"><label>PIN Toko (Wajib Diisi)</label><input id="loginEmailInput" type="password" inputmode="numeric" placeholder="Masukkan PIN Toko"></div>
+<div id="emailLoginWrap">
+  <div class="grid">
+    <div>
+      <label>Penjaga 1 (Wajib)</label>
+      <select id="loginStaff1Select"></select>
+    </div>
+    <div>
+      <label>Penjaga 2 (Opsional)</label>
+      <select id="loginStaff2Select"></select>
+    </div>
+  </div>
+  <label>PIN Toko (Wajib Diisi)</label>
+  <input id="loginEmailInput" type="password" inputmode="numeric" placeholder="Masukkan PIN Toko">
+</div>
 <div id="passLoginWrap" class="hide"><label>Password Akses</label><input id="loginPassInput" type="password" placeholder="Masukkan password"></div>
 <button type="button" class="btn" id="doLoginBtn">Masuk ke Sistem</button>
 <p class="note" id="loginHintText" style="text-align:center;margin-top:8px">Karyawan Toko: Akses Kasir, Closing & Order.</p>
@@ -477,6 +499,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
   <div class="topbar-left">
     <button type="button" class="btn-back-top hide" id="topBackBtn" title="Kembali">←</button>
     <span id="activeSessionLabel" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Outlet 01 · Karyawan</span>
+    <button type="button" class="btn-shift-mini hide" id="changeShiftBtn" title="Ganti Penjaga">🔄 Jaga</button>
   </div>
   <div class="topbar-right">
     <button type="button" id="logoutBtn">Keluar</button>
@@ -494,6 +517,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 <button type="button" class="tab role-admin hide" id="tAdmin">Master <span id="reqBadgeCount" class="badge alert hide">0</span></button>
 <button type="button" class="tab role-admin hide" id="tSetting">⚙️ Setting</button>
 <button type="button" class="tab role-mgmt role-admin hide" id="tMgmt">Laporan <span id="notifBadge" class="badge alert hide">0</span></button>
+<button type="button" class="tab role-mgmt role-admin hide" id="tExpenseMgmt">💸 Pengeluaran</button>
 <button type="button" class="tab role-admin hide" id="tNotif">🔔 Notif <span id="notifBadgeAdmin" class="badge alert hide">0</span></button>
 </div>
 <!-- ============ KASIR ============ -->
@@ -532,11 +556,9 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 <div class="row"><strong>Konsentrasi Bibit</strong><span class="pct" id="pctLabel">50%</span></div>
 <div style="display:flex; align-items:center; gap:8px; margin:10px 0;">
   <button type="button" id="pctMinusBtn" style="width:34px; height:34px; border-radius:8px; border:1px solid #bfdbfe; background:#eff6ff; color:#0d6efd; font-size:18px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">◀</button>
-  
   <div class="sc-wrap" id="scWrap" style="flex:1; margin:0;">
     <div class="sc-track"><div class="sc-fill" id="scFill"></div><div class="sc-knob" id="scKnob"></div></div>
   </div>
-  
   <button type="button" id="pctPlusBtn" style="width:34px; height:34px; border-radius:8px; border:1px solid #bfdbfe; background:#eff6ff; color:#0d6efd; font-size:18px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">▶</button>
 </div>
 <div class="status good" id="status">☑️ RECOMMENDED ☑️</div>
@@ -555,21 +577,70 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 </div>
 </section>
 
-<!-- ============ CLOSING ============ -->
+<!-- ============ CLOSING (2 TAB: LAPORAN OMZET & PENGELUARAN WAJIB) ============ -->
 <section id="secLaporan" class="hide">
-<div class="card">
-<div class="row"><div class="adminhead" style="margin:0">📊 Laporan & Closing</div><input type="date" id="reportDate" style="width:auto;padding:6px 10px;font-size:13px"></div>
-<div class="stat-grid" style="margin-top:10px">
-<div class="stat-box"><div class="small">Total Omzet</div><div class="stat-val" id="statOmzet">Rp0</div></div>
-<div class="stat-box"><div class="small">Jumlah Nota</div><div class="stat-val" id="statCount">0</div></div>
-<div class="stat-box"><div class="small">Tunai (Cash)</div><div class="stat-val" id="statCash" style="color:var(--green)">Rp0</div></div>
-<div class="stat-box"><div class="small">QRIS / Transfer</div><div class="stat-val" id="statNonCash" style="color:#0284c7">Rp0</div></div>
+<div class="card" style="padding-bottom:10px">
+  <div class="row">
+    <div class="adminhead" style="margin:0">📊 Laporan & Closing</div>
+    <input type="date" id="reportDate" style="width:auto;padding:6px 10px;font-size:13px">
+  </div>
+  <div class="report-tabs" style="margin-bottom:0">
+    <button type="button" class="report-tab active" data-ctab="omzet">💰 Laporan Omzet</button>
+    <button type="button" class="report-tab" data-ctab="pengeluaran">💸 Pengeluaran <span id="closingExpStatusBadge" class="badge alert" style="margin-left:4px">Belum Diisi</span></button>
+  </div>
 </div>
-<button type="button" class="btn" id="closingBtn">🔒 Closing Penjualan Hari Ini (Kirim Online)</button>
-<div class="grid"><button type="button" class="btn secondary" id="waReportBtn">Kirim Rekap WA</button><button type="button" class="btn secondary" id="exportSalesCsvBtn">Export Excel (.xls)</button></div>
-<p class="note" id="syncStatusNote" style="margin-top:8px;text-align:center">Tersimpan di database HP.</p>
+
+<!-- TAB 1: LAPORAN OMZET -->
+<div class="closing-section" data-csec="omzet">
+  <div class="card">
+    <div class="stat-grid">
+      <div class="stat-box"><div class="small">Total Omzet</div><div class="stat-val" id="statOmzet">Rp0</div></div>
+      <div class="stat-box"><div class="small">Jumlah Nota</div><div class="stat-val" id="statCount">0</div></div>
+      <div class="stat-box"><div class="small">Tunai (Cash)</div><div class="stat-val" id="statCash" style="color:var(--green)">Rp0</div></div>
+      <div class="stat-box"><div class="small">QRIS / Transfer</div><div class="stat-val" id="statNonCash" style="color:#0284c7">Rp0</div></div>
+      <div class="stat-box"><div class="small">Total Pengeluaran</div><div class="stat-val" id="statExpenseTot" style="color:var(--red)">Rp0</div></div>
+      <div class="stat-box"><div class="small">Setoran Tunai Bersih</div><div class="stat-val" id="statNetCash" style="color:var(--purple)">Rp0</div></div>
+    </div>
+    <button type="button" class="btn" id="closingBtn">🔒 Closing Penjualan Hari Ini (Kirim Online)</button>
+    <div class="grid"><button type="button" class="btn secondary" id="waReportBtn">Kirim Rekap WA</button><button type="button" class="btn secondary" id="exportSalesCsvBtn">Export Excel (.xls)</button></div>
+    <p class="note" id="syncStatusNote" style="margin-top:8px;text-align:center">Tersimpan di database HP.</p>
+  </div>
+  <div class="card"><div class="adminhead">Riwayat Nota Outlet Ini</div><div id="salesList"></div></div>
 </div>
-<div class="card"><div class="adminhead">Riwayat Nota Outlet Ini</div><div id="salesList"></div></div>
+<!-- TAB 2: PENGELUARAN HARIAN (WAJIB DIISI SEBELUM CLOSING) -->
+<div class="closing-section hide" data-csec="pengeluaran">
+  <div class="card">
+    <div class="adminhead">💸 Input Pengeluaran Toko (<span id="expDateLabel">-</span>)</div>
+    <p class="note">Wajib diisi sebelum melakukan Closing. Jika tidak ada uang keluar hari ini, tekan tombol <strong>Tidak Ada Pengeluaran Hari Ini</strong>.</p>
+    <button type="button" class="btn secondary" id="noExpenseTodayBtn" style="margin-bottom:10px;border-color:#86efac;background:#f0fdf4;color:#15803d">✅ Tidak Ada Pengeluaran Hari Ini</button>
+
+    <label>Kategori Pengeluaran</label>
+    <select id="expCategorySelect"></select>
+
+    <div id="expKasbonWrap" class="hide">
+      <label>Pilih Nama Karyawan (Kasbon)</label>
+      <select id="expKasbonEmpSelect"></select>
+    </div>
+
+    <div id="expNoteWrap">
+      <label id="expNoteLabel">Keterangan (Optional)</label>
+      <input id="expNoteInput" placeholder="Catatan pengeluaran...">
+    </div>
+
+    <label>Nominal Pengeluaran (Rp)</label>
+    <input id="expAmountInput" type="number" min="1" placeholder="Contoh: 50000">
+
+    <button type="button" class="btn" id="addExpenseBtn">+ Simpan Pengeluaran</button>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <div class="adminhead" style="margin:0">📋 Daftar Pengeluaran Hari Ini</div>
+      <strong id="expListTotalBadge" style="color:var(--red)">Rp0</strong>
+    </div>
+    <div id="dailyExpenseList" style="margin-top:8px"><p class="note">Belum ada pengeluaran dicatat pada tanggal ini.</p></div>
+  </div>
+</div>
 </section>
 
 <!-- ============ ORDER ============ -->
@@ -601,6 +672,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 <div class="card"><div class="adminhead">🏪 Perbandingan Omzet Antar Outlet</div><div id="chartOutlets"></div></div>
 </div>
 </section>
+
 <!-- ============ DISTRIBUSI (SEBELUMNYA STOK MASUK) ============ -->
 <section id="secStokMasuk" class="hide">
 <div class="sticky-head">
@@ -612,7 +684,6 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
   <span id="distHargaBeliWarnTxt">⚠️ Ada parfum dengan harga 0.</span>
   <button type="button" id="distHargaBeliFixBtn">Perbaiki</button>
 </div>
-
 <div class="card" id="distInputCard">
   <div class="adminhead">➕ Buat Distribusi Baru</div>
   <p class="note">Pilih kategori, cari item, lalu masukkan jumlah. Klik <strong>Fix Distribusi & Cetak Struk</strong> setelah selesai.</p>
@@ -645,17 +716,10 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
           <span style="font-size:11px;color:var(--blue)">▼</span>
         </div>
         <input type="hidden" id="distQtyInput" value="">
-        <div class="cap-menu hide" id="distQtyMenu">
-          <div class="cap-opt" data-val="100"><span>100</span><span class="small">Pilih</span></div>
-          <div class="cap-opt" data-val="200"><span>200</span><span class="small">Pilih</span></div>
-          <div class="cap-opt" data-val="300"><span>300</span><span class="small">Pilih</span></div>
-          <div class="cap-opt" data-val="500"><span>500</span><span class="small">Pilih</span></div>
-          <div class="cap-opt" data-val="1000"><span>1.000</span><span class="small">Pilih</span></div>
-          <div class="cap-opt manual" data-val="MANUAL"><span>⌨️ Ketik Manual (Bebas)</span><span>→</span></div>
-        </div>
+        <div class="cap-menu hide" id="distQtyMenu"></div>
       </div>
     </div>
-    <div><label>Keterangan</label><input id="distNoteInput" placeholder="Kiriman Pusat"></div>
+    <div><label>Keterangan (Optional)</label><input id="distNoteInput" placeholder="Kiriman Pusat"></div>
   </div>
 
   <div class="small" style="margin-top:8px" id="distPreviewInfo">—</div>
@@ -706,7 +770,6 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
   <button type="button" class="btn secondary" id="distExportRekapBtn">📊 Export Rekap Excel (.xls)</button>
   <div id="distRekapList" style="margin-top:8px"></div>
 </div>
-
 <div class="card">
   <div class="adminhead">Riwayat Distribusi Outlet Ini</div>
   <div id="distHistoryList"><p class="note">Belum ada distribusi.</p></div>
@@ -743,17 +806,21 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
     </div>
   </div>
 </div>
+
 <!-- SUB 1: STOK AWAL -->
 <div id="secStokAwal" class="hide">
 <div class="card">
-<div class="adminhead">🏁 Pengaturan Stok Awal Outlet</div>
-<label>Tanggal Berlaku Stok Awal</label><input type="date" id="stokAwalDateInput">
-<button type="button" class="btn" id="saveStokAwalDateBtn">Simpan Tanggal Stok Awal</button>
-<div class="admin-section">
-  <div class="adminhead">Export & Import Stok Awal (Excel)</div>
-<button type="button" class="btn secondary" id="exportStokAwalBtn">📤 Export Stok Awal (.xls)</button>
-<label style="margin-top:10px">📥 Import File Stok Awal (.xls / .csv)</label><input type="file" id="importStokAwalInput" accept=".xls,.csv,application/vnd.ms-excel,text/csv">
+  <div class="adminhead">📤 Export & Import Stok Awal (Excel .xls)</div>
+  <div class="grid">
+    <button type="button" class="btn secondary" id="exportStokAwalBtn" style="margin:0">📤 Export (.xls)</button>
+    <button type="button" class="btn secondary" id="importStokAwalBtn" style="margin:0">📥 Import (.xls)</button>
+  </div>
+  <input type="file" id="importStokAwalInput" accept=".xls,.csv,application/vnd.ms-excel,text/csv" style="display:none">
 </div>
+<div class="card">
+  <div class="adminhead">🏁 Tanggal Berlaku Stok Awal</div>
+  <input type="date" id="stokAwalDateInput">
+  <button type="button" class="btn" id="saveStokAwalDateBtn">Simpan Tanggal Stok Awal</button>
 </div>
 <div class="card"><div class="adminhead">Daftar Stok Awal (<span id="lblTglStokAwal">-</span>)</div><input id="filterStokAwal" placeholder="Cari item..." style="margin-bottom:8px"><div id="stokAwalList"></div></div>
 </div>
@@ -762,13 +829,12 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 <div id="secAudit" class="hide">
 <div class="card">
   <div class="adminhead">🛡️ Cek Stok per Sesi</div>
-  <p class="note">Buat sesi baru, isi stok fisik semua item, lalu simpan. Laporan lose muncul per sesi.</p>
   <div class="grid">
-    <button type="button" class="btn" id="newAuditSessionBtn" style="margin:0">+ Mulai Sesi Baru</button>
     <button type="button" class="btn secondary" id="exportAuditTemplateBtn" style="margin:0">📤 Template (.xls)</button>
+    <button type="button" class="btn secondary" id="importAuditCsvBtn" style="margin:0">📥 Import (.xls)</button>
   </div>
-  <label style="margin-top:10px">📥 Import Excel Cek Stok (isi kolom STOK_FISIK)</label>
-  <input type="file" id="importAuditCsvInput" accept=".xls,.csv,application/vnd.ms-excel,text/csv">
+  <input type="file" id="importAuditCsvInput" accept=".xls,.csv,application/vnd.ms-excel,text/csv" style="display:none">
+  <button type="button" class="btn" id="newAuditSessionBtn" style="margin-top:8px">+ Mulai Sesi Baru</button>
 </div>
 
 <div class="card" id="auditDraftCard" style="display:none">
@@ -799,26 +865,25 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
   <div id="auditDetailList"></div>
 </div>
 </div>
-
 <!-- SUB 3: STOK MINIM PER OUTLET -->
 <div id="secStokMin" class="hide">
 <div class="card">
   <div class="adminhead">⚠️ Stok Minim per Outlet (Acuan Distribusi)</div>
-  <p class="note">Kolom <strong>Rata-rata (10 Hr)</strong> dihitung otomatis dari penjualan maksimal 4 bulan ke belakang sebagai acuan mengisi batas minimal stok toko.</p>
   <div class="grid">
-    <div><label>Pilih Outlet</label><select id="minOutletSelect"></select></div>
-    <div><label>Cari Item</label><input id="minFilterInput" placeholder="Cari nama..."></div>
-  </div>
-  <div class="grid" style="margin-top:8px">
     <button type="button" class="btn secondary" id="minExportBtn" style="margin:0">📤 Export (.xls)</button>
     <button type="button" class="btn secondary" id="minImportBtn" style="margin:0">📥 Import (.xls)</button>
   </div>
   <input type="file" id="minImportInput" accept=".xls,.csv,application/vnd.ms-excel,text/csv" style="display:none">
+  <div class="grid" style="margin-top:6px">
+    <div><label>Pilih Outlet</label><select id="minOutletSelect"></select></div>
+    <div><label>Cari Item</label><input id="minFilterInput" placeholder="Cari nama..."></div>
+  </div>
   <button type="button" class="btn danger" id="minResetBtn" style="margin-top:8px">🔄 Reset Outlet Ini ke Default (0)</button>
 </div>
 
 <div class="card">
   <div class="adminhead">Daftar Stok Minim — <span id="minOutletLabel">-</span></div>
+  <p class="note">Kolom <strong>Rata2 10Hr</strong> dihitung otomatis dari penjualan maksimal 4 bulan ke belakang.</p>
   <div class="min-table-wrap">
     <table class="min-table">
       <thead>
@@ -832,9 +897,9 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
       <tbody id="minTableBody"><tr><td colspan="4" class="note">Pilih outlet dulu.</td></tr></tbody>
     </table>
   </div>
-  <p class="note" style="margin-top:8px">💡 Kosongkan kolom "Min Outlet" untuk memakai default (0).</p>
 </div>
 </div>
+
 <!-- SUB 4: STOK SYSTEM (REAL-TIME) -->
 <div id="secStokSystem" class="hide">
 <div class="card">
@@ -842,8 +907,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
     <div class="adminhead" style="margin:0">💻 Stok System Outlet Ini</div>
     <button type="button" class="btn secondary sm" id="exportStokSysBtn">📤 Export (.xls)</button>
   </div>
-  <p class="note">Menampilkan sisa stok saat ini yang tercatat di sistem untuk seluruh kategori barang.</p>
-  <div class="grid">
+  <div class="grid" style="margin-top:6px">
     <div>
       <label>Filter Kategori</label>
       <select id="stokSysCatFilter">
@@ -881,7 +945,6 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
     <button type="button" class="master-tab" data-mtab="botol">🍶 Botol</button>
     <button type="button" class="master-tab" data-mtab="additional">📦 Additional</button>
   </div>
-
   <!-- PARFUM -->
   <div class="master-section active" data-msec="parfum">
     <div class="adminhead">Master Parfum</div>
@@ -929,10 +992,8 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
     </div>
     <div id="additionalList" style="margin-top:8px"></div>
   </div>
-
-  </div>
+</div>
 </section>
-
 
 <!-- ============ SETTING ============ -->
 <section id="secSetting" class="hide">
@@ -961,6 +1022,29 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
     <div><label>Pass Admin</label><input id="devPassInput" type="text"></div>
   </div>
 </div>
+<div class="card">
+  <div class="adminhead">👥 Daftar Karyawan & Pengganti Libur</div>
+  <p class="note">Daftarkan nama karyawan tetap per toko atau pilih <strong>Pengganti Libur (Semua Toko)</strong> agar bisa berjaga di outlet mana saja.</p>
+  <div class="grid">
+    <div><label>Nama Karyawan</label><input id="newEmpName" placeholder="Contoh: Rina"></div>
+    <div>
+      <label>Penempatan / Status</label>
+      <select id="newEmpOutletSelect"></select>
+    </div>
+    <div class="full"><button type="button" class="btn" id="addEmpBtn">+ Tambah Karyawan</button></div>
+  </div>
+  <div id="empList" style="margin-top:8px"></div>
+</div>
+
+<div class="card">
+  <div class="adminhead">💸 Kategori Pengeluaran Toko (Closing)</div>
+  <p class="note">Daftar pilihan pengeluaran saat Closing. <strong>Kasbon</strong> otomatis memunculkan pilihan nama karyawan, <strong>Lain-lain</strong> wajib keterangan.</p>
+  <div class="grid">
+    <div><input id="newExpCatName" placeholder="Kategori baru (misal: Lakban)"></div>
+    <div><button type="button" class="btn" id="addExpCatBtn" style="margin:0">+ Tambah Kategori</button></div>
+  </div>
+  <div id="expCatMasterList" style="margin-top:8px"></div>
+</div>
 
 <div class="card">
   <div class="adminhead">🎛️ Pengaturan Pop-up & Pembulatan Harga</div>
@@ -972,7 +1056,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
   </div>
   <div id="capacityList" style="margin-top:8px"></div>
 
-    <div class="admin-section">
+  <div class="admin-section">
     <label>🚚 Pilihan Pop-up Jumlah Distribusi (Klik Kategori):</label>
     <input type="hidden" id="distQtyCatSelect" value="perfumes">
     <div class="cat-pill-grid" id="setDistCatPills" style="margin-bottom:10px">
@@ -1020,7 +1104,6 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
     </div>
   </div>
 </div>
-
 <div class="card">
   <div class="adminhead">🏬 Daftar Outlet + PIN Toko</div>
   <p class="note">Karyawan hanya bisa masuk menggunakan PIN Toko yang didaftarkan untuk outlet tersebut.</p>
@@ -1037,7 +1120,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 </div>
 </section>
 
-<!-- ============ LAPORAN MANAGEMENT (PRO) ============ -->
+<!-- ============ LAPORAN MANAGEMENT (FILTER BULAN & TAHUN OTOMATIS) ============ -->
 <section id="secMgmt" class="hide">
 <div class="card">
   <div class="row">
@@ -1048,10 +1131,8 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
     </select>
   </div>
   <div class="laporan-filter">
-    <input type="date" id="mgmtFrom">
-    <input type="date" id="mgmtTo">
-    <button type="button" class="btn sm" id="mgmtApplyBtn" style="margin:0">Terapkan</button>
-    <button type="button" class="btn secondary sm" id="mgmtResetBtn" style="margin:0">Bulan Ini</button>
+    <select id="mgmtMonthSelect"></select>
+    <select id="mgmtYearSelect"></select>
     <button type="button" class="btn secondary sm" id="mgmtExportBtn" style="margin:0">📤 Export (.xls)</button>
   </div>
   <p class="note" id="mgmtPeriodLabel">—</p>
@@ -1075,12 +1156,13 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
       <div class="kpi-card"><div class="kp-label">RATA-RATA / NOTA</div><div class="kp-val" id="rpAvg">Rp0</div><div class="kp-sub flat">per transaksi</div></div>
       <div class="kpi-card"><div class="kp-label">OMZET HARI INI</div><div class="kp-val" id="rpHariIni">Rp0</div><div class="kp-sub" id="rpHariSub">—</div></div>
     </div>
-    <div class="card"><div class="adminhead">📈 Tren Harian (30 Hari Terakhir)</div><div id="rpChart30"></div></div>
+    <div class="card"><div class="adminhead">📈 Tren Harian Bulan Terpilih</div><div id="rpChart30"></div></div>
     <div class="card"><div class="adminhead">🏪 Performa Tiap Outlet (Klik untuk detail)</div>
       <div id="rpOutletList" class="grid" style="grid-template-columns:1fr; gap:6px"></div>
     </div>
     <div class="card"><div class="adminhead">💳 Metode Bayar (Semua Toko)</div><div id="rpPaymentChart"></div></div>
   </div>
+
   <!-- PRODUK -->
   <div class="report-section" data-rsec="produk">
     <div class="card"><div class="adminhead">🏆 Top 10 Parfum Terlaris</div><div id="rpTop10"></div></div>
@@ -1095,7 +1177,7 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
   <div class="report-section" data-rsec="belanja">
     <div class="kpi-grid">
       <div class="kpi-card"><div class="kp-label">TOTAL BELANJA (NORMAL)</div><div class="kp-val" id="rpBelanjaNormal">Rp0</div><div class="kp-sub flat">qty masuk × harga</div></div>
-      <div class="kpi-card"><div class="kp-label">TOTAL BELANJA (NETTO)</div><div class="kp-val" id="rpBelanjaNetto">Rp0</div><div class="kp-sub flat">setelah susut 2,5%</div></div>
+      <div class="kpi-card"><div class="kp-label">TOTAL BELANJA (NETTO)</div><div class="kp-val" id="rpBelanjaNetto">Rp0</div><div class="kp-sub flat">setelah susut</div></div>
       <div class="kpi-card"><div class="kp-label">RASIO BELANJA / OMZET</div><div class="kp-val" id="rpHppRatio">0%</div><div class="kp-sub flat">semakin dekat 100% semakin baik</div></div>
       <div class="kpi-card"><div class="kp-label">BALANCE (OMZET − BELANJA)</div><div class="kp-val" id="rpBalance">Rp0</div><div class="kp-sub flat">selisih</div></div>
     </div>
@@ -1104,7 +1186,6 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
       <div style="overflow-x:auto"><table class="data-table" id="rpBulananTable"></table></div>
     </div>
   </div>
-
   <!-- STOK -->
   <div class="report-section" data-rsec="stok">
     <div class="card"><div class="adminhead">💎 Total Nilai Stok per Outlet</div>
@@ -1146,15 +1227,77 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 </div>
 </section>
 
+<!-- ============ HALAMAN KHUSUS: PENGELUARAN & KASBON (SEMUA TOKO / PER TOKO) ============ -->
+<section id="secExpenseMgmt" class="hide">
+<div class="card">
+  <div class="row">
+    <div class="adminhead" style="margin:0">💸 Rekap Pengeluaran & Kasbon</div>
+    <button type="button" class="btn secondary sm" id="expMgmtExportBtn">📤 Export (.xls)</button>
+  </div>
+  <div class="grid" style="margin-top:8px">
+    <div>
+      <label>Bulan</label>
+      <select id="expMgmtMonth"></select>
+    </div>
+    <div>
+      <label>Tahun</label>
+      <select id="expMgmtYear"></select>
+    </div>
+    <div>
+      <label>Filter Toko</label>
+      <select id="expMgmtOutlet"></select>
+    </div>
+    <div>
+      <label>Filter Kategori</label>
+      <select id="expMgmtCat"></select>
+    </div>
+  </div>
+</div>
+
+<div class="kpi-grid">
+  <div class="kpi-card"><div class="kp-label">TOTAL SEMUA PENGELUARAN</div><div class="kp-val" id="emTotalAll">Rp0</div><div class="kp-sub flat" id="emCountAll">0 transaksi</div></div>
+  <div class="kpi-card"><div class="kp-label">TOTAL KASBON KARYAWAN</div><div class="kp-val" id="emTotalKasbon" style="color:var(--red)">Rp0</div><div class="kp-sub flat" id="emCountKasbon">0 kasbon</div></div>
+  <div class="kpi-card"><div class="kp-label">BIAYA OPERASIONAL TOKO</div><div class="kp-val" id="emTotalOps" style="color:#d97706">Rp0</div><div class="kp-sub flat">di luar kasbon</div></div>
+  <div class="kpi-card"><div class="kp-label">TOKO AKTIF MENGELUARKAN</div><div class="kp-val" id="emOutletActive">0</div><div class="kp-sub flat">outlet tercatat</div></div>
+</div>
+
+<div class="report-tabs">
+  <button type="button" class="report-tab active" data-etab="kasbon">👤 Rekap Kasbon Karyawan</button>
+  <button type="button" class="report-tab" data-etab="pertoko">🏪 Rekap per Toko</button>
+  <button type="button" class="report-tab" data-etab="rincian">📋 Rincian Transaksi Keluar</button>
+</div>
+
+<div class="exp-section active" data-esec="kasbon">
+  <div class="card">
+    <div class="adminhead">👤 Total Kasbon per Karyawan (Acuan Potong Gaji)</div>
+    <p class="note">Klik nama karyawan untuk melihat rincian tanggal dan toko pengambilan kasbon.</p>
+    <div id="emKasbonList"></div>
+  </div>
+</div>
+
+<div class="exp-section hide" data-esec="pertoko">
+  <div class="card">
+    <div class="adminhead">🏪 Kesimpulan Pengeluaran per Toko</div>
+    <div style="overflow-x:auto"><table class="data-table" id="emPerTokoTable"></table></div>
+  </div>
+</div>
+
+<div class="exp-section hide" data-esec="rincian">
+  <div class="card">
+    <div class="adminhead">📋 Rincian Seluruh Pengeluaran</div>
+    <div id="emRincianList"></div>
+  </div>
+</div>
+</section>
 <section id="secNotif" class="hide">
 <div class="card">
   <div class="adminhead" style="color:#dc2626">🔔 Notifikasi Admin</div>
-  <p class="note">Daftar masalah yang perlu ditindaklanjuti. Klik <strong>Buka & Isi</strong> untuk langsung menuju bagian bermasalah.</p>
+  <p class="note">Daftar masalah yang perlu ditindaklanjuti (Harga 0, Ajuan Hapus Nota Kasir, dan Ajuan Hapus Item Distribusi).</p>
   <div id="adminNotifList"><p class="note" style="color:#16a34a;font-weight:700">✅ Tidak ada masalah.</p></div>
 </div>
 <div class="card">
   <div class="adminhead" style="color:#dc2626">📥 Pengajuan Hapus dari Karyawan</div>
-  <p class="note">Daftar pengajuan hapus dari karyawan. Klik <strong>Accept</strong> untuk menyetujui & menghapus, atau <strong>Tolak</strong> untuk menolak.</p>
+  <p class="note">Klik <strong>Accept</strong> untuk menyetujui & menghapus item/nota, atau <strong>Tolak</strong> untuk menolak.</p>
   <div id="devReqList"></div>
 </div>
 </section>
@@ -1254,7 +1397,6 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 </div>
 <button type="button" class="btn secondary" id="strukCloseBtn" style="margin-top:8px">Tutup</button>
 </div></div>
-
 <!-- MODAL KONFIRMASI KELUAR -->
 <div id="exitModal" class="modal-bg hide"><div class="modal-box">
   <div class="adminhead">Keluar tanpa menyimpan?</div>
@@ -1284,11 +1426,17 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 /* ================== DEFAULT DATA ================== */
 var defaultOutlets=[];for(var o=1;o<=19;o++)defaultOutlets.push("Outlet "+String(o).padStart(2,"0"));
 var defaultCaps=[];for(var sz=10;sz<=100;sz+=5)defaultCaps.push({size:sz});
+var defaultExpCats=[
+  "Token","Transport HO","Transport Distribusi","Reward","Cling pembersih",
+  "Aqua","Sampah","Keamanan","Kasbon","Super pel","Lain-lain"
+];
 
 var def={
 shop:{name:"AURA INTERNATIONAL PERFUME",addr:"Wangi Khas Pilihanmu",webhook:"https://google.com",mgmtPass:"2222",devPass:"9999",devWa:"",pusatWa:""},
 outlets:defaultOutlets,
 outletEmails:{},
+employees:[],
+expenseCategories:defaultExpCats,
 perfumes:[
 {code:"101",name:"101 - Adidas",displayName:"Adidas",price:2500},
 {code:"4302",name:"4302 - Al Rehab - lovely",displayName:"Al Rehab - lovely",price:2700},
@@ -1366,18 +1514,22 @@ function clone(o){return JSON.parse(JSON.stringify(o));}
 var KEY="auraPos19MasterV11",SALES_KEY="auraPos19SalesV9",STOCK_KEY="auraPos19StockV9",IN_KEY="auraPos19InV9";
 var AUDIT_KEY="auraPos19AuditSessionsV2",REQ_KEY="auraPos19ReqV9";
 var DIST_KEY="auraPos19DistV9",DISTQ_KEY="auraPos19DistQueueV1",STOKMIN_KEY="auraPos19StokMinV1";
+var EXP_KEY="auraPos19ExpensesV1",EXP_NONE_KEY="auraPos19ExpNoneV1";
 
 var data=null,sales=[],stocks={},stockIns=[],cart=[],currentPct=50,session=null,delReqs=[];
-var distCart=[],distQueue=[],stokMinOverride={};
+var distCart=[],distQueue=[],stokMinOverride={},expenses=[],noExpenseFlags={};
 try{data=JSON.parse(localStorage.getItem(KEY));}catch(e){}
 if(!data||!data.perfumes)data=clone(def);
 if(!data.additionals)data.additionals=clone(def.additionals);
 if(!data.outletEmails)data.outletEmails={};
+if(!Array.isArray(data.employees))data.employees=[];
+if(!Array.isArray(data.expenseCategories)||!data.expenseCategories.length)data.expenseCategories=defaultExpCats.slice();
 if(!data.shop.devWa)data.shop.devWa="";
 if(!data.shop.pusatWa)data.shop.pusatWa="";
 if(!data.shop.mgmtPass)data.shop.mgmtPass="2222";
 if(!data.shop.devPass)data.shop.devPass="9999";
 if(!data.stokMin)data.stokMin={};
+
 /* ===== MIGRASI DATA LAMA → STRUKTUR BARU ===== */
 (function migrateData(){
   function migrateItem(it, cat){
@@ -1418,7 +1570,8 @@ try{stockIns=JSON.parse(localStorage.getItem(IN_KEY))||[];}catch(e){stockIns=[];
 try{delReqs=JSON.parse(localStorage.getItem(REQ_KEY))||[];}catch(e){delReqs=[];}
 try{distQueue=JSON.parse(localStorage.getItem(DISTQ_KEY))||[];}catch(e){distQueue=[];}
 try{stokMinOverride=JSON.parse(localStorage.getItem(STOKMIN_KEY))||{};}catch(e){stokMinOverride={};}
-
+try{expenses=JSON.parse(localStorage.getItem(EXP_KEY))||[];}catch(e){expenses=[];}
+try{noExpenseFlags=JSON.parse(localStorage.getItem(EXP_NONE_KEY))||{};}catch(e){noExpenseFlags={};}
 /* ================== HELPERS & EXCEL (.XLS) ================== */
 function el(id){return document.getElementById(id);}
 function fmt(n){return "Rp"+Math.round(n).toLocaleString("id-ID");}
@@ -1431,6 +1584,8 @@ function saveStockIns(){try{localStorage.setItem(IN_KEY,JSON.stringify(stockIns)
 function saveReqs(){try{localStorage.setItem(REQ_KEY,JSON.stringify(delReqs));}catch(e){toast("⚠️ Penyimpanan penuh!","err");}}
 function saveDistQueue(){try{localStorage.setItem(DISTQ_KEY,JSON.stringify(distQueue));}catch(e){toast("⚠️ Penyimpanan penuh!","err");}}
 function saveStokMin(){try{localStorage.setItem(STOKMIN_KEY,JSON.stringify(stokMinOverride));}catch(e){toast("⚠️ Penyimpanan penuh!","err");}}
+function saveExpenses(){try{localStorage.setItem(EXP_KEY,JSON.stringify(expenses));}catch(e){toast("⚠️ Penyimpanan penuh!","err");}}
+function saveNoExpenseFlags(){try{localStorage.setItem(EXP_NONE_KEY,JSON.stringify(noExpenseFlags));}catch(e){toast("⚠️ Penyimpanan penuh!","err");}}
 function getAutoCfg(){
   if(!data.autoCfg)data.autoCfg={susutDist:2.5,susutKasir:2.5,minRecPct:30,syncSec:120,retainYears:10};
   return data.autoCfg;
@@ -1502,8 +1657,10 @@ function pruneOldData(){
   var cutStr=cutoff.getFullYear()+"-"+String(cutoff.getMonth()+1).padStart(2,"0")+"-"+String(cutoff.getDate()).padStart(2,"0");
   sales=sales.filter(function(s){return s.date>=cutStr;});
   stockIns=stockIns.filter(function(s){return s.date>=cutStr;});
-  saveSales();saveStockIns();
+  expenses=expenses.filter(function(x){return x.date>=cutStr;});
+  saveSales();saveStockIns();saveExpenses();
 }
+
 /* ================== TOAST ================== */
 function toast(msg,type){
   var w=el("toastWrap");var t=document.createElement("div");
@@ -1539,6 +1696,7 @@ document.addEventListener("change",function(e){
 window.addEventListener("beforeunload",function(e){
   if(hasUnsavedChanges){e.preventDefault();e.returnValue="";return "";}
 });
+
 /* ================== MODAL ================== */
 var act=null;
 function modal(title,html,fn){
@@ -1580,7 +1738,7 @@ el("waCopyBtn").onclick=async function(){
   catch(e){toast("Salin manual dari kotak teks.","warn");}
 };
 el("waOpenBtn").onclick=function(){
-  var url=waCurrentNumber?("https://wa.me"+waCurrentNumber+"?text="+encodeURIComponent(waCurrentText)):("https://wa.me?text="+encodeURIComponent(waCurrentText));
+  var url=waCurrentNumber?("https://wa.me"+waCurrentNumber+"?text="+encodeURIComponent(waCurrentText)):("https://wa.me"+encodeURIComponent(waCurrentText));
   window.open(url,"_blank");
 };
 
@@ -1609,7 +1767,7 @@ function ensureOutletStock(outlet){
   saveStocks();
 }
 
-/* ================== STOK MIN & RATA-RATA 10 HARI (4 BULAN KE BELAKANG) ================== */
+/* ================== STOK MIN & RATA-RATA 10 HARI ================== */
 function getStokMin(outlet,cat,name){
   var key=outlet+"|"+cat+"|"+name;
   if(stokMinOverride[key]!==undefined&&stokMinOverride[key]!=="")return +stokMinOverride[key];
@@ -1642,15 +1800,74 @@ function getAvg10Days(outlet,cat,name){
   });
   return +(totalUsed/(monthsActive*3)).toFixed(1);
 }
+/* ================== LOGIN 3 ROLE + PENJAGA 1 & 2 (PENGGANTI LIBUR) ================== */
+function getEligibleEmployees(outlet){
+  var list=(data.employees||[]).slice();
+  var tetap=list.filter(function(e){return e.outlet===outlet;});
+  var backup=list.filter(function(e){return e.outlet==="BACKUP";});
+  var lainnya=list.filter(function(e){return e.outlet!==outlet && e.outlet!=="BACKUP";});
+  return {tetap:tetap,backup:backup,lainnya:lainnya,all:list};
+}
+function buildStaffOptionsHtml(outlet,includeNone){
+  var g=getEligibleEmployees(outlet);
+  var html=includeNone?'<option value="">-- Sendiri (1 Orang) --</option>':'<option value="">-- Pilih Penjaga --</option>';
+  if(!g.all.length){
+    html+='<option value="Staff Toko">Staff Toko (Default)</option>';
+    return html;
+  }
+  g.tetap.forEach(function(e){
+    html+='<option value="'+esc(e.name)+'">'+esc(e.name)+' (Tetap)</option>';
+  });
+  g.backup.forEach(function(e){
+    html+='<option value="'+esc(e.name)+' [Pengganti]">'+esc(e.name)+' [Pengganti Libur]</option>';
+  });
+  g.lainnya.forEach(function(e){
+    html+='<option value="'+esc(e.name)+' ['+esc(e.outlet)+']">🔄 '+esc(e.name)+' ('+esc(e.outlet)+')</option>';
+  });
+  return html;
+}
+function renderLoginStaffSelects(){
+  var out=el("loginOutletSelect").value;
+  if(el("loginStaff1Select"))el("loginStaff1Select").innerHTML=buildStaffOptionsHtml(out,false);
+  if(el("loginStaff2Select"))el("loginStaff2Select").innerHTML=buildStaffOptionsHtml(out,true);
+}
+function updateSessionHeaderLabel(){
+  if(!session)return;
+  var roleLbl={staff:"Staff",management:"MANAGEMENT",admin:"ADMIN"};
+  if(session.role==="staff"){
+    var sNames=session.staff2?(session.staff1+" & "+session.staff2):(session.staff1||"Karyawan");
+    el("activeSessionLabel").textContent=session.outlet+" · "+sNames;
+    if(el("changeShiftBtn"))el("changeShiftBtn").classList.remove("hide");
+  }else{
+    el("activeSessionLabel").textContent=session.outlet+" · "+roleLbl[session.role];
+    if(el("changeShiftBtn"))el("changeShiftBtn").classList.add("hide");
+  }
+}
+if(el("changeShiftBtn"))el("changeShiftBtn").onclick=function(){
+  if(!session||session.role!=="staff")return;
+  modal("🔄 Ganti Penjaga Toko ("+session.outlet+")",
+    '<label>Penjaga 1 (Wajib)</label><select id="mShift1">'+buildStaffOptionsHtml(session.outlet,false)+'</select>'+
+    '<label>Penjaga 2 (Opsional)</label><select id="mShift2">'+buildStaffOptionsHtml(session.outlet,true)+'</select>',
+    function(){
+      var s1=el("mShift1").value,s2=el("mShift2").value;
+      if(!s1){toast("Pilih Penjaga 1 terlebih dahulu.","err");return false;}
+      if(s2&&s1===s2){toast("Penjaga 1 dan Penjaga 2 tidak boleh sama.","err");return false;}
+      session.staff1=s1;session.staff2=s2;
+      updateSessionHeaderLabel();
+      toast("✅ Penjaga diperbarui: "+(s2?(s1+" & "+s2):s1),"ok");
+    });
+  if(el("mShift1")&&session.staff1)el("mShift1").value=session.staff1;
+  if(el("mShift2")&&session.staff2)el("mShift2").value=session.staff2;
+};
 
-/* ================== LOGIN 3 ROLE ================== */
 function updateLoginUI(){
   var role=el("loginRoleSelect").value,out=el("loginOutletSelect").value;
+  renderLoginStaffSelects();
   if(role==="staff"){
     el("emailLoginWrap").classList.remove("hide");
     el("passLoginWrap").classList.add("hide");
     var reqPin=(data.outletEmails[out]||"").trim();
-    el("loginHintText").textContent=reqPin?"Masukkan PIN Toko "+out+" untuk masuk sebagai Karyawan.":"⚠️ PIN Toko "+out+" belum diatur oleh Admin.";
+    el("loginHintText").textContent=reqPin?"Pilih Penjaga & masukkan PIN Toko "+out+".":"⚠️ PIN Toko "+out+" belum diatur oleh Admin.";
   }else{
     el("emailLoginWrap").classList.add("hide");
     el("passLoginWrap").classList.remove("hide");
@@ -1666,7 +1883,12 @@ function renderLoginOutlets(){
 }
 el("doLoginBtn").onclick=function(){
   var outlet=el("loginOutletSelect").value,role=el("loginRoleSelect").value;
+  var s1="",s2="";
   if(role==="staff"){
+    s1=el("loginStaff1Select")?el("loginStaff1Select").value:"";
+    s2=el("loginStaff2Select")?el("loginStaff2Select").value:"";
+    if(!s1){toast("Pilih nama Penjaga 1 terlebih dahulu.","err");return;}
+    if(s2&&s1===s2){toast("Penjaga 1 dan Penjaga 2 tidak boleh sama.","err");return;}
     var reqPin=(data.outletEmails[outlet]||"").trim();
     var inpPin=el("loginEmailInput").value.trim();
     if(!reqPin){toast("Akses ditolak! PIN Toko "+outlet+" belum didaftarkan.","err");return;}
@@ -1676,14 +1898,13 @@ el("doLoginBtn").onclick=function(){
     var validPass=role==="management"?(data.shop.mgmtPass||"2222"):(data.shop.devPass||"9999");
     if(pass!==validPass){toast("Password salah!","err");return;}
   }
-  session={outlet:outlet,role:role};
+  session={outlet:outlet,role:role,staff1:s1,staff2:s2};
   ensureOutletStock(outlet);
   el("loginEmailInput").value="";el("loginPassInput").value="";
   el("loginScreen").classList.add("hide");
   if(el("loginHero"))el("loginHero").classList.add("hide");
   el("mainApp").classList.remove("hide");
-  var roleLbl={staff:"KARYAWAN TOKO",management:"MANAGEMENT",admin:"ADMIN"};
-  el("activeSessionLabel").textContent=outlet+" · "+roleLbl[role];
+  updateSessionHeaderLabel();
   document.querySelectorAll("#navTabs .tab").forEach(function(t){
     if(t.classList.contains("role-"+role))t.classList.remove("hide");
     else t.classList.add("hide");
@@ -1703,7 +1924,6 @@ el("doLoginBtn").onclick=function(){
     }
   },600);
 };
-
 el("logoutBtn").onclick=function(){
   if(hasUnsavedChanges){el("exitModal").classList.remove("hide");return;}
   performLogout();
@@ -1714,6 +1934,7 @@ function performLogout(){
   el("loginScreen").classList.remove("hide");
   if(el("loginHero"))el("loginHero").classList.remove("hide");
   el("globalSaveBtn").classList.add("hide");
+  if(el("changeShiftBtn"))el("changeShiftBtn").classList.add("hide");
   renderLoginOutlets();
   clearDirty();
 }
@@ -1802,7 +2023,6 @@ el("capDisplay").onclick=function(e){
 document.addEventListener("click",function(e){
   if(!e.target.closest("#capWrap")&&el("capMenu"))el("capMenu").classList.add("hide");
 });
-
 /* ================== KNOB ================== */
 var knob=el("scKnob"),wrap=el("scWrap"),fill=el("scFill"),dragging=false;
 function refreshKnob(){
@@ -1904,7 +2124,6 @@ el("openPayMethodBtn").onclick=function(){
   el("payMethodModal").classList.remove("hide");
 };
 el("pmCancelBtn").onclick=function(){el("payMethodModal").classList.add("hide");};
-
 document.querySelectorAll(".pay-method-btn").forEach(function(btn){
   btn.onclick=function(){
     selectedPayMethod=this.getAttribute("data-method")||"Tunai";
@@ -1989,7 +2208,9 @@ document.querySelectorAll("#calcNumpad .calc-key").forEach(function(btn){
 function buildReceipt58(trx){
   var out="================================\n  "+(data.shop.name||"AURA POS").toUpperCase()+"\n";
   if(data.shop.addr)out+="  "+data.shop.addr+"\n";
-  out+="  Cabang: "+trx.outlet+"\n================================\nNo   : "+trx.id+"\nTgl  : "+trx.time+"\nBayar: "+trx.method+"\n--------------------------------\n";
+  out+="  Cabang: "+trx.outlet+"\n================================\nNo   : "+trx.id+"\nTgl  : "+trx.time+"\n";
+  if(trx.staff)out+="Kasir: "+trx.staff+"\n";
+  out+="Bayar: "+trx.method+"\n--------------------------------\n";
   trx.items.forEach(function(it,idx){
     out+=(idx+1)+". "+it.parfum+" ("+it.vol+"ml)\n   "+it.pct+"% | "+it.campuran+" | "+it.botol+"\n   Subtotal: "+fmt(it.subtotal)+"\n";
   });
@@ -2000,9 +2221,10 @@ function buildReceipt58(trx){
   out+="================================\n  Terima Kasih Atas Kunjungan   \n\n\n";
   return out;
 }
-
 function buildDistReceipt58(d){
-  var out="================================\n  "+(data.shop.name||"AURA POS").toUpperCase()+"\n  BUKTI DISTRIBUSI BARANG\n  Tujuan: "+d.outlet+"\n================================\nNo   : "+d.id+"\nTgl  : "+d.date+" ("+d.time+")\nDok  : "+d.doc+"\n--------------------------------\n";
+  var out="================================\n  "+(data.shop.name||"AURA POS").toUpperCase()+"\n  BUKTI DISTRIBUSI BARANG\n  Tujuan: "+d.outlet+"\n================================\nNo   : "+d.id+"\nTgl  : "+d.date+" ("+d.time+")\n";
+  if(d.staff)out+="Petugas: "+d.staff+"\n";
+  out+="Dok  : "+d.doc+"\n--------------------------------\n";
   d.items.forEach(function(it,idx){
     var isAdd=(it.cat==="additionals");
     var qtyInfo=isAdd?(it.qtyIn+" "+it.unit):(it.qtyIn+" -> "+it.qtyNet+" "+it.unit);
@@ -2070,6 +2292,11 @@ el("strukShareBtn").onclick=async function(){
 };
 
 /* ================== CHECKOUT DARI KALKULATOR ================== */
+function getActiveStaffLabel(){
+  if(!session)return "";
+  if(session.role!=="staff")return session.role.toUpperCase();
+  return session.staff2?(session.staff1+" & "+session.staff2):(session.staff1||"Staff");
+}
 el("calcPayPrintBtn").onclick=function(){
   if(!session||!cart.length)return;
   var tot=getCartTotal();
@@ -2089,7 +2316,7 @@ el("calcPayPrintBtn").onclick=function(){
   var now=new Date();
   var trx={
     id:"INV-"+now.getTime().toString().slice(-6),
-    outlet:out,date:todayStr(),time:nowTime(),
+    outlet:out,staff:getActiveStaffLabel(),date:todayStr(),time:nowTime(),
     items:clone(cart),total:tot,method:selectedPayMethod,paid:paid,
     change:Math.max(0,paid-tot),synced:false
   };
@@ -2100,7 +2327,6 @@ el("calcPayPrintBtn").onclick=function(){
   showReceiptPreview(buildReceipt58(trx));
   toast("✅ Transaksi tersimpan.","ok");
 };
-
 /* ================== LOW STOCK / ORDER (PER OUTLET) ================== */
 function getLowStockItems(outlet){
   ensureOutletStock(outlet);
@@ -2143,7 +2369,7 @@ el("sendOrderWaBtn").onclick=function(){
   openWaModal(txt,data.shop.pusatWa);
 };
 
-/* ================== SETTING: OUTLET + PIN ================== */
+/* ================== SETTING: OUTLET + PIN + KARYAWAN + KATEGORI PENGELUARAN ================== */
 function renderOutletList(){
   el("outletList").innerHTML=data.outlets.map(function(o,i){
     var pin=data.outletEmails[o]||"";
@@ -2157,6 +2383,63 @@ function renderOutletList(){
   });
 }
 function renderOutletEmails(){renderOutletList();}
+
+function renderEmployeeSetting(){
+  if(el("newEmpOutletSelect")){
+    var prev=el("newEmpOutletSelect").value;
+    var opts='<option value="BACKUP">🔄 Pengganti Libur (Semua Toko)</option>';
+    opts+=data.outlets.map(function(o){return '<option value="'+esc(o)+'">🏪 '+esc(o)+' (Tetap)</option>';}).join("");
+    el("newEmpOutletSelect").innerHTML=opts;
+    if(prev)el("newEmpOutletSelect").value=prev;
+  }
+  if(!el("empList"))return;
+  var list=data.employees||[];
+  el("empList").innerHTML=list.map(function(emp,idx){
+    var badge=(emp.outlet==="BACKUP")?'<span class="badge wait">🔄 Pengganti Libur</span>':'<span class="badge ok">🏪 '+esc(emp.outlet)+'</span>';
+    return '<div class="item"><div class="row"><div><strong>'+esc(emp.name)+'</strong> '+badge+'</div><div class="item-actions"><button type="button" onclick="window._edEmp('+idx+')">Edit</button><button type="button" onclick="window._delEmp('+idx+')" style="background:#fee2e2;color:#b91c1c">Hapus</button></div></div></div>';
+  }).join("")||'<p class="note">Belum ada karyawan didaftarkan.</p>';
+}
+window._edEmp=function(idx){
+  var emp=data.employees[idx];if(!emp)return;
+  var opts='<option value="BACKUP"'+(emp.outlet==="BACKUP"?" selected":"")+'>🔄 Pengganti Libur (Semua Toko)</option>';
+  opts+=data.outlets.map(function(o){return '<option value="'+esc(o)+'"'+(emp.outlet===o?" selected":"")+'>🏪 '+esc(o)+' (Tetap)</option>';}).join("");
+  modal("Edit Data Karyawan",
+    '<label>Nama Karyawan</label><input id="mEmpNm" value="'+esc(emp.name)+'">'+
+    '<label>Penempatan / Status</label><select id="mEmpOut">'+opts+'</select>',
+    function(){
+      var nm=el("mEmpNm").value.trim(),out=el("mEmpOut").value;
+      if(!nm){toast("Nama karyawan wajib diisi.","err");return false;}
+      data.employees[idx]={name:nm,outlet:out};
+      saveMaster();renderEmployeeSetting();renderLoginStaffSelects();markDirty();
+      toast("✅ Data karyawan diperbarui.","ok");
+    });
+};
+window._delEmp=function(idx){
+  var emp=data.employees[idx];if(!emp)return;
+  modal("Hapus Karyawan",'<p class="note">Hapus <strong>'+esc(emp.name)+'</strong> dari daftar karyawan?</p>',
+    function(){
+      data.employees.splice(idx,1);
+      saveMaster();renderEmployeeSetting();renderLoginStaffSelects();markDirty();
+      toast("Karyawan dihapus.","warn");
+    });
+};
+function renderExpCatSetting(){
+  if(!el("expCatMasterList"))return;
+  var cats=data.expenseCategories||defaultExpCats;
+  el("expCatMasterList").innerHTML=cats.map(function(c,idx){
+    var isSpecial=(c.toLowerCase()==="kasbon"||c.toLowerCase()==="lain-lain");
+    var tag=c.toLowerCase()==="kasbon"?' <span class="badge info">Pilih Karyawan</span>':(c.toLowerCase()==="lain-lain"?' <span class="badge wait">Wajib Keterangan</span>':"");
+    var delBtn=isSpecial?'':'<button type="button" onclick="window._delExpCat('+idx+')" style="background:#fee2e2;color:#b91c1c">Hapus</button>';
+    return '<div class="item"><div class="row"><div><strong>'+esc(c)+'</strong>'+tag+'</div><div class="item-actions">'+delBtn+'</div></div></div>';
+  }).join("");
+}
+window._delExpCat=function(idx){
+  var nm=(data.expenseCategories||[])[idx];
+  if(!nm)return;
+  data.expenseCategories.splice(idx,1);
+  saveMaster();renderExpCatSetting();renderExpenseFormOptions();markDirty();
+  toast("Kategori "+nm+" dihapus.","warn");
+};
 
 /* ================== MASTER & CLOUD SYNC (GLOBAL SEMUA TOKO) ================== */
 function collectMasterFromUI(){
@@ -2191,7 +2474,7 @@ async function globalSaveAll(){
     collectMasterFromUI();
     saveMaster();saveStokMin();saveStocks();
     await pushCloudMaster();
-    clearDirty();renderLoginOutlets();renderOutletList();
+    clearDirty();renderLoginOutlets();renderOutletList();renderEmployeeSetting();renderExpCatSetting();
     if(session)all();
     toast("✅ Master & pengaturan disimpan untuk semua toko!","ok");
   }catch(e){toast("Gagal menyimpan: "+e.message,"err");}
@@ -2221,6 +2504,8 @@ async function pullCloudData(){
       var keepPins=data.outletEmails;
       data=j.master;
       if(!data.additionals)data.additionals=clone(def.additionals);
+      if(!Array.isArray(data.employees))data.employees=[];
+      if(!Array.isArray(data.expenseCategories)||!data.expenseCategories.length)data.expenseCategories=defaultExpCats.slice();
       if(!data.shop)data.shop={};
       if(!data.shop.webhook)data.shop.webhook=keepHook;
       if(!data.shop.mgmtPass)data.shop.mgmtPass=keepPass.mgmt||"2222";
@@ -2233,14 +2518,14 @@ async function pullCloudData(){
       (data.mixes||[]).forEach(function(m){if(m.code===undefined){var mm=String(m.name||"").match(/^(Al|Et|Eta)\s*-\s*(.+)$/i);if(mm){m.code=mm;m.displayName=mm;}else{m.code="";m.displayName=m.name||"";}}if(!m.displayName)m.displayName=m.name||"";if(m.price===undefined)m.price=(m.buy||0);delete m.min;delete m.buy;});
       (data.purchases||[]).forEach(function(b){if(b.code===undefined)b.code="";if(!b.displayName)b.displayName=b.name||"";if(b.price===undefined)b.price=(b.buy||0);delete b.min;delete b.buy;});
       (data.additionals||[]).forEach(function(a){if(a.code===undefined)a.code="";if(!a.displayName)a.displayName=a.name||"";a.price=0;});
-      saveMaster();renderLoginOutlets();renderOutletList();if(session)all();
+      saveMaster();renderLoginOutlets();renderOutletList();renderEmployeeSetting();renderExpCatSetting();if(session)all();
     }
     if(j&&j.stokMin){stokMinOverride=j.stokMin;saveStokMin();if(session)renderMinTable();}
     if(j&&Array.isArray(j.sales)&&j.sales.length){
       j.sales.forEach(function(cs){
         if(cs.id&&!sales.some(function(ls){return ls.id===cs.id;})){
           sales.push({
-            outlet:cs.outlet,id:cs.id,date:String(cs.date).slice(0,10),time:cs.time,method:cs.method,
+            outlet:cs.outlet,id:cs.id,date:String(cs.date).slice(0,10),time:cs.time,method:cs.method,staff:cs.staff||"",
             items:[{parfum:cs.summary,vol:(typeof cs.vol==="number"?cs.vol:0),pct:(typeof cs.pct==="number"?cs.pct:0),campuran:cs.campuran||"",botol:cs.botol||"",subtotal:cs.total}],
             total:cs.total,synced:true
           });
@@ -2251,6 +2536,7 @@ async function pullCloudData(){
     if(j&&Array.isArray(j.reqs)){delReqs=j.reqs;saveReqs();renderDevRequests();if(session)all();}
   }catch(e){}
 }
+
 /* ================== BACKUP & RESTORE MASTER (.XLS) ================== */
 el("exportMasterBtn").onclick=function(){
   var rows=[["TIPE","KATEGORI_ATAU_KEY","KODE","NAMA","HARGA_ATAU_NILAI"]];
@@ -2264,6 +2550,12 @@ el("exportMasterBtn").onclick=function(){
   rows.push(["SETTING","rounding","","",data.rounding||1000]);
   (data.outlets||[]).forEach(function(o){
     rows.push(["OUTLET",o,"",o,data.outletEmails[o]||""]);
+  });
+  (data.employees||[]).forEach(function(emp){
+    rows.push(["KARYAWAN",emp.outlet||"BACKUP","",emp.name||"",0]);
+  });
+  (data.expenseCategories||[]).forEach(function(cat){
+    rows.push(["EXP_CAT","kategori","",cat,0]);
   });
   (data.perfumes||[]).forEach(function(p){
     rows.push(["MASTER","parfum",p.code||"",p.displayName||p.name,p.price||0]);
@@ -2288,7 +2580,7 @@ el("importMasterInput").onchange=function(e){
     try{
       var rows=parseSpreadsheetRows(ev.target.result);
       if(rows.length<2){toast("File Excel kosong atau tidak valid.","err");return;}
-      var newPerf=[],newMix=[],newBot=[],newAdd=[],newOutlets=[],newPins={};
+      var newPerf=[],newMix=[],newBot=[],newAdd=[],newOutlets=[],newPins={},newEmps=[],newExpCats=[];
       rows.forEach(function(c,idx){
         if(idx===0)return;
         var tipe=(c[0]||"").toUpperCase(),kat=(c[1]||"").toLowerCase(),code=c[2]||"",nm=c[3]||"",val=c[4]||"";
@@ -2304,6 +2596,10 @@ el("importMasterInput").onchange=function(e){
         }else if(tipe==="OUTLET"&&nm){
           newOutlets.push(nm);
           if(val)newPins[nm]=val;
+        }else if(tipe==="KARYAWAN"&&nm){
+          newEmps.push({name:nm,outlet:c[1]||"BACKUP"});
+        }else if(tipe==="EXP_CAT"&&nm){
+          newExpCats.push(nm);
         }else if(tipe==="MASTER"&&nm){
           var pr=parseInt(String(val).replace(/\D/g,""),10)||0;
           var full=code?(code+" - "+nm):nm;
@@ -2318,7 +2614,9 @@ el("importMasterInput").onchange=function(e){
       if(newBot.length)data.purchases=newBot;
       if(newAdd.length)data.additionals=newAdd;
       if(newOutlets.length){data.outlets=newOutlets;data.outletEmails=newPins;}
-      saveMaster();renderLoginOutlets();renderOutletList();all();await pushCloudMaster();
+      if(newEmps.length)data.employees=newEmps;
+      if(newExpCats.length)data.expenseCategories=newExpCats;
+      saveMaster();renderLoginOutlets();renderOutletList();renderEmployeeSetting();renderExpCatSetting();all();await pushCloudMaster();
       toast("✅ Restore Master (.xls) berhasil!","ok");
     }catch(err){toast("File gagal dibaca.","err");}
   };
@@ -2373,23 +2671,172 @@ window._edOut=function(i){
   modal("Ubah Nama Outlet",'<input id="mOut" value="'+esc(data.outlets[i])+'">',
     function(){
       var v=el("mOut").value.trim();
-      if(v){data.outlets[i]=v;saveMaster();renderOutletList();renderLoginOutlets();renderMinOutletSelect();}
+      if(v){data.outlets[i]=v;saveMaster();renderOutletList();renderLoginOutlets();renderMinOutletSelect();renderEmployeeSetting();}
       else{toast("Nama tidak boleh kosong.","err");return false;}
     });
 };
 
-/* ================== CLOSING ================== */
+/* ================== CLOSING 2 TAB: LAPORAN OMZET & PENGELUARAN WAJIB ================== */
+function setClosingTab(ctab){
+  document.querySelectorAll("#secLaporan .report-tab").forEach(function(b){
+    b.classList.toggle("active",b.getAttribute("data-ctab")===ctab);
+  });
+  document.querySelectorAll("#secLaporan .closing-section").forEach(function(s){
+    s.classList.toggle("hide",s.getAttribute("data-csec")!==ctab);
+  });
+}
+document.querySelectorAll("#secLaporan .report-tab").forEach(function(btn){
+  btn.onclick=function(){setClosingTab(this.getAttribute("data-ctab"));};
+});
+
+function renderExpenseFormOptions(){
+  if(!el("expCategorySelect"))return;
+  var cats=data.expenseCategories||defaultExpCats;
+  el("expCategorySelect").innerHTML=cats.map(function(c){
+    return '<option value="'+esc(c)+'">'+esc(c)+'</option>';
+  }).join("");
+  if(el("expKasbonEmpSelect")){
+    var emps=data.employees||[];
+    el("expKasbonEmpSelect").innerHTML='<option value="">-- Pilih Nama Karyawan --</option>'+emps.map(function(e){
+      return '<option value="'+esc(e.name)+'">'+esc(e.name)+' ('+(e.outlet==="BACKUP"?"Pengganti Libur":esc(e.outlet))+')</option>';
+    }).join("");
+  }
+  updateExpenseFormFields();
+}
+function updateExpenseFormFields(){
+  if(!el("expCategorySelect"))return;
+  var cat=(el("expCategorySelect").value||"").toLowerCase();
+  if(cat==="kasbon"){
+    el("expKasbonWrap").classList.remove("hide");
+    el("expNoteLabel").textContent="Keterangan Kasbon (Optional)";
+    el("expNoteInput").placeholder="Misal: Kasbon tengah bulan";
+  }else if(cat==="lain-lain"){
+    el("expKasbonWrap").classList.add("hide");
+    el("expNoteLabel").textContent="Sebutkan Pengeluaran (Wajib Diisi)";
+    el("expNoteInput").placeholder="Wajib sebutkan jenis pengeluaran...";
+  }else{
+    el("expKasbonWrap").classList.add("hide");
+    el("expNoteLabel").textContent="Keterangan (Optional)";
+    el("expNoteInput").placeholder="Catatan pengeluaran...";
+  }
+}
+if(el("expCategorySelect"))el("expCategorySelect").onchange=updateExpenseFormFields;
+function getDailyExpenses(outlet,dateStr){
+  return (expenses||[]).filter(function(x){return x.outlet===outlet&&x.date===dateStr;});
+}
+function isExpenseReadyForClosing(outlet,dateStr){
+  var list=getDailyExpenses(outlet,dateStr);
+  if(list.length>0)return true;
+  return !!noExpenseFlags[outlet+"|"+dateStr];
+}
+if(el("noExpenseTodayBtn"))el("noExpenseTodayBtn").onclick=function(){
+  if(!session)return;
+  var d=el("reportDate").value||todayStr();
+  var list=getDailyExpenses(session.outlet,d);
+  if(list.length>0){
+    toast("Sudah ada catatan pengeluaran pada tanggal ini.","warn");
+    return;
+  }
+  noExpenseFlags[session.outlet+"|"+d]=true;
+  saveNoExpenseFlags();
+  renderReport();
+  toast("✅ Ditandai: Tidak ada pengeluaran pada "+d,"ok");
+};
+if(el("addExpenseBtn"))el("addExpenseBtn").onclick=function(){
+  if(!session)return;
+  var d=el("reportDate").value||todayStr();
+  var cat=el("expCategorySelect").value||"Lain-lain";
+  var catLow=cat.toLowerCase();
+  var empName="";
+  var note=el("expNoteInput").value.trim();
+  var amount=parseInt(el("expAmountInput").value,10)||0;
+  if(catLow==="kasbon"){
+    empName=el("expKasbonEmpSelect")?el("expKasbonEmpSelect").value:"";
+    if(!empName){toast("Pilih nama karyawan yang mengambil kasbon.","err");return;}
+  }
+  if(catLow==="lain-lain"&&!note){
+    toast("Wajib sebutkan keterangan untuk kategori Lain-lain.","err");return;
+  }
+  if(amount<=0){toast("Masukkan nominal pengeluaran lebih dari 0.","err");return;}
+  var now=new Date();
+  expenses.unshift({
+    id:"EXP-"+now.getTime().toString().slice(-6),
+    outlet:session.outlet,
+    date:d,
+    time:nowTime(),
+    category:cat,
+    employee:empName,
+    note:note,
+    amount:amount,
+    staff:getActiveStaffLabel()
+  });
+  delete noExpenseFlags[session.outlet+"|"+d];
+  saveExpenses();saveNoExpenseFlags();
+  el("expNoteInput").value="";el("expAmountInput").value="";
+  if(el("expKasbonEmpSelect"))el("expKasbonEmpSelect").value="";
+  renderReport();
+  if(session.role!=="staff")renderExpenseMgmt();
+  toast("✅ Pengeluaran "+cat+" ("+fmt(amount)+") tersimpan.","ok");
+};
+window._delExpense=function(id){
+  var idx=expenses.findIndex(function(x){return x.id===id;});
+  if(idx<0)return;
+  var ex=expenses[idx];
+  modal("Hapus Pengeluaran",
+    '<p class="note">Hapus catatan pengeluaran <strong>'+esc(ex.category)+' ('+fmt(ex.amount)+')</strong>?</p>',
+    function(){
+      expenses.splice(idx,1);saveExpenses();renderReport();
+      if(session&&session.role!=="staff")renderExpenseMgmt();
+      toast("Catatan pengeluaran dihapus.","warn");
+    });
+};
+
 function renderReport(){
   if(!session)return;
   var d=el("reportDate").value||todayStr();
+  if(el("expDateLabel"))el("expDateLabel").textContent=d;
+  renderExpenseFormOptions();
   var list=sales.filter(function(s){return s.outlet===session.outlet&&s.date===d;});
+  var dayExps=getDailyExpenses(session.outlet,d);
+  var expTot=dayExps.reduce(function(s,x){return s+x.amount;},0);
+  var isNoExp=!!noExpenseFlags[session.outlet+"|"+d];
+  var ready=isExpenseReadyForClosing(session.outlet,d);
+
+  if(el("closingExpStatusBadge")){
+    if(dayExps.length>0){
+      el("closingExpStatusBadge").className="badge ok";
+      el("closingExpStatusBadge").textContent=dayExps.length+" Item";
+    }else if(isNoExp){
+      el("closingExpStatusBadge").className="badge ok";
+      el("closingExpStatusBadge").textContent="Nihil (OK)";
+    }else{
+      el("closingExpStatusBadge").className="badge alert";
+      el("closingExpStatusBadge").textContent="Wajib Diisi";
+    }
+  }
+  if(el("expListTotalBadge"))el("expListTotalBadge").textContent=fmt(expTot);
+  if(el("dailyExpenseList")){
+    if(dayExps.length>0){
+      el("dailyExpenseList").innerHTML=dayExps.map(function(ex){
+        var detail=(ex.employee?("👤 "+esc(ex.employee)+(ex.note?" · "+esc(ex.note):"")):(ex.note?esc(ex.note):""));
+        return '<div class="item"><div class="row"><div><strong>'+esc(ex.category)+' · '+fmt(ex.amount)+'</strong>'+(detail?'<div class="small">'+detail+'</div>':'')+'<div class="small">🕒 '+ex.time+(ex.staff?' · Kasir: '+esc(ex.staff):'')+'</div></div><button type="button" onclick="window._delExpense(\''+ex.id+'\')" class="btn danger sm" style="margin:0">Hapus</button></div></div>';
+      }).join("");
+    }else if(isNoExp){
+      el("dailyExpenseList").innerHTML='<p class="note" style="color:#16a34a;font-weight:700">✅ Dikonfirmasi tidak ada pengeluaran pada tanggal '+d+'.</p>';
+    }else{
+      el("dailyExpenseList").innerHTML='<p class="note" style="color:#b45309">⚠️ Belum ada pengeluaran diisi. Isi pengeluaran atau klik tombol <strong>Tidak Ada Pengeluaran Hari Ini</strong> di atas.</p>';
+    }
+  }
+
   var omzet=0,cash=0,nonCash=0,unsynced=0;
   list.forEach(function(s){omzet+=s.total;if(s.method==="Tunai")cash+=s.total;else nonCash+=s.total;if(!s.synced)unsynced++;});
   el("statOmzet").textContent=fmt(omzet);
   el("statCount").textContent=list.length+" Nota";
   el("statCash").textContent=fmt(cash);
   el("statNonCash").textContent=fmt(nonCash);
-  el("syncStatusNote").textContent=unsynced>0?("Ada "+unsynced+" nota belum dikirim."):"Semua transaksi hari ini sudah terkirim.";
+  if(el("statExpenseTot"))el("statExpenseTot").textContent=fmt(expTot);
+  if(el("statNetCash"))el("statNetCash").textContent=fmt(Math.max(0,cash-expTot));
+  el("syncStatusNote").textContent=!ready?"⚠️ Lengkapi tab Pengeluaran terlebih dahulu sebelum Closing.":(unsynced>0?("Ada "+unsynced+" nota belum dikirim."):"Semua transaksi hari ini sudah terkirim.");
   el("salesList").innerHTML=list.map(function(s){
     var badge=s.synced?'<span class="badge ok">Online</span>':'<span class="badge wait">Offline</span>';
     var summaryItems=s.items.map(function(i){return i.parfum+" "+i.vol+"ml";}).join(", ");
@@ -2404,7 +2851,7 @@ function renderReport(){
       else menuItems.push({label:"⚠️ Ajukan Hapus",danger:true,onclick:"window._reqDel('sale','"+s.id+"')"});
     }
     var pendingBadge=pending?'<span class="badge wait" style="margin-left:4px">⏳ Diajukan</span>':'';
-    return '<div class="item"><div class="row"><div><strong>'+s.id+' · '+fmt(s.total)+'</strong> '+badge+pendingBadge+'<div class="small">📅 '+s.date+' ('+s.time+') · '+s.method+'</div><div class="small">'+esc(summaryItems)+'</div></div><div>'+dropdownHTML(uid,menuItems)+'</div></div></div>';
+    return '<div class="item"><div class="row"><div><strong>'+s.id+' · '+fmt(s.total)+'</strong> '+badge+pendingBadge+'<div class="small">📅 '+s.date+' ('+s.time+') · '+s.method+(s.staff?' · 👤 '+esc(s.staff):'')+'</div><div class="small">'+esc(summaryItems)+'</div></div><div>'+dropdownHTML(uid,menuItems)+'</div></div></div>';
   }).join("")||'<p class="note">Belum ada transaksi pada tanggal ini.</p>';
 }
 window._reprint=function(id){
@@ -2449,8 +2896,14 @@ el("closingBtn").onclick=async function(){
   if(!session)return;
   if(this.disabled)return;
   var d=el("reportDate").value||todayStr();
+  if(!isExpenseReadyForClosing(session.outlet,d)){
+    toast("⚠️ Wajib isi Pengeluaran hari ini (atau klik Tidak Ada Pengeluaran) sebelum Closing!","err");
+    setClosingTab("pengeluaran");
+    return;
+  }
   var list=sales.filter(function(s){return s.outlet===session.outlet&&s.date===d;});
-  if(!list.length){toast("Belum ada transaksi tanggal "+d,"err");return;}
+  var dayExps=getDailyExpenses(session.outlet,d);
+  if(!list.length&&!dayExps.length){toast("Belum ada transaksi tanggal "+d,"err");return;}
   if(!data.shop.webhook){toast("Link Google Sheets belum diisi.","err");return;}
   var oldText=this.textContent;this.disabled=true;this.textContent="⏳ Mengirim...";
   var snap=[];
@@ -2460,7 +2913,7 @@ el("closingBtn").onclick=async function(){
     snap.push({cat:"Bibit",name:p.name,displayName:p.displayName||p.name,qty:q.toFixed(1)+" ml",min:m,status:q<=m?"WAJIB ORDER":"AMAN"});
   });
   try{
-    await fetch(data.shop.webhook,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({outlet:session.outlet,date:d,transactions:list,stockSnapshot:snap})});
+    await fetch(data.shop.webhook,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({outlet:session.outlet,date:d,staff:getActiveStaffLabel(),transactions:list,expenses:dayExps,stockSnapshot:snap})});
     list.forEach(function(s){s.synced=true;});
     saveSales();renderReport();toast("✅ Closing berhasil!","ok");
   }catch(e){toast("Gagal terhubung.","err");}
@@ -2469,16 +2922,24 @@ el("closingBtn").onclick=async function(){
 el("waReportBtn").onclick=function(){
   if(!session)return;
   var d=el("reportDate").value||todayStr();
+  if(!isExpenseReadyForClosing(session.outlet,d)){
+    toast("⚠️ Lengkapi tab Pengeluaran terlebih dahulu!","err");
+    setClosingTab("pengeluaran");
+    return;
+  }
   var list=sales.filter(function(s){return s.outlet===session.outlet&&s.date===d;});
-  var omzet=0,cash=0,nonCash=0;
+  var dayExps=getDailyExpenses(session.outlet,d);
+  var omzet=0,cash=0,nonCash=0,expTot=0;
   list.forEach(function(s){omzet+=s.total;if(s.method==="Tunai")cash+=s.total;else nonCash+=s.total;});
-  openWaModal("CLOSING "+session.outlet+"\nTanggal: "+d+"\nTotal Nota: "+list.length+"\nTunai: "+fmt(cash)+"\nQRIS/Transfer: "+fmt(nonCash)+"\nTOTAL: "+fmt(omzet),data.shop.pusatWa);
+  dayExps.forEach(function(ex){expTot+=ex.amount;});
+  var expLines=dayExps.length?("\n\nPengeluaran:\n"+dayExps.map(function(ex,i){return (i+1)+". "+ex.category+(ex.employee?" ("+ex.employee+")":"")+(ex.note?" - "+ex.note:"")+": "+fmt(ex.amount);}).join("\n")):"\n\nPengeluaran: Tidak ada (Rp0)";
+  openWaModal("CLOSING "+session.outlet+"\nTanggal: "+d+"\nPenjaga: "+getActiveStaffLabel()+"\nTotal Nota: "+list.length+"\nTunai: "+fmt(cash)+"\nQRIS/Transfer: "+fmt(nonCash)+"\nTOTAL OMZET: "+fmt(omzet)+expLines+"\nTotal Keluar: "+fmt(expTot)+"\nSETOR TUNAI BERSIH: "+fmt(Math.max(0,cash-expTot)),data.shop.pusatWa);
 };
 el("exportSalesCsvBtn").onclick=function(){
-  var rows=[["OUTLET","NO_NOTA","TANGGAL","WAKTU","METODE","DETAIL_ITEM","TOTAL"]];
+  var rows=[["OUTLET","NO_NOTA","TANGGAL","WAKTU","PENJAGA","METODE","DETAIL_ITEM","TOTAL"]];
   sales.forEach(function(s){
     var det=s.items.map(function(i){return i.parfum+" ("+i.vol+"ml "+i.pct+"% "+i.campuran+" "+i.botol+")";}).join(" | ");
-    rows.push([s.outlet,s.id,s.date,s.time,s.method,det,s.total]);
+    rows.push([s.outlet,s.id,s.date,s.time,s.staff||"",s.method,det,s.total]);
   });
   downloadXls("Laporan_AuraPOS_"+todayStr()+".xls",rows);
   toast("✅ Laporan Excel (.xls) diunduh.","ok");
@@ -2532,34 +2993,45 @@ el("masterImportCsvInput").onchange=function(e){
   reader.readAsText(file);this.value="";
 };
 
-/* ================== AJUKAN HAPUS & BATAL ================== */
-window._reqDel=function(type,ref){
+/* ================== AJUKAN HAPUS (KASIR & ITEM DISTRIBUSI) ================== */
+window._reqDel=function(type,ref,itemIdx){
   if(!session)return;
-  var desc="",targetId="",tgl=todayStr();
+  var desc="",targetId="",tgl=todayStr(),extraIdx=(itemIdx!==undefined?+itemIdx:-1);
   if(type==="sale"){
     var s=sales.find(function(x){return x.id===ref;});if(!s)return;
     targetId=s.id;tgl=s.date;
     desc="Nota "+s.id+" ("+fmt(s.total)+")";
+  }else if(type==="distItem"){
+    var d=distHistory.find(function(x){return x.id===ref;});if(!d||!d.items[extraIdx])return;
+    var it=d.items[extraIdx];
+    targetId=d.id;tgl=d.date;
+    desc="Item Distribusi "+d.id+": "+it.name+" ("+it.qtyIn+" "+it.unit+")";
   }else{
     var x=stockIns.find(function(s){return s.id===ref;});if(!x)return;
     targetId=x.id;tgl=x.date;desc="Distribusi "+x.name+" (+"+x.qty+")";
   }
   modal("Ajukan Hapus ke Admin",
-    '<p class="note">Item: <strong>'+esc(desc)+'</strong></p><label>Alasan (Wajib)</label><input id="mReqReason" placeholder="Contoh: Salah input">',
+    '<p class="note">Item: <strong>'+esc(desc)+'</strong></p><label>Alasan (Wajib)</label><input id="mReqReason" placeholder="Contoh: Salah input item / jumlah">',
     async function(){
       var reason=el("mReqReason").value.trim();
       if(!reason){toast("Alasan wajib diisi.","err");return false;}
-      var reqObj={reqId:"REQ-"+Date.now().toString().slice(-6),outlet:session.outlet,type:type,targetId:targetId,date:tgl,desc:desc,reason:reason,status:"pending",createdAt:nowTime()};
+      var reqObj={
+        reqId:"REQ-"+Date.now().toString().slice(-6),
+        outlet:session.outlet,type:type,targetId:targetId,itemIdx:extraIdx,
+        date:tgl,desc:desc,reason:reason,status:"pending",createdAt:nowTime(),
+        staff:getActiveStaffLabel()
+      };
       delReqs.unshift(reqObj);saveReqs();all();await pushCloudReqs();
       var waNum=(data.shop.devWa||"").replace(/\D/g,"");
-      if(waNum)openWaModal("🔔 PENGAJUAN HAPUS\nOutlet: "+session.outlet+"\nData: "+desc+"\nAlasan: "+reason,waNum);
-      else toast("✅ Pengajuan terkirim.","ok");
+      if(waNum)openWaModal("🔔 PENGAJUAN HAPUS\nOutlet: "+session.outlet+"\nPenjaga: "+getActiveStaffLabel()+"\nData: "+desc+"\nAlasan: "+reason,waNum);
+      else toast("✅ Pengajuan terkirim ke Admin.","ok");
     });
 };
-window._cancelReq=function(type,ref){
+window._cancelReq=function(type,ref,itemIdx){
   if(!session)return;
   var idx=-1;
   if(type==="sale")idx=delReqs.findIndex(function(r){return r.type==="sale"&&r.targetId===ref&&r.status==="pending";});
+  else if(type==="distItem")idx=delReqs.findIndex(function(r){return r.type==="distItem"&&r.targetId===ref&&r.itemIdx===+itemIdx&&r.status==="pending";});
   else idx=delReqs.findIndex(function(r){return r.type==="stockIn"&&r.targetId===ref&&r.status==="pending";});
   if(idx<0){toast("Pengajuan tidak ditemukan.","err");return;}
   modal("Batalkan Pengajuan",'<p class="note">Batalkan pengajuan hapus untuk <strong>'+esc(delReqs[idx].desc)+'</strong>?</p>',
@@ -2568,7 +3040,6 @@ window._cancelReq=function(type,ref){
       toast("✅ Pengajuan dibatalkan.","ok");
     });
 };
-
 /* ================== NOTIF ADMIN ================== */
 function countAdminProblems(){
   var c=0;
@@ -2588,7 +3059,7 @@ function renderAdminNotif(){
   var pend=delReqs.filter(function(r){return r.status==="pending";});
   pend.forEach(function(r){
     items.push({
-      html:'<div class="notif-item"><div class="ni-head">📥 Pengajuan Hapus: '+esc(r.desc)+'</div><div class="ni-sub">'+esc(r.outlet)+' · '+r.date+' · Alasan: '+esc(r.reason)+'</div><div class="ni-actions"><button type="button" class="btn-fix" onclick="window._acceptReq(\''+r.reqId+'\')">✅ Accept</button><button type="button" class="btn-ignore" onclick="window._rejectReq(\''+r.reqId+'\')">❌ Tolak</button></div></div>'
+      html:'<div class="notif-item"><div class="ni-head">📥 Pengajuan Hapus: '+esc(r.desc)+'</div><div class="ni-sub">'+esc(r.outlet)+' · '+r.date+(r.staff?' · Oleh: '+esc(r.staff):'')+' · Alasan: '+esc(r.reason)+'</div><div class="ni-actions"><button type="button" class="btn-fix" onclick="window._acceptReq(\''+r.reqId+'\')">✅ Accept</button><button type="button" class="btn-ignore" onclick="window._rejectReq(\''+r.reqId+'\')">❌ Tolak</button></div></div>'
     });
   });
   el("adminNotifList").innerHTML=items.length?items.map(function(x){return x.html;}).join(""):'<p class="note" style="color:#16a34a;font-weight:700">✅ Tidak ada masalah.</p>';
@@ -2620,7 +3091,7 @@ function renderDevRequests(){
   }
   if(!el("devReqList"))return;
   el("devReqList").innerHTML=pend.map(function(r){
-    return '<div class="item" style="border-color:#fca5a5;background:#fef2f2"><div><strong>['+esc(r.outlet)+'] '+esc(r.desc)+'</strong><div class="small">📅 '+r.date+' · Diajukan: '+r.createdAt+'</div><div class="small" style="color:#b91c1c">Alasan: '+esc(r.reason)+'</div></div><div class="item-actions" style="margin-top:8px"><button type="button" onclick="window._acceptReq(\''+r.reqId+'\')" style="background:#16a34a;color:#fff">✅ Accept</button><button type="button" onclick="window._rejectReq(\''+r.reqId+'\')" style="background:#fee2e2;color:#b91c1c">❌ Tolak</button></div></div>';
+    return '<div class="item" style="border-color:#fca5a5;background:#fef2f2"><div><strong>['+esc(r.outlet)+'] '+esc(r.desc)+'</strong><div class="small">📅 '+r.date+' · Diajukan: '+r.createdAt+(r.staff?' · Oleh: '+esc(r.staff):'')+'</div><div class="small" style="color:#b91c1c">Alasan: '+esc(r.reason)+'</div></div><div class="item-actions" style="margin-top:8px"><button type="button" onclick="window._acceptReq(\''+r.reqId+'\')" style="background:#16a34a;color:#fff">✅ Accept</button><button type="button" onclick="window._rejectReq(\''+r.reqId+'\')" style="background:#fee2e2;color:#b91c1c">❌ Tolak</button></div></div>';
   }).join("")||'<p class="note" style="color:#16a34a;font-weight:700">✅ Tidak ada pengajuan menunggu.</p>';
 }
 window._acceptReq=async function(reqId){
@@ -2640,6 +3111,30 @@ window._acceptReq=async function(reqId){
       });
       saveStocks();sales.splice(idx,1);saveSales();
     }
+  }else if(r.type==="distItem"){
+    var didx=distHistory.findIndex(function(d){return d.id===r.targetId;});
+    if(didx>=0){
+      var dist=distHistory[didx];
+      var iIdx=+r.itemIdx;
+      if(dist.items&&dist.items[iIdx]){
+        var remIt=dist.items[iIdx];
+        ensureOutletStock(dist.outlet);
+        var cur2=stocks[dist.outlet].current;
+        if(cur2[remIt.cat]){
+          cur2[remIt.cat][remIt.name]=Math.max(0,(cur2[remIt.cat][remIt.name]||0)-remIt.qtyNet);
+        }
+        saveStocks();
+        dist.items.splice(iIdx,1);
+        if(dist.items.length===0){
+          distHistory.splice(didx,1);
+        }else{
+          var tN=0,tNet=0;
+          dist.items.forEach(function(x){tN+=x.nilaiNormal;tNet+=x.nilaiNetto;});
+          dist.totalNormal=tN;dist.totalNetto=tNet;
+        }
+        saveDistHistory();
+      }
+    }
   }else if(r.type==="stockIn"){
     var sidx=stockIns.findIndex(function(s){return s.id===r.targetId;});
     if(sidx>=0){
@@ -2649,7 +3144,7 @@ window._acceptReq=async function(reqId){
     }
   }
   r.status="accepted";saveReqs();all();await pushCloudReqs();
-  toast("✅ Pengajuan diterima.","ok");
+  toast("✅ Pengajuan diterima & stok diperbarui.","ok");
 };
 window._rejectReq=async function(reqId){
   var r=delReqs.find(function(x){return x.reqId===reqId;});
@@ -2657,7 +3152,6 @@ window._rejectReq=async function(reqId){
   r.status="rejected";saveReqs();all();await pushCloudReqs();
   toast("Pengajuan ditolak.","warn");
 };
-
 /* ================== STOK AWAL (.XLS) ================== */
 function renderStokAwal(){
   if(!session)return;
@@ -2776,6 +3270,7 @@ el("exportStokSysBtn").onclick=function(){
   downloadXls("StokSystem_"+out.replace(/\s+/g,"_")+"_"+todayStr()+".xls",rows);
   toast("✅ Stok System (.xls) diunduh.","ok");
 };
+
 /* ================== DISTRIBUSI STOK MASUK ================== */
 var distHistory=[];
 try{distHistory=JSON.parse(localStorage.getItem(DIST_KEY))||[];}catch(e){distHistory=[];}
@@ -2802,7 +3297,8 @@ function renderDistItems(){
   if(!list.length){
     el("distItemSelect").innerHTML='<option value="">Tidak ditemukan</option>';
   }else{
-    el("distItemSelect").innerHTML=list.map(function(x){
+    var placeholder=!q?'<option value="">-- Pilih Item --</option>':'';
+    el("distItemSelect").innerHTML=placeholder+list.map(function(x){
       var lbl=(x.code?x.code+" - ":"")+(x.displayName||x.name);
       return '<option value="'+esc(x.name)+'">'+esc(lbl)+'</option>';
     }).join("");
@@ -2866,24 +3362,6 @@ el("distQtyDisplay").onclick=function(e){
   e.stopPropagation();
   el("distQtyMenu").classList.toggle("hide");
 };
-document.querySelectorAll("#distQtyMenu .cap-opt").forEach(function(opt){
-  opt.onclick=function(e){
-    e.stopPropagation();
-    var v=this.getAttribute("data-val");
-    el("distQtyMenu").classList.add("hide");
-    if(v==="MANUAL"){
-      modal("Input Jumlah Masuk Manual",
-        '<label>Masukkan Jumlah</label><input id="mManualDistQty" type="number" min="1" step="1" placeholder="Contoh: 250">',
-        function(){
-          var num=parseFloat(el("mManualDistQty").value)||0;
-          if(num<=0){toast("Masukkan angka lebih dari 0.","err");return false;}
-          setDistQtyValue(num);
-        });
-    }else{
-      setDistQtyValue(+v);
-    }
-  };
-});
 document.addEventListener("click",function(e){
   if(!e.target.closest("#distQtyWrap")&&el("distQtyMenu"))el("distQtyMenu").classList.add("hide");
 });
@@ -2893,7 +3371,7 @@ el("distAddBtn").onclick=function(){
   var cat=el("distCatSelect").value,name=el("distItemSelect").value;
   var qty=+el("distQtyInput").value||0;
   var note=el("distNoteInput").value.trim();
-  if(!name){toast("Pilih item terlebih dahulu.","err");return;}
+  if(!name){toast("Pilih nama item terlebih dahulu.","err");return;}
   if(qty<=0){toast("Masukkan jumlah masuk.","err");return;}
   var buy=getHargaBeli(cat,name);
   var susut=getSusutRate(cat);
@@ -2905,7 +3383,12 @@ el("distAddBtn").onclick=function(){
     hargaBeli:buy,susut:susut,
     nilaiNormal:totalNormal,nilaiNetto:totalNetto,note:note
   });
-  setDistQtyValue("");el("distNoteInput").value="";
+  if(el("distSearchInput"))el("distSearchInput").value="";
+  renderDistItems();
+  el("distItemSelect").value="";
+  setDistQtyValue("");
+  el("distNoteInput").value="";
+  updateDistHargaBeliBox();
   renderDistCart();
   toast("✅ Item ditambahkan ke distribusi.","ok");
 };
@@ -2923,7 +3406,7 @@ function renderDistCart(){
     var isAdd=(it.cat==="additionals");
     var warn=(!isAdd&&it.hargaBeli===0)?'<span class="badge alert">⚠️ Harga 0</span>':(isAdd?'<span class="badge info">Operasional Rp0</span>':'');
     var subTxt=isAdd?(it.qtyIn+' '+it.unit+' · Rp0'):(it.qtyIn+' → '+it.qtyNet+' '+it.unit+' · @'+fmt(it.hargaBeli));
-    return '<div class="dist-item"><div><div class="di-name">'+esc(it.name)+' '+warn+'</div><div class="di-sub">'+subTxt+'</div></div><div class="di-qty"><div class="di-val">'+fmt(it.nilaiNetto)+'</div><button type="button" onclick="window._rmDist('+i+')" class="btn danger sm" style="margin-top:4px">Hapus</button></div></div>';
+    return '<div class="dist-item"><div><div class="di-name">'+esc(it.name)+' '+warn+'</div><div class="di-sub">'+subTxt+(it.note?' · '+esc(it.note):'')+'</div></div><div class="di-qty"><div class="di-val">'+fmt(it.nilaiNetto)+'</div><button type="button" onclick="window._rmDist('+i+')" class="btn danger sm" style="margin-top:4px">Hapus</button></div></div>';
   }).join("");
   el("distTotalNormal").textContent=fmt(totN);
   el("distTotalNetto").textContent=fmt(totNet);
@@ -2936,9 +3419,6 @@ el("distClearBtn").onclick=function(){
     function(){distCart=[];renderDistCart();});
 };
 
-function hasHargaBeliZero(){
-  return data.perfumes.some(function(p){return !p.price||p.price<=0;});
-}
 function getHargaBeliZeroList(){
   return data.perfumes.filter(function(p){return !p.price||p.price<=0;});
 }
@@ -2971,7 +3451,7 @@ el("distFixBtn").onclick=async function(){
   distCart.forEach(function(x){totalN+=x.nilaiNormal;totalNet+=x.nilaiNetto;});
   var dist={
     id:"DIST-"+now.getTime().toString().slice(-6),
-    outlet:session.outlet,
+    outlet:session.outlet,staff:getActiveStaffLabel(),
     date:date,time:nowTime(),doc:doc,
     items:clone(distCart),
     totalNormal:totalN,totalNetto:totalNet,
@@ -2992,7 +3472,6 @@ el("distFixBtn").onclick=async function(){
   toast("✅ Distribusi "+dist.id+" disimpan & struk siap cetak.","ok");
   trySendDist(dist.id);
 };
-
 function renderDistQueue(){
   el("distQueueInfo").textContent="Antrian: "+distQueue.filter(function(d){return d.status!=="sent";}).length;
   if(!distQueue.length){
@@ -3021,7 +3500,7 @@ async function trySendDist(id){
     var payload={
       type:"STOCK_DISTRIBUTION",
       outlet:d.outlet,distributionId:d.id,
-      date:d.date,time:d.time,doc:d.doc,
+      date:d.date,time:d.time,doc:d.doc,staff:d.staff||"",
       items:d.items.map(function(x){
         return {cat:x.cat,name:x.name,qtyIn:x.qtyIn,qtyNet:x.qtyNet,unit:x.unit,
           hargaBeli:x.hargaBeli,nilaiNormal:x.nilaiNormal,nilaiNetto:x.nilaiNetto,note:x.note};
@@ -3047,22 +3526,58 @@ function renderDistHistory(){
   el("distHistoryList").innerHTML=list.map(function(d){
     var st=d.status||"pending";
     var badge=st==="sent"?'<span class="badge ok">Terkirim</span>':'<span class="badge wait">Menunggu</span>';
-    return '<div class="item"><div class="row"><div><strong>'+d.id+' · '+esc(d.doc)+'</strong> '+badge+'<div class="small">📅 '+d.date+' · '+d.items.length+' item</div><div class="small">Normal: '+fmt(d.totalNormal)+' · Netto: '+fmt(d.totalNetto)+'</div></div><div class="item-actions"><button type="button" onclick="window._printDist(\''+d.id+'\')">🖨️ Struk</button><button type="button" onclick="window._viewDist(\''+d.id+'\')">Detail</button></div></div></div>';
+    var hasPending=delReqs.some(function(r){return r.type==="distItem"&&r.targetId===d.id&&r.status==="pending";});
+    var pendBadge=hasPending?' <span class="badge alert">⏳ Ajuan Hapus</span>':'';
+    return '<div class="item"><div class="row"><div><strong>'+d.id+' · '+esc(d.doc)+'</strong> '+badge+pendBadge+'<div class="small">📅 '+d.date+' · '+d.items.length+' item'+(d.staff?' · 👤 '+esc(d.staff):'')+'</div><div class="small">Normal: '+fmt(d.totalNormal)+' · Netto: '+fmt(d.totalNetto)+'</div></div><div class="item-actions"><button type="button" onclick="window._printDist(\''+d.id+'\')">🖨️ Struk</button><button type="button" onclick="window._viewDist(\''+d.id+'\')">Detail</button></div></div></div>';
   }).join("");
 }
 window._printDist=function(id){
   var d=distHistory.find(function(x){return x.id===id;});
   if(d)showReceiptPreview(buildDistReceipt58(d));
 };
+window._adminDelDistItem=function(distId,itemIdx){
+  if(!session||session.role!=="admin")return;
+  var didx=distHistory.findIndex(function(x){return x.id===distId;});
+  if(didx<0)return;
+  var dist=distHistory[didx];
+  var it=dist.items[itemIdx];if(!it)return;
+  ensureOutletStock(dist.outlet);
+  var cur=stocks[dist.outlet].current;
+  if(cur[it.cat])cur[it.cat][it.name]=Math.max(0,(cur[it.cat][it.name]||0)-it.qtyNet);
+  saveStocks();
+  dist.items.splice(itemIdx,1);
+  if(dist.items.length===0){
+    distHistory.splice(didx,1);
+  }else{
+    var tN=0,tNet=0;
+    dist.items.forEach(function(x){tN+=x.nilaiNormal;tNet+=x.nilaiNetto;});
+    dist.totalNormal=tN;dist.totalNetto=tNet;
+  }
+  saveDistHistory();
+  el("editModal").classList.add("hide");
+  all();
+  toast("✅ Item distribusi dihapus & stok disesuaikan.","ok");
+};
 window._viewDist=function(id){
   var d=distHistory.find(function(x){return x.id===id;});
   if(!d)return;
-  var html='<div class="small">Tanggal: '+d.date+' · '+d.time+'</div><div class="small">Dokumen: '+esc(d.doc)+'</div>';
+  var html='<div class="small">Tanggal: '+d.date+' · '+d.time+(d.staff?' · Oleh: '+esc(d.staff):'')+'</div><div class="small">Dokumen: '+esc(d.doc)+'</div>';
   html+='<div style="margin-top:8px">';
-  d.items.forEach(function(it){
+  d.items.forEach(function(it,idx){
     var isAdd=(it.cat==="additionals");
     var subTxt=isAdd?(it.qtyIn+' '+it.unit+' · Rp0'):(it.qtyIn+' → '+it.qtyNet+' '+it.unit+' @'+fmt(it.hargaBeli));
-    html+='<div class="dist-item"><div><div class="di-name">'+esc(it.name)+'</div><div class="di-sub">'+subTxt+'</div></div><div class="di-qty"><div class="di-val">'+fmt(it.nilaiNetto)+'</div></div></div>';
+    var pend=delReqs.some(function(r){return r.type==="distItem"&&r.targetId===d.id&&r.itemIdx===idx&&r.status==="pending";});
+    var actionBtn="";
+    if(session&&session.role==="admin"){
+      actionBtn='<button type="button" onclick="window._adminDelDistItem(\''+d.id+'\','+idx+')" class="btn danger sm" style="margin-top:4px;font-size:11px;padding:4px 8px">🗑️ Hapus Item</button>';
+    }else{
+      if(pend){
+        actionBtn='<div style="margin-top:4px"><span class="badge wait">⏳ Diajukan</span> <button type="button" onclick="el(\'editModal\').classList.add(\'hide\');window._cancelReq(\'distItem\',\''+d.id+'\','+idx+')" class="btn secondary sm" style="font-size:10.5px;padding:3px 7px">Batal</button></div>';
+      }else{
+        actionBtn='<button type="button" onclick="el(\'editModal\').classList.add(\'hide\');window._reqDel(\'distItem\',\''+d.id+'\','+idx+')" class="btn danger sm" style="margin-top:4px;font-size:11px;padding:4px 8px">⚠️ Ajukan Hapus</button>';
+      }
+    }
+    html+='<div class="dist-item"><div><div class="di-name">'+esc(it.name)+'</div><div class="di-sub">'+subTxt+'</div></div><div class="di-qty"><div class="di-val">'+fmt(it.nilaiNetto)+'</div>'+actionBtn+'</div></div>';
   });
   html+='</div><div class="dist-summary"><div class="ds-row"><span>Total Normal</span><strong>'+fmt(d.totalNormal)+'</strong></div><div class="ds-row total"><span>Total Netto</span><strong>'+fmt(d.totalNetto)+'</strong></div></div>';
   var oldSaveHandler = el("modalSave").onclick;
@@ -3077,7 +3592,6 @@ window._viewDist=function(id){
     showReceiptPreview(buildDistReceipt58(d));
   };
 };
-
 function renderDistRekap(){
   if(!session)return;
   var from=el("distRekapFrom").value||"";
@@ -3119,6 +3633,7 @@ el("distExportRekapBtn").onclick=function(){
 el("distDateInput").value=todayStr();
 el("distRekapFrom").value=todayStr().slice(0,7)+"-01";
 el("distRekapTo").value=todayStr();
+
 /* ================== CEK STOK PER SESI (.XLS) ================== */
 var AUDIT_SESSION_KEY="auraPos19AuditSessionsV2";
 var auditSessions=[];
@@ -3478,39 +3993,72 @@ el("minImportInput").onchange=function(e){
   reader.readAsText(file);this.value="";
 };
 
-/* ================== LAPORAN MANAGEMENT (PRO) ================== */
+/* ================== LAPORAN MANAGEMENT (FILTER BULAN & TAHUN OTOMATIS) ================== */
+var MONTH_NAMES=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 var mgmtFrom="",mgmtTo="";
-function initMgmtDates(){
+function populateMonthYearSelects(mId,yId){
+  var mSel=el(mId),ySel=el(yId);
+  if(!mSel||!ySel)return;
   var now=new Date();
-  var first=new Date(now.getFullYear(),now.getMonth(),1);
-  mgmtFrom=first.getFullYear()+"-"+String(first.getMonth()+1).padStart(2,"0")+"-01";
-  mgmtTo=todayStr();
-  el("mgmtFrom").value=mgmtFrom;
-  el("mgmtTo").value=mgmtTo;
+  var curM=now.getMonth(),curY=now.getFullYear();
+  mSel.innerHTML=MONTH_NAMES.map(function(nm,i){
+    return '<option value="'+i+'"'+(i===curM?' selected':'')+'>'+nm+'</option>';
+  }).join("");
+  var yHtml="";
+  for(var y=curY-3;y<=curY+2;y++){
+    yHtml+='<option value="'+y+'"'+(y===curY?' selected':'')+'>'+y+'</option>';
+  }
+  ySel.innerHTML=yHtml;
+}
+function getMonthBounds(mIdx,year){
+  var mm=String(mIdx+1).padStart(2,"0");
+  var lastDay=new Date(year,mIdx+1,0).getDate();
+  return {
+    from:year+"-"+mm+"-01",
+    to:year+"-"+mm+"-"+String(lastDay).padStart(2,"0"),
+    label:MONTH_NAMES[mIdx]+" "+year,
+    daysInMonth:lastDay
+  };
+}
+function initMgmtDates(){
+  populateMonthYearSelects("mgmtMonthSelect","mgmtYearSelect");
+  var now=new Date();
+  var b=getMonthBounds(now.getMonth(),now.getFullYear());
+  mgmtFrom=b.from;mgmtTo=b.to;
 }
 function getMgmtData(){
   var scope=el("mgmtScope").value;
-  var from=el("mgmtFrom").value||mgmtFrom;
-  var to=el("mgmtTo").value||mgmtTo;
+  var mIdx=parseInt(el("mgmtMonthSelect")?el("mgmtMonthSelect").value:new Date().getMonth(),10);
+  var yr=parseInt(el("mgmtYearSelect")?el("mgmtYearSelect").value:new Date().getFullYear(),10);
+  var b=getMonthBounds(mIdx,yr);
+  mgmtFrom=b.from;mgmtTo=b.to;
   var outletFilter=(scope==="all")?null:session.outlet;
   var listSales=sales.filter(function(s){
-    return (!outletFilter||s.outlet===outletFilter)&&s.date>=from&&s.date<=to;
+    return (!outletFilter||s.outlet===outletFilter)&&s.date>=b.from&&s.date<=b.to;
   });
   var listDist=distHistory.filter(function(d){
-    return (!outletFilter||d.outlet===outletFilter)&&d.date>=from&&d.date<=to;
+    return (!outletFilter||d.outlet===outletFilter)&&d.date>=b.from&&d.date<=b.to;
   });
-  return {listSales:listSales,listDist:listDist,from:from,to:to,scope:scope};
+  return {listSales:listSales,listDist:listDist,from:b.from,to:b.to,label:b.label,daysInMonth:b.daysInMonth,mIdx:mIdx,yr:yr,scope:scope};
 }
 function renderMgmt(){
   if(!session)return;
-  el("mgmtPeriodLabel").textContent="Periode: "+(el("mgmtFrom").value||"—")+" s/d "+(el("mgmtTo").value||"—");
   var d=getMgmtData();
+  el("mgmtPeriodLabel").textContent="Periode: "+d.label+" ("+d.from+" s/d "+d.to+")";
   renderMgmtOmzet(d);
   renderMgmtProduk(d);
   renderMgmtBelanja(d);
   renderMgmtStok(d);
   renderMgmtKasir(d);
+  if(!el("mgmtDetailView").classList.contains("hide")){
+    el("mgmtDetailPeriod").textContent="Periode: "+d.label+" ("+d.from+" s/d "+d.to+")";
+    renderMgmtDetail(currentMgmtOutlet);
+  }
 }
+if(el("mgmtMonthSelect"))el("mgmtMonthSelect").onchange=renderMgmt;
+if(el("mgmtYearSelect"))el("mgmtYearSelect").onchange=renderMgmt;
+if(el("mgmtScope"))el("mgmtScope").onchange=renderMgmt;
+
 function renderMgmtOmzet(d){
   var omzet=0,nota=d.listSales.length;
   d.listSales.forEach(function(s){omzet+=s.total;});
@@ -3518,7 +4066,7 @@ function renderMgmtOmzet(d){
   el("rpNota").textContent=nota;
   el("rpAvg").textContent=nota?fmt(omzet/nota):"Rp0";
   var today=todayStr();
-  var todaySales=d.listSales.filter(function(s){return s.date===today;});
+  var todaySales=sales.filter(function(s){return (d.scope==="all"||s.outlet===session.outlet)&&s.date===today;});
   var todayOmzet=todaySales.reduce(function(a,b){return a+b.total;},0);
   el("rpHariIni").textContent=fmt(todayOmzet);
   el("rpOmzetDelta").textContent=nota>0?("Rata-rata "+fmt(omzet/nota)+"/nota"):"—";
@@ -3526,12 +4074,12 @@ function renderMgmtOmzet(d){
   el("rpNotaSub").textContent=nota>0?("Omzet total "+fmt(omzet)):"—";
   el("rpHariSub").textContent=todaySales.length+" nota hari ini";
   var days=[];var maxD=1;
-  for(var i=29;i>=0;i--){
-    var dt=new Date();dt.setDate(dt.getDate()-i);
-    var ds=dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0");
+  var mm=String(d.mIdx+1).padStart(2,"0");
+  for(var day=1;day<=d.daysInMonth;day++){
+    var ds=d.yr+"-"+mm+"-"+String(day).padStart(2,"0");
     var sum=d.listSales.filter(function(s){return s.date===ds;}).reduce(function(a,b){return a+b.total;},0);
     if(sum>maxD)maxD=sum;
-    days.push({lbl:ds.slice(5),val:sum});
+    days.push({lbl:String(day).padStart(2,"0"),val:sum});
   }
   el("rpChart30").innerHTML='<div class="mini-chart">'+days.map(function(x){
     return '<div class="mc-bar" style="height:'+Math.max(2,Math.round(x.val/maxD*100))+'%"><span class="mc-lbl">'+x.lbl+'</span><span class="mc-val">'+(x.val>0?fmt(x.val):'')+'</span></div>';
@@ -3565,10 +4113,8 @@ function renderMgmtProduk(d){
   el("rpTop10").innerHTML=top.map(function(x){
     return '<div class="bar-row"><div class="row"><small>'+esc(x.name)+'</small><strong>'+x.vol.toFixed(1)+' ml</strong></div><div class="bar-bg"><div class="bar-fill" style="width:'+Math.round(x.vol/maxV*100)+'%"></div></div></div>';
   }).join("")||'<p class="note">Belum ada data.</p>';
-  var last30=new Date();last30.setDate(last30.getDate()-30);
-  var cut=last30.getFullYear()+"-"+String(last30.getMonth()+1).padStart(2,"0")+"-"+String(last30.getDate()).padStart(2,"0");
   var soldSet={};
-  sales.filter(function(s){return s.date>=cut;}).forEach(function(s){s.items.forEach(function(i){if(i.parfum)soldSet[i.parfum]=true;});});
+  d.listSales.forEach(function(s){s.items.forEach(function(i){if(i.parfum)soldSet[i.parfum]=true;});});
   var dead=data.perfumes.filter(function(p){return !soldSet[p.name];});
   el("rpDeadProducts").innerHTML=dead.slice(0,20).map(function(p){
     return '<div class="item"><div class="row"><strong>'+esc(p.displayName||p.name)+'</strong><span class="badge alert">0 terjual</span></div></div>';
@@ -3589,19 +4135,23 @@ function renderMgmtBelanja(d){
   var days={};
   d.listSales.forEach(function(s){days[s.date]=days[s.date]||{omzet:0,belanja:0};days[s.date].omzet+=s.total;});
   d.listDist.forEach(function(x){days[x.date]=days[x.date]||{omzet:0,belanja:0};days[x.date].belanja+=x.totalNetto;});
-  var keys=Object.keys(days).sort().slice(-30);
+  var keys=Object.keys(days).sort();
   var maxV=1;keys.forEach(function(k){maxV=Math.max(maxV,days[k].omzet,days[k].belanja);});
   el("rpBelanjaChart").innerHTML=keys.map(function(k){
     var o=days[k].omzet,b=days[k].belanja;
     return '<div class="bar-row"><div class="row"><small>'+k.slice(5)+'</small><strong>O: '+fmt(o)+' · B: '+fmt(b)+'</strong></div><div class="bar-bg" style="height:14px"><div class="bar-fill" style="width:'+Math.round(o/maxV*100)+'%;background:#0d6efd;height:6px"></div><div class="bar-fill" style="width:'+Math.round(b/maxV*100)+'%;background:#d97706;height:6px;margin-top:2px"></div></div></div>';
   }).join("")||'<p class="note">Belum ada data.</p>';
   var byMonth={};
-  d.listSales.forEach(function(s){
+  sales.forEach(function(s){
+    if(d.scope==="outlet"&&s.outlet!==session.outlet)return;
+    if(String(s.date).indexOf(String(d.yr))!==0)return;
     var m=s.date.slice(0,7);
     byMonth[m]=byMonth[m]||{omzet:0,belanja:0};
     byMonth[m].omzet+=s.total;
   });
-  d.listDist.forEach(function(x){
+  distHistory.forEach(function(x){
+    if(d.scope==="outlet"&&x.outlet!==session.outlet)return;
+    if(String(x.date).indexOf(String(d.yr))!==0)return;
     var m=x.date.slice(0,7);
     byMonth[m]=byMonth[m]||{omzet:0,belanja:0};
     byMonth[m].belanja+=x.totalNetto;
@@ -3613,7 +4163,7 @@ function renderMgmtBelanja(d){
     var hpp=x.omzet>0?Math.round(x.belanja/x.omzet*100):0;
     mhtml+='<tr><td>'+m+'</td><td class="right">'+fmt(x.omzet)+'</td><td class="right">'+fmt(x.belanja)+'</td><td class="right">'+hpp+'%</td></tr>';
   });
-  if(!mkeys.length)mhtml+='<tr><td colspan="4" class="note">Belum ada data.</td></tr>';
+  if(!mkeys.length)mhtml+='<tr><td colspan="4" class="note">Belum ada data tahun '+d.yr+'.</td></tr>';
   el("rpBulananTable").innerHTML=mhtml;
 }
 function renderMgmtStok(d){
@@ -3668,7 +4218,7 @@ function renderMgmtKasir(d){
   d.listSales.forEach(function(s){
     if(!s.time)return;
     var m=s.time.match(/(\d{1,2})[.:]/);
-    if(m){var h=+m;hourMap[h]=(hourMap[h]||0)+s.total;}
+    if(m){var h=+m[1];hourMap[h]=(hourMap[h]||0)+s.total;}
   });
   var hours=Object.keys(hourMap).map(function(h){return {h:+h,v:hourMap[h]};}).sort(function(a,b){return a.h-b.h;});
   var maxH=hours.length?Math.max.apply(null,hours.map(function(x){return x.v;})):1;
@@ -3687,17 +4237,18 @@ window._openMgmtDetail = function(outletName){
   el("mgmtListView").classList.add("hide");
   el("mgmtDetailView").classList.remove("hide");
   el("mgmtDetailTitle").textContent = (outletName==="ALL") ? "🌐 Semua Toko" : "🏪 "+outletName;
-  el("mgmtDetailPeriod").textContent = "Periode: "+ (el("mgmtFrom").value||"—") +" s/d "+ (el("mgmtTo").value||"—");
+  var d = getMgmtData();
+  el("mgmtDetailPeriod").textContent = "Periode: "+ d.label +" ("+ d.from +" s/d "+ d.to +")";
   renderMgmtDetail(outletName);
   updateTopBackBtn();
   window.scrollTo(0,0);
 };
 function renderMgmtDetail(outletName){
-  var from = el("mgmtFrom").value || mgmtFrom;
-  var to = el("mgmtTo").value || mgmtTo;
+  var d = getMgmtData();
+  var from = d.from, to = d.to;
   var filterOutlet = (outletName === "ALL") ? null : outletName;
   var listSales = sales.filter(function(s){return (!filterOutlet || s.outlet===filterOutlet) && s.date>=from && s.date<=to;});
-  var listDist = distHistory.filter(function(d){return (!filterOutlet || d.outlet===filterOutlet) && d.date>=from && d.date<=to;});
+  var listDist = distHistory.filter(function(x){return (!filterOutlet || x.outlet===filterOutlet) && x.date>=from && x.date<=to;});
   var omzet=0, nota=listSales.length, belanja=0;
   listSales.forEach(function(s){omzet+=s.total;});
   listDist.forEach(function(x){belanja+=x.totalNetto;});
@@ -3726,24 +4277,148 @@ function renderMgmtDetail(outletName){
     return '<div class="bar-row"><div class="row"><small>'+String(x.h).padStart(2,"0")+':00</small><strong>'+fmt(x.v)+'</strong></div><div class="bar-bg"><div class="bar-fill" style="width:'+Math.round(x.v/maxH*100)+'%"></div></div></div>';
   }).join("")||'<p class="note">Belum ada data.</p>';
 }
-el("mgmtApplyBtn").onclick=renderMgmt;
-el("mgmtResetBtn").onclick=function(){initMgmtDates();renderMgmt();};
 el("mgmtExportBtn").onclick=function(){
   if(!session)return;
   var d=getMgmtData();
-  var rows=[["OUTLET","TANGGAL","NO_NOTA","METODE","TOTAL"]];
-  d.listSales.forEach(function(s){rows.push([s.outlet,s.date,s.id,s.method,s.total]);});
-  downloadXls("LaporanMgmt_"+d.from+"_"+d.to+".xls",rows);
+  var rows=[["OUTLET","TANGGAL","NO_NOTA","PENJAGA","METODE","TOTAL"]];
+  d.listSales.forEach(function(s){rows.push([s.outlet,s.date,s.id,s.staff||"",s.method,s.total]);});
+  downloadXls("LaporanMgmt_"+d.label.replace(/\s+/g,"_")+".xls",rows);
   toast("✅ Laporan Management (.xls) diunduh.","ok");
 };
-document.querySelectorAll(".report-tab").forEach(function(t){
+document.querySelectorAll("#mgmtListView .report-tab").forEach(function(t){
   t.onclick=function(){
-    document.querySelectorAll(".report-tab").forEach(function(x){x.classList.remove("active");});
+    document.querySelectorAll("#mgmtListView .report-tab").forEach(function(x){x.classList.remove("active");});
     this.classList.add("active");
     var tab=this.getAttribute("data-rtab");
     document.querySelectorAll(".report-section").forEach(function(s){s.classList.toggle("active",s.getAttribute("data-rsec")===tab);});
   };
 });
+
+/* ================== HALAMAN KHUSUS: REKAP PENGELUARAN & KASBON ================== */
+function initExpenseMgmtFilters(){
+  populateMonthYearSelects("expMgmtMonth","expMgmtYear");
+  if(el("expMgmtOutlet")){
+    var prev=el("expMgmtOutlet").value;
+    el("expMgmtOutlet").innerHTML='<option value="ALL">🌐 Semua 19 Toko</option>'+data.outlets.map(function(o){
+      return '<option value="'+esc(o)+'">🏪 '+esc(o)+'</option>';
+    }).join("");
+    if(prev)el("expMgmtOutlet").value=prev;
+  }
+  if(el("expMgmtCat")){
+    var prevC=el("expMgmtCat").value;
+    var cats=data.expenseCategories||defaultExpCats;
+    el("expMgmtCat").innerHTML='<option value="ALL">Semua Kategori</option>'+cats.map(function(c){
+      return '<option value="'+esc(c)+'">'+esc(c)+'</option>';
+    }).join("");
+    if(prevC)el("expMgmtCat").value=prevC;
+  }
+}
+function getFilteredExpensesMgmt(){
+  var mIdx=parseInt(el("expMgmtMonth")?el("expMgmtMonth").value:new Date().getMonth(),10);
+  var yr=parseInt(el("expMgmtYear")?el("expMgmtYear").value:new Date().getFullYear(),10);
+  var outF=el("expMgmtOutlet")?el("expMgmtOutlet").value:"ALL";
+  var catF=el("expMgmtCat")?el("expMgmtCat").value:"ALL";
+  var b=getMonthBounds(mIdx,yr);
+  var list=(expenses||[]).filter(function(ex){
+    if(ex.date<b.from||ex.date>b.to)return false;
+    if(outF!=="ALL"&&ex.outlet!==outF)return false;
+    if(catF!=="ALL"&&ex.category!==catF)return false;
+    return true;
+  });
+  return {list:list,bounds:b,outF:outF,catF:catF};
+}
+function renderExpenseMgmt(){
+  if(!session)return;
+  var res=getFilteredExpensesMgmt();
+  var list=res.list;
+  var totAll=0,totKasbon=0,cntKasbon=0,totOps=0;
+  var outletSet={},kasbonMap={},perTokoMap={};
+  list.forEach(function(ex){
+    totAll+=ex.amount;
+    outletSet[ex.outlet]=true;
+    if(!perTokoMap[ex.outlet])perTokoMap[ex.outlet]={ops:0,kasbon:0,total:0,count:0};
+    perTokoMap[ex.outlet].total+=ex.amount;
+    perTokoMap[ex.outlet].count++;
+    if((ex.category||"").toLowerCase()==="kasbon"){
+      totKasbon+=ex.amount;cntKasbon++;
+      perTokoMap[ex.outlet].kasbon+=ex.amount;
+      var emp=ex.employee||"Tanpa Nama";
+      if(!kasbonMap[emp])kasbonMap[emp]={name:emp,total:0,items:[]};
+      kasbonMap[emp].total+=ex.amount;
+      kasbonMap[emp].items.push(ex);
+    }else{
+      totOps+=ex.amount;
+      perTokoMap[ex.outlet].ops+=ex.amount;
+    }
+  });
+  if(el("emTotalAll"))el("emTotalAll").textContent=fmt(totAll);
+  if(el("emCountAll"))el("emCountAll").textContent=list.length+" transaksi";
+  if(el("emTotalKasbon"))el("emTotalKasbon").textContent=fmt(totKasbon);
+  if(el("emCountKasbon"))el("emCountKasbon").textContent=cntKasbon+" kasbon";
+  if(el("emTotalOps"))el("emTotalOps").textContent=fmt(totOps);
+  if(el("emOutletActive"))el("emOutletActive").textContent=Object.keys(outletSet).length+" Toko";
+
+  var kArr=Object.keys(kasbonMap).map(function(k){return kasbonMap[k];}).sort(function(a,b){return b.total-a.total;});
+  if(el("emKasbonList")){
+    el("emKasbonList").innerHTML=kArr.map(function(k,idx){
+      var tokoList=Array.from(new Set(k.items.map(function(x){return x.outlet;}))).join(", ");
+      return '<div class="item" style="cursor:pointer;border-left:4px solid #dc2626" onclick="window._viewEmpKasbon('+idx+')">'+
+        '<div class="row"><div><strong>👤 '+esc(k.name)+'</strong><div class="small">🏪 '+esc(tokoList)+' · '+k.items.length+'× kasbon</div></div><strong style="color:var(--red);font-size:15px">'+fmt(k.total)+'</strong></div></div>';
+    }).join("")||'<p class="note">Tidak ada data kasbon pada periode ini.</p>';
+    window._lastKasbonArr=kArr;
+  }
+
+  if(el("emPerTokoTable")){
+    var tHtml='<tr><th>Outlet</th><th class="right">Operasional</th><th class="right">Kasbon</th><th class="right">Total Keluar</th></tr>';
+    var outletsShow=(res.outF==="ALL")?data.outlets:[res.outF];
+    outletsShow.forEach(function(o){
+      var r=perTokoMap[o]||{ops:0,kasbon:0,total:0};
+      tHtml+='<tr><td>'+esc(o)+'</td><td class="right">'+fmt(r.ops)+'</td><td class="right">'+fmt(r.kasbon)+'</td><td class="right"><strong>'+fmt(r.total)+'</strong></td></tr>';
+    });
+    tHtml+='<tr class="total-row"><td>TOTAL</td><td class="right">'+fmt(totOps)+'</td><td class="right">'+fmt(totKasbon)+'</td><td class="right">'+fmt(totAll)+'</td></tr>';
+    el("emPerTokoTable").innerHTML=tHtml;
+  }
+
+  if(el("emRincianList")){
+    el("emRincianList").innerHTML=list.map(function(ex){
+      var sub=(ex.employee?("👤 "+esc(ex.employee)+(ex.note?" · "+esc(ex.note):"")):(ex.note?esc(ex.note):""));
+      return '<div class="item"><div class="row"><div><strong>['+esc(ex.outlet)+'] '+esc(ex.category)+'</strong><div class="small">📅 '+ex.date+(sub?' · '+sub:'')+(ex.staff?' · Kasir: '+esc(ex.staff):'')+'</div></div><strong style="color:var(--red)">'+fmt(ex.amount)+'</strong></div></div>';
+    }).join("")||'<p class="note">Tidak ada catatan pengeluaran.</p>';
+  }
+}
+window._viewEmpKasbon=function(idx){
+  var k=(window._lastKasbonArr||[])[idx];
+  if(!k)return;
+  var html='<div class="small" style="margin-bottom:8px">Total Kasbon Bulan Ini: <strong style="color:var(--red)">'+fmt(k.total)+'</strong></div>';
+  html+=k.items.map(function(it){
+    return '<div class="item"><div class="row"><div><strong>📅 '+it.date+' · '+esc(it.outlet)+'</strong>'+(it.note?'<div class="small">'+esc(it.note)+'</div>':'')+'</div><strong>'+fmt(it.amount)+'</strong></div></div>';
+  }).join("");
+  modal("Rincian Kasbon — "+k.name,html,null);
+};
+["expMgmtMonth","expMgmtYear","expMgmtOutlet","expMgmtCat"].forEach(function(id){
+  if(el(id))el(id).onchange=renderExpenseMgmt;
+});
+document.querySelectorAll("#secExpenseMgmt .report-tab").forEach(function(btn){
+  btn.onclick=function(){
+    document.querySelectorAll("#secExpenseMgmt .report-tab").forEach(function(b){b.classList.remove("active");});
+    this.classList.add("active");
+    var tab=this.getAttribute("data-etab");
+    document.querySelectorAll("#secExpenseMgmt .exp-section").forEach(function(s){
+      s.classList.toggle("hide",s.getAttribute("data-esec")!==tab);
+    });
+  };
+});
+if(el("expMgmtExportBtn"))el("expMgmtExportBtn").onclick=function(){
+  var res=getFilteredExpensesMgmt();
+  if(!res.list.length){toast("Tidak ada data pengeluaran pada filter ini.","err");return;}
+  var rows=[["TANGGAL","WAKTU","OUTLET","KATEGORI","NAMA_KARYAWAN_KASBON","KETERANGAN","NOMINAL","PENJAGA_SHIFT"]];
+  res.list.forEach(function(ex){
+    rows.push([ex.date,ex.time||"",ex.outlet,ex.category,ex.employee||"",ex.note||"",ex.amount,ex.staff||""]);
+  });
+  var fn="Pengeluaran_Kasbon_"+res.bounds.label.replace(/\s+/g,"_")+(res.outF!=="ALL"?"_"+res.outF.replace(/\s+/g,"_"):"")+".xls";
+  downloadXls(fn,rows);
+  toast("✅ Data Pengeluaran & Kasbon (.xls) diunduh.","ok");
+};
 document.querySelectorAll(".master-tab").forEach(function(t){
   t.onclick=function(){
     document.querySelectorAll(".master-tab").forEach(function(x){x.classList.remove("active");});
@@ -3779,6 +4454,7 @@ function closeKsSub(){
 document.querySelectorAll("#ksHubView .stok-menu-card").forEach(function(card){
   card.onclick=function(){openKsSub(this.getAttribute("data-kssub"));};
 });
+
 /* ================== GRAFIK OUTLET ================== */
 function renderGrafik(){
   if(!session)return;
@@ -3840,7 +4516,7 @@ function all(){
   if(el("autoMinPctInput"))el("autoMinPctInput").value=ac.minRecPct;
   if(el("autoSyncSecInput"))el("autoSyncSecInput").value=ac.syncSec;
   if(el("autoRetainYearsInput"))el("autoRetainYearsInput").value=ac.retainYears;
-  renderSelects();renderOutletList();
+  renderSelects();renderOutletList();renderEmployeeSetting();renderExpCatSetting();
   listRender("perfumes","perfumeList",el("filterMasterParfum")?el("filterMasterParfum").value:"");
   listRender("mixes","mixList");
   listRender("purchases","purchaseList");
@@ -3854,14 +4530,14 @@ function all(){
   renderAuditSession();renderAuditHistoryNew();
   renderMinOutletSelect();
   renderGrafik();renderDevRequests();renderAdminNotif();
-  if(session&&session.role!=="staff")renderMgmt();
+  if(session&&session.role!=="staff"){renderMgmt();renderExpenseMgmt();}
 }
 
 var currentTabId="tKasir";
 var TAB_MAP={
   tKasir:"secKasir", tLaporan:"secLaporan", tOrder:"secOrder", tGrafik:"secGrafik",
   tStokMasuk:"secStokMasuk", tKelolaStok:"secKelolaStok",
-  tAdmin:"secMaster", tSetting:"secSetting", tMgmt:"secMgmt", tNotif:"secNotif"
+  tAdmin:"secMaster", tSetting:"secSetting", tMgmt:"secMgmt", tExpenseMgmt:"secExpenseMgmt", tNotif:"secNotif"
 };
 function getHomeTab(){
   if(!session)return "tKasir";
@@ -3911,17 +4587,19 @@ function setTab(id){
   if(el(id))el(id).classList.add("active");
   if(id==="tKasir")refreshKnob();
   if(id==="tOrder")renderLowStock();
-  if(id==="tLaporan")renderReport();
+  if(id==="tLaporan"){setClosingTab("omzet");renderReport();}
   if(id==="tGrafik")renderGrafik();
   if(id==="tStokMasuk"){renderDistItems();renderDistCart();renderDistQueue();renderDistHistory();renderDistRekap();updateDistHargaBeliWarn();}
   if(id==="tKelolaStok"){closeKsSub();}
   if(id==="tAdmin"){updateDistHargaBeliWarn();}
-  if(id==="tSetting"){renderOutletList();renderCapacityList();renderDistQtyMasterList();}
+  if(id==="tSetting"){renderOutletList();renderEmployeeSetting();renderExpCatSetting();renderCapacityList();renderDistQtyMasterList();}
   if(id==="tMgmt")renderMgmt();
+  if(id==="tExpenseMgmt"){initExpenseMgmtFilters();renderExpenseMgmt();}
   if(id==="tNotif"){renderAdminNotif();renderDevRequests();}
   updateTopBackBtn();
 }
 Object.keys(TAB_MAP).forEach(function(id){if(el(id))el(id).onclick=function(){setTab(id);};});
+
 /* ================== INPUT BINDING & INIT ================== */
 el("searchParfum").oninput=function(){renderPerfumeOptions(this.value);};
 el("filterMasterParfum").oninput=function(){listRender("perfumes","perfumeList",this.value);};
@@ -3929,11 +4607,38 @@ el("filterMasterParfum").oninput=function(){listRender("perfumes","perfumeList",
 el("reportDate").value=todayStr();
 el("reportDate").onchange=renderReport;
 initMgmtDates();
+initExpenseMgmtFilters();
 
 el("addOutletBtn").onclick=function(){
   var n=el("newOutletName").value.trim();
   if(n){data.outlets.push(n);el("newOutletName").value="";saveMaster();all();toast("Outlet ditambahkan.","ok");}
 };
+if(el("addEmpBtn"))el("addEmpBtn").onclick=function(){
+  var nm=el("newEmpName").value.trim();
+  var out=el("newEmpOutletSelect")?el("newEmpOutletSelect").value:"BACKUP";
+  if(!nm){toast("Nama karyawan wajib diisi.","err");return;}
+  if(!Array.isArray(data.employees))data.employees=[];
+  if(data.employees.some(function(e){return e.name.toLowerCase()===nm.toLowerCase();})){
+    toast("Nama karyawan sudah terdaftar.","warn");return;
+  }
+  data.employees.push({name:nm,outlet:out});
+  el("newEmpName").value="";
+  saveMaster();renderEmployeeSetting();renderLoginStaffSelects();markDirty();
+  toast("✅ Karyawan "+nm+" ditambahkan.","ok");
+};
+if(el("addExpCatBtn"))el("addExpCatBtn").onclick=function(){
+  var nm=el("newExpCatName").value.trim();
+  if(!nm){toast("Nama kategori pengeluaran wajib diisi.","err");return;}
+  if(!Array.isArray(data.expenseCategories))data.expenseCategories=defaultExpCats.slice();
+  if(data.expenseCategories.some(function(c){return c.toLowerCase()===nm.toLowerCase();})){
+    toast("Kategori "+nm+" sudah ada.","warn");return;
+  }
+  data.expenseCategories.push(nm);
+  el("newExpCatName").value="";
+  saveMaster();renderExpCatSetting();renderExpenseFormOptions();markDirty();
+  toast("✅ Kategori "+nm+" ditambahkan.","ok");
+};
+
 el("addPerfume").onclick=function(){
   var c=el("newPerfumeCode").value.trim(),n=el("newPerfumeName").value.trim(),v=+el("newPerfumePrice").value;
   var st=+el("newPerfumeStock").value||0;
