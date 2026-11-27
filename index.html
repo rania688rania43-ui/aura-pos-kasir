@@ -614,6 +614,10 @@ select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 <div class="closing-section hide" data-csec="pengeluaran">
   <div class="card">
     <div class="adminhead">💸 Input Pengeluaran Toko (<span id="expDateLabel">-</span>)</div>
+    <div class="stat-box" style="margin-bottom:10px;text-align:left;display:flex;justify-content:space-between;align-items:center">
+      <div><div class="small">Sisa Uang Tunai Laci</div><div class="small" id="expCashFormulaInfo">Tunai Rp0 − Keluar Rp0</div></div>
+      <div class="stat-val" id="expAvailCashBadge" style="color:var(--green)">Rp0</div>
+    </div>
     <p class="note">Wajib diisi sebelum melakukan Closing. Jika tidak ada uang keluar hari ini, tekan tombol <strong>Tidak Ada Pengeluaran Hari Ini</strong>.</p>
     <button type="button" class="btn secondary" id="noExpenseTodayBtn" style="margin-bottom:10px;border-color:#86efac;background:#f0fdf4;color:#15803d">✅ Tidak Ada Pengeluaran Hari Ini</button>
 
@@ -1517,10 +1521,10 @@ function clone(o){return JSON.parse(JSON.stringify(o));}
 var KEY="auraPos19MasterV11",SALES_KEY="auraPos19SalesV9",STOCK_KEY="auraPos19StockV9",IN_KEY="auraPos19InV9";
 var AUDIT_KEY="auraPos19AuditSessionsV2",REQ_KEY="auraPos19ReqV9";
 var DIST_KEY="auraPos19DistV9",DISTQ_KEY="auraPos19DistQueueV1",STOKMIN_KEY="auraPos19StokMinV1";
-var EXP_KEY="auraPos19ExpensesV1",EXP_NONE_KEY="auraPos19ExpNoneV1";
+var EXP_KEY="auraPos19ExpensesV1",EXP_NONE_KEY="auraPos19ExpNoneV1",CLOSED_KEY="auraPos19ClosedDatesV1";
 
 var data=null,sales=[],stocks={},stockIns=[],cart=[],currentPct=50,session=null,delReqs=[];
-var distCart=[],distQueue=[],stokMinOverride={},expenses=[],noExpenseFlags={};
+var distCart=[],distQueue=[],stokMinOverride={},expenses=[],noExpenseFlags={},closedDates={};
 try{data=JSON.parse(localStorage.getItem(KEY));}catch(e){}
 if(!data||!data.perfumes)data=clone(def);
 if(!data.additionals)data.additionals=clone(def.additionals);
@@ -1575,6 +1579,9 @@ try{distQueue=JSON.parse(localStorage.getItem(DISTQ_KEY))||[];}catch(e){distQueu
 try{stokMinOverride=JSON.parse(localStorage.getItem(STOKMIN_KEY))||{};}catch(e){stokMinOverride={};}
 try{expenses=JSON.parse(localStorage.getItem(EXP_KEY))||[];}catch(e){expenses=[];}
 try{noExpenseFlags=JSON.parse(localStorage.getItem(EXP_NONE_KEY))||{};}catch(e){noExpenseFlags={};}
+try{closedDates=JSON.parse(localStorage.getItem(CLOSED_KEY))||{};}catch(e){closedDates={};}
+function saveClosedDates(){try{localStorage.setItem(CLOSED_KEY,JSON.stringify(closedDates));}catch(e){}}
+function isDateClosed(outlet,dateStr){return !!closedDates[outlet+"|"+dateStr];}
 /* ================== HELPERS & EXCEL (.XLS) ================== */
 function el(id){return document.getElementById(id);}
 function fmt(n){return "Rp"+Math.round(n).toLocaleString("id-ID");}
@@ -2735,9 +2742,13 @@ function isExpenseReadyForClosing(outlet,dateStr){
 if(el("noExpenseTodayBtn"))el("noExpenseTodayBtn").onclick=function(){
   if(!session)return;
   var d=el("reportDate").value||todayStr();
+  if(session.role==="staff" && isDateClosed(session.outlet,d)){
+    toast("🔒 Data tanggal "+d+" sudah di-Closing. Tidak bisa diubah.","err");
+    return;
+  }
   var list=getDailyExpenses(session.outlet,d);
   if(list.length>0){
-    toast("Sudah ada catatan pengeluaran. Hapus item dulu jika ingin menandai nihil.","warn");
+    toast("Sudah ada catatan pengeluaran pada tanggal ini.","warn");
     return;
   }
   var key=session.outlet+"|"+d;
@@ -2756,6 +2767,10 @@ if(el("noExpenseTodayBtn"))el("noExpenseTodayBtn").onclick=function(){
 if(el("addExpenseBtn"))el("addExpenseBtn").onclick=function(){
   if(!session)return;
   var d=el("reportDate").value||todayStr();
+  if(session.role==="staff" && isDateClosed(session.outlet,d)){
+    toast("🔒 Data tanggal "+d+" sudah di-Closing. Hubungi Admin jika ada perubahan.","err");
+    return;
+  }
   var cat=el("expCategorySelect").value||"Lain-lain";
   var catLow=cat.toLowerCase();
   var empName="";
@@ -2769,6 +2784,17 @@ if(el("addExpenseBtn"))el("addExpenseBtn").onclick=function(){
     toast("Wajib sebutkan keterangan untuk kategori Lain-lain.","err");return;
   }
   if(amount<=0){toast("Masukkan nominal pengeluaran lebih dari 0.","err");return;}
+
+  var daySales=sales.filter(function(s){return s.outlet===session.outlet&&s.date===d;});
+  var cashIn=daySales.reduce(function(sum,s){return sum+(s.method==="Tunai"?s.total:0);},0);
+  var dayExps=getDailyExpenses(session.outlet,d);
+  var expUsed=dayExps.reduce(function(sum,x){return sum+x.amount;},0);
+  var availCash=cashIn-expUsed;
+  if(amount>availCash){
+    toast("❌ Uang tunai tidak cukup! Sisa tunai tersedia: "+fmt(Math.max(0,availCash)),"err");
+    return;
+  }
+
   var now=new Date();
   expenses.unshift({
     id:"EXP-"+now.getTime().toString().slice(-6),
@@ -2793,6 +2819,10 @@ window._delExpense=function(id){
   var idx=expenses.findIndex(function(x){return x.id===id;});
   if(idx<0)return;
   var ex=expenses[idx];
+  if(session&&session.role==="staff"&&isDateClosed(ex.outlet,ex.date)){
+    toast("🔒 Sudah di-Closing! Gunakan tombol Ajukan Hapus ke Admin.","err");
+    return;
+  }
   modal("Hapus Pengeluaran",
     '<p class="note">Hapus catatan pengeluaran <strong>'+esc(ex.category)+' ('+fmt(ex.amount)+')</strong>?</p>',
     function(){
@@ -2812,6 +2842,18 @@ function renderReport(){
   var expTot=dayExps.reduce(function(s,x){return s+x.amount;},0);
   var isNoExp=!!noExpenseFlags[session.outlet+"|"+d];
   var ready=isExpenseReadyForClosing(session.outlet,d);
+  var isClosed=isDateClosed(session.outlet,d);
+  var isStaffLocked=(session.role==="staff" && isClosed);
+
+  var omzet=0,cash=0,nonCash=0,unsynced=0;
+  list.forEach(function(s){omzet+=s.total;if(s.method==="Tunai")cash+=s.total;else nonCash+=s.total;if(!s.synced)unsynced++;});
+  var availCash=Math.max(0,cash-expTot);
+
+  if(el("expAvailCashBadge")){
+    el("expAvailCashBadge").textContent=fmt(availCash);
+    el("expAvailCashBadge").style.color=(availCash>0)?"var(--green)":"var(--red)";
+  }
+  if(el("expCashFormulaInfo"))el("expCashFormulaInfo").textContent="Tunai "+fmt(cash)+" − Keluar "+fmt(expTot);
 
   if(el("closingExpStatusBadge")){
     if(dayExps.length>0){
@@ -2825,12 +2867,13 @@ function renderReport(){
       el("closingExpStatusBadge").textContent="Wajib Diisi";
     }
   }
+
   var noExpBtn=el("noExpenseTodayBtn");
   var expFormEls=["expCategorySelect","expKasbonEmpSelect","expNoteInput","expAmountInput","addExpenseBtn"];
   if(noExpBtn){
-    if(dayExps.length>0){
+    if(isStaffLocked || dayExps.length>0){
       noExpBtn.classList.add("hide");
-      expFormEls.forEach(function(fid){if(el(fid))el(fid).disabled=false;});
+      expFormEls.forEach(function(fid){if(el(fid))el(fid).disabled=isStaffLocked;});
     }else if(isNoExp){
       noExpBtn.classList.remove("hide");
       noExpBtn.textContent="🔄 Batalkan \"Tidak Ada Pengeluaran\" (Buka Input)";
@@ -2847,29 +2890,41 @@ function renderReport(){
       expFormEls.forEach(function(fid){if(el(fid))el(fid).disabled=false;});
     }
   }
+
   if(el("expListTotalBadge"))el("expListTotalBadge").textContent=fmt(expTot);
   if(el("dailyExpenseList")){
     if(dayExps.length>0){
       el("dailyExpenseList").innerHTML=dayExps.map(function(ex){
         var detail=(ex.employee?("👤 "+esc(ex.employee)+(ex.note?" · "+esc(ex.note):"")):(ex.note?esc(ex.note):""));
-        return '<div class="item"><div class="row"><div><strong>'+esc(ex.category)+' · '+fmt(ex.amount)+'</strong>'+(detail?'<div class="small">'+detail+'</div>':'')+'<div class="small">🕒 '+ex.time+(ex.staff?' · Kasir: '+esc(ex.staff):'')+'</div></div><button type="button" onclick="window._delExpense(\''+ex.id+'\')" class="btn danger sm" style="margin:0">Hapus</button></div></div>';
+        var pendExp=delReqs.some(function(r){return r.type==="expense"&&r.targetId===ex.id&&r.status==="pending";});
+        var actBtn="";
+        if(session.role==="admin"){
+          actBtn='<button type="button" onclick="window._delExpense(\''+ex.id+'\')" class="btn danger sm" style="margin:0">Hapus</button>';
+        }else if(isStaffLocked){
+          if(pendExp){
+            actBtn='<span class="badge wait">⏳ Diajukan</span> <button type="button" onclick="window._cancelReq(\'expense\',\''+ex.id+'\')" class="btn secondary sm" style="font-size:10.5px;padding:3px 7px">Batal</button>';
+          }else{
+            actBtn='<button type="button" onclick="window._reqDel(\'expense\',\''+ex.id+'\')" class="btn danger sm" style="margin:0;font-size:11px">⚠️ Ajukan Hapus</button>';
+          }
+        }else{
+          actBtn='<button type="button" onclick="window._delExpense(\''+ex.id+'\')" class="btn danger sm" style="margin:0">Hapus</button>';
+        }
+        return '<div class="item"><div class="row"><div><strong>'+esc(ex.category)+' · '+fmt(ex.amount)+'</strong>'+(detail?'<div class="small">'+detail+'</div>':'')+'<div class="small">🕒 '+ex.time+(ex.staff?' · Kasir: '+esc(ex.staff):'')+'</div></div><div>'+actBtn+'</div></div></div>';
       }).join("");
     }else if(isNoExp){
-      el("dailyExpenseList").innerHTML='<p class="note" style="color:#16a34a;font-weight:700">✅ Dikonfirmasi tidak ada pengeluaran pada tanggal '+d+'.</p>';
+      el("dailyExpenseList").innerHTML='<p class="note" style="color:#16a34a;font-weight:700">✅ Dikonfirmasi tidak ada pengeluaran pada tanggal '+d+(isStaffLocked?' (Terkunci setelah Closing)':'')+'.</p>';
     }else{
       el("dailyExpenseList").innerHTML='<p class="note" style="color:#b45309">⚠️ Belum ada pengeluaran diisi. Isi pengeluaran atau klik tombol <strong>Tidak Ada Pengeluaran Hari Ini</strong> di atas.</p>';
     }
   }
 
-  var omzet=0,cash=0,nonCash=0,unsynced=0;
-  list.forEach(function(s){omzet+=s.total;if(s.method==="Tunai")cash+=s.total;else nonCash+=s.total;if(!s.synced)unsynced++;});
   el("statOmzet").textContent=fmt(omzet);
   el("statCount").textContent=list.length+" Nota";
   el("statCash").textContent=fmt(cash);
   el("statNonCash").textContent=fmt(nonCash);
   if(el("statExpenseTot"))el("statExpenseTot").textContent=fmt(expTot);
-  if(el("statNetCash"))el("statNetCash").textContent=fmt(Math.max(0,cash-expTot));
-  el("syncStatusNote").textContent=!ready?"⚠️ Lengkapi tab Pengeluaran terlebih dahulu sebelum Closing.":(unsynced>0?("Ada "+unsynced+" nota belum dikirim."):"Semua transaksi hari ini sudah terkirim.");
+  if(el("statNetCash"))el("statNetCash").textContent=fmt(availCash);
+  el("syncStatusNote").textContent=isClosed?"🔒 Tanggal "+d+" sudah di-Closing (Pengubahan butuh persetujuan Admin).":(!ready?"⚠️ Lengkapi tab Pengeluaran terlebih dahulu sebelum Closing.":(unsynced>0?("Ada "+unsynced+" nota belum dikirim."):"Semua transaksi hari ini sudah terkirim."));
   el("salesList").innerHTML=list.map(function(s){
     var badge=s.synced?'<span class="badge ok">Online</span>':'<span class="badge wait">Offline</span>';
     var summaryItems=s.items.map(function(i){return i.parfum+" "+i.vol+"ml";}).join(", ");
@@ -2947,8 +3002,10 @@ el("closingBtn").onclick=async function(){
   });
   try{
     await fetch(data.shop.webhook,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({outlet:session.outlet,date:d,staff:getActiveStaffLabel(),transactions:list,expenses:dayExps,stockSnapshot:snap})});
-    list.forEach(function(s){s.synced=true;});
-    saveSales();renderReport();toast("✅ Closing berhasil!","ok");
+      list.forEach(function(s){s.synced=true;});
+    closedDates[session.outlet+"|"+d]=true;
+    saveClosedDates();
+    saveSales();renderReport();toast("✅ Closing berhasil! Data tanggal "+d+" dikunci.","ok");
   }catch(e){toast("Gagal terhubung.","err");}
   finally{this.disabled=false;this.innerHTML=oldHtml;}
 };
@@ -3034,6 +3091,10 @@ window._reqDel=function(type,ref,itemIdx){
     var s=sales.find(function(x){return x.id===ref;});if(!s)return;
     targetId=s.id;tgl=s.date;
     desc="Nota "+s.id+" ("+fmt(s.total)+")";
+  }else if(type==="expense"){
+    var ex=expenses.find(function(x){return x.id===ref;});if(!ex)return;
+    targetId=ex.id;tgl=ex.date;
+    desc="Pengeluaran "+ex.category+(ex.employee?" ("+ex.employee+")":"")+": "+fmt(ex.amount);
   }else if(type==="distItem"){
     var d=distHistory.find(function(x){return x.id===ref;});if(!d||!d.items[extraIdx])return;
     var it=d.items[extraIdx];
@@ -3168,6 +3229,9 @@ window._acceptReq=async function(reqId){
         saveDistHistory();
       }
     }
+  }else if(r.type==="expense"){
+    var eidx=expenses.findIndex(function(x){return x.id===r.targetId;});
+    if(eidx>=0){expenses.splice(eidx,1);saveExpenses();}
   }else if(r.type==="stockIn"){
     var sidx=stockIns.findIndex(function(s){return s.id===r.targetId;});
     if(sidx>=0){
